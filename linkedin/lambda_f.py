@@ -48,4 +48,5 @@ if __name__ == "__main__":
     main()
 
 # TODO: Create UrlUtils class
+# TODO: Put parameters tu requests for mroe robust client (retry, failed, ...)
 # TODO: Copy linkedin connector from singer.io tap
