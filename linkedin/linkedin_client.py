@@ -3,10 +3,12 @@ from datetime import date, datetime, timedelta
 from urllib.parse import urlencode
 
 import requests
+from requests.exceptions import ConnectionError, ConnectTimeout, RetryError
 from requests.structures import CaseInsensitiveDict
 
 from aws_tools import Secret
 from models import Model
+from utils.http_utils import get_http_adapter
 
 
 class LinkedInAccessToken:
@@ -110,6 +112,7 @@ class LinkedInClient:
     def __init__(self, destination=None):
         self.access_token = LinkedInAccessToken().value
         self.destination = destination
+        self.http_adapter = get_http_adapter()
 
     def get_dynamics_param(self, name, params, value):
         if params["value_type"] == "date":
@@ -207,7 +210,7 @@ class LinkedInClient:
             if "rawsql" in v["type"]:
                 tmp = Model.get_from_raw_sql(self.destination, v["raw_sql"])
             else:
-                model = Model(v["filter_model"], destination=self.destination)
+                model = Model(v["filter_model"], db_engine=self.destination)
                 tmp = model.get_all(fields=v["all_fields"])
 
             kwargs_list = self.get_kwargs_list(v["kwargs_fields"], tmp)
@@ -262,11 +265,22 @@ class LinkedInClient:
                 )
 
                 data = self.do_get_query(endpoint=endpoint, headers=headers)
+                # If request has failed, we log the error and continue to next iteration
+                if not data:
+                    continue
+
                 response_key = url_params.get("response_datas_key", None)
 
                 tmp_result = []
                 if response_key:
                     data = data[response_key]
+                    if len(data) >= 15000:
+                        print(
+                            "LINKEDIN API error. Max elements of 15 000 per request"
+                            f" reached. Elments for enpoint {endpoint} will not be"
+                            " inserted in Db."
+                        )
+                        continue
                     for da in data:
                         tmp_result.append(da)
                 else:
@@ -286,9 +300,11 @@ class LinkedInClient:
                 category=url_params["category"],
                 q=url_params["q"],
             )
-            print(endpoint)
 
             data = self.do_get_query(endpoint=endpoint, headers=headers)
+            # If request has failed, we log the error and continue to next iteration
+            if not data:
+                return None
 
             response_key = url_params.get("response_datas_key", None)
             tmp_result = []
@@ -314,22 +330,6 @@ class LinkedInClient:
 
         return headers
 
-    from functools import lru_cache
-
-    @lru_cache
-    def get_max_date_from_db(self, table=None, field=None):
-        result = Model(table, self.destination).get_max_for_field(field)
-        return result
-
-    @lru_cache
-    def get_date_from_today(self, offset_value=None, offset_unity=None):
-        timedelta_args = {offset_unity: int(offset_value)}
-        # result = datetime.now() - timedelta(**timedelta_args)
-
-        from dateutil.relativedelta import relativedelta
-
-        return datetime.now() - relativedelta(**timedelta_args)
-
     def build_endpoint(self, base=None, category=None, q=None, kwargs=None, args=None):
         if kwargs:
             kwargs_tuple = [(k, v) for f in kwargs for k, v in f.items()]
@@ -340,7 +340,6 @@ class LinkedInClient:
             f"{'?q='+q if q else ''}"
             f"{'&' + urlencode(kwargs_tuple) if kwargs else ''}"
         )
-        print(endpoint)
         return endpoint
 
     def do_get_query(
@@ -348,7 +347,24 @@ class LinkedInClient:
         endpoint="",
         headers={},
     ):
-        response = requests.get(url=endpoint, headers=headers)
+        try:
+            response = self.http_adapter.get(url=endpoint, headers=headers)
+        except ConnectionError as e:
+            print("Error while connecting to db")
+            print(e)
+            return None
+        except ConnectTimeout as e:
+            print("Timeout connecting to db")
+            print(e)
+            return None
+        except RetryError as e:
+            print("Timeout connecting to db")
+            print(e)
+            return None
+        except Exception as e:
+            print("Unhandled exception occurs")
+            print(e)
+            return None
 
         if response.status_code != 200:
             print("Error while processing request")

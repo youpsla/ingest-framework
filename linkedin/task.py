@@ -20,6 +20,8 @@ class Task:
             )
             with open(os.path.join(__location__, "tasks.json"), "r") as f:
                 f = json.load(f)
+                if len(f) == 0:
+                    return None
             for task_definition in f:
                 if self.name in task_definition:
                     self._params = task_definition[self.name]
@@ -29,7 +31,7 @@ class Task:
 
     @property
     def model(self):
-        return Model(self.params["model"], destination=self.destination)
+        return Model(self.params["model"], db_engine=self.destination)
 
     @property
     def actions(self):
@@ -42,10 +44,25 @@ class Task:
         #     datas_from_source = fix["social_metrics"]["elements"]
 
         # Retrieving datas from source
-        datas_from_source = self.source.get(
-            task_params=self.params,
-            header=self.params["request"]["header"],
-        )
+        if self.params is not None:
+            datas_from_source = self.source.get(
+                task_params=self.params,
+                header=self.params["request"]["header"],
+            )
+        else:
+            print(f"No available params for task {self.name}. Running next task.")
+            return None
+
+        if len(datas_from_source) == 0:
+            print(f"{self.name}: No new datas from source. Running next task.")
+            return None
+
+        if not datas_from_source:
+            print(
+                f"{self.name}: Failed retrieving datas from source. Skipping. Running"
+                " next task."
+            )
+            return None
 
         # Insert datas in destination
         if "insert" in self.actions:
