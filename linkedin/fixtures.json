@@ -1,0 +1,135 @@
+{
+    "social_metrics": {
+        "paging": {
+            "count": 10,
+            "start": 0,
+            "links": []
+        },
+        "elements": [
+            {
+                "pivotValue": "urn:li:sponsoredCreative:160275324",
+                "costInUsd": "49.5734122405928",
+                "dateRange": {
+                    "start": {
+                        "month": 3,
+                        "year": 2022,
+                        "day": 4
+                    },
+                    "end": {
+                        "month": 3,
+                        "year": 2022,
+                        "day": 4
+                    }
+                },
+                "costInLocalCurrency": "43.63001170642486",
+                "impressions": 2463,
+                "shares": 0,
+                "pivotValue~": {
+                    "variables": {
+                        "data": {
+                            "com.linkedin.ads.SponsoredUpdateCreativeVariables": {
+                                "sponsoredStatusUpdateContentType": "ARTICLE",
+                                "mediaAspectRatio": {
+                                    "widthAspect": 4.0,
+                                    "heightAspect": 3.0
+                                },
+                                "share": "urn:li:share:6892814897319591937",
+                                "activity": "urn:li:activity:6892814897822937088",
+                                "directSponsoredContent": true,
+                                "callToActionEnabled": true
+                            }
+                        }
+                    },
+                    "test": false,
+                    "servingStatuses": [
+                        "RUNNABLE"
+                    ],
+                    "type": "SPONSORED_STATUS_UPDATE",
+                    "version": {
+                        "versionTag": "10"
+                    },
+                    "changeAuditStamps": {
+                        "created": {
+                            "time": 1643375134000
+                        },
+                        "lastModified": {
+                            "time": 1643707981000
+                        }
+                    },
+                    "review": {
+                        "reviewStatus": "AUTO_APPROVED"
+                    },
+                    "campaign": "urn:li:sponsoredCampaign:190167464",
+                    "id": 160275324,
+                    "account": "urn:li:sponsoredAccount:502423682",
+                    "status": "ACTIVE"
+                },
+                "clicks": 20,
+                "pivot": "CREATIVE",
+                "likes": 1
+            },
+            {
+                "pivotValue": "urn:li:sponsoredCreative:163847064",
+                "costInUsd": "76.78478443686507",
+                "dateRange": {
+                    "start": {
+                        "month": 3,
+                        "year": 2022,
+                        "day": 4
+                    },
+                    "end": {
+                        "month": 3,
+                        "year": 2022,
+                        "day": 4
+                    }
+                },
+                "costInLocalCurrency": "68.65810808309476",
+                "impressions": 2211,
+                "shares": 0,
+                "pivotValue~": {
+                    "variables": {
+                        "data": {
+                            "com.linkedin.ads.SponsoredUpdateCreativeVariables": {
+                                "mediaAspectRatio": {
+                                    "widthAspect": 1.3513514,
+                                    "heightAspect": 1.0
+                                },
+                                "sponsoredStatusUpdateContentType": "ARTICLE",
+                                "share": "urn:li:share:6902602513757876224",
+                                "activity": "urn:li:activity:6902602514219233280",
+                                "directSponsoredContent": true,
+                                "callToActionEnabled": true
+                            }
+                        }
+                    },
+                    "test": false,
+                    "servingStatuses": [
+                        "RUNNABLE"
+                    ],
+                    "type": "SPONSORED_STATUS_UPDATE",
+                    "version": {
+                        "versionTag": "3"
+                    },
+                    "changeAuditStamps": {
+                        "created": {
+                            "time": 1645708683000
+                        },
+                        "lastModified": {
+                            "time": 1645710053000
+                        }
+                    },
+                    "review": {
+                        "reviewStatus": "AUTO_APPROVED"
+                    },
+                    "campaign": "urn:li:sponsoredCampaign:191656654",
+                    "id": 163847064,
+                    "account": "urn:li:sponsoredAccount:502423682",
+                    "status": "ACTIVE"
+                },
+                "clicks": 16,
+                "pivot": "CREATIVE",
+                "likes": 5
+            }
+        ]
+    }
+}
