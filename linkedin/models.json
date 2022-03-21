@@ -390,10 +390,6 @@
                     "type": "datetime_from_timestamp_in_milliseconds"
                 }
             },
-            "entry_date": {
-                "source_path": null,
-                "type": "datetime_today"
-            },
             "width": {
                 "source_path": [
                     "variables",
@@ -470,10 +466,6 @@
                     "contentEntities",
                     "description"
                 ]
-            },
-            "entry_date": {
-                "source_path": null,
-                "type": "datetime_today"
             },
             "subject": {
                 "type": "raw",
@@ -688,10 +680,6 @@
                 },
                 "composite_pattern": "{year}-{month}-{day}"
             },
-            "entry_date": {
-                "source_path": null,
-                "type": "datetime_today"
-            },
             "time_granularity": {
                 "type": "constant",
                 "value": "daily",
@@ -893,10 +881,6 @@
                     "end_year": "year"
                 },
                 "composite_pattern": "{year}-{month}-{day}"
-            },
-            "entry_date": {
-                "source_path": null,
-                "type": "datetime_today"
             }
         }
     },
@@ -1022,10 +1006,6 @@
                 },
                 "composite_pattern": "{year}-{month}-{day}"
             },
-            "entry_date": {
-                "source_path": null,
-                "type": "datetime_today"
-            },
             "time_granularity": {
                 "type": "constant",
                 "value": "daily",
@@ -1101,10 +1081,6 @@
                 "source_path": [
                     "facet_id"
                 ]
-            },
-            "entry_date": {
-                "source_path": null,
-                "type": "datetime_today"
             },
             "start_day": {
                 "source_path": [
@@ -1252,10 +1228,6 @@
                     "thumbnails",
                     "resolvedUrl"
                 ]
-            },
-            "entry_date": {
-                "source_path": null,
-                "type": "datetime_today"
             }
         }
     },
@@ -1427,10 +1399,6 @@
                 "source_path": [
                     "facet_id"
                 ]
-            },
-            "entry_date": {
-                "source_path": null,
-                "type": "datetime_today"
             },
             "organization_name": {
                 "type": "raw",
