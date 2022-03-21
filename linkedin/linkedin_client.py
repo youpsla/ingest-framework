@@ -314,22 +314,6 @@ class LinkedInClient:
 
         return headers
 
-    from functools import lru_cache
-
-    @lru_cache
-    def get_max_date_from_db(self, table=None, field=None):
-        result = Model(table, self.destination).get_max_for_field(field)
-        return result
-
-    @lru_cache
-    def get_date_from_today(self, offset_value=None, offset_unity=None):
-        timedelta_args = {offset_unity: int(offset_value)}
-        # result = datetime.now() - timedelta(**timedelta_args)
-
-        from dateutil.relativedelta import relativedelta
-
-        return datetime.now() - relativedelta(**timedelta_args)
-
     def build_endpoint(self, base=None, category=None, q=None, kwargs=None, args=None):
         if kwargs:
             kwargs_tuple = [(k, v) for f in kwargs for k, v in f.items()]
