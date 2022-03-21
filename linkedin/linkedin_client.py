@@ -7,6 +7,7 @@ from requests.structures import CaseInsensitiveDict
 
 from aws_tools import Secret
 from models import Model
+from utils.http_utils import get_http_adapter
 
 
 class LinkedInAccessToken:
@@ -110,6 +111,7 @@ class LinkedInClient:
     def __init__(self, destination=None):
         self.access_token = LinkedInAccessToken().value
         self.destination = destination
+        self.http_adapter = get_http_adapter()
 
     def get_dynamics_param(self, name, params, value):
         if params["value_type"] == "date":
@@ -332,7 +334,8 @@ class LinkedInClient:
         endpoint="",
         headers={},
     ):
-        response = requests.get(url=endpoint, headers=headers)
+        # response = requests.get(url=endpoint, headers=headers)
+        response = self.http_adapter.get(url=endpoint, headers=headers)
 
         if response.status_code != 200:
             print("Error while processing request")

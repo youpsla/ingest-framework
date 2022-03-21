@@ -7,7 +7,7 @@ import os
 from datetime import datetime
 
 from sql_utils import SqlQuery
-from utils import nested_get
+from utils.various_utils import nested_get
 
 
 class Model:
