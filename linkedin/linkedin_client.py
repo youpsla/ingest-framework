@@ -293,10 +293,8 @@ class LinkedInClient:
                 category=url_params["category"],
                 q=url_params["q"],
             )
-            print(endpoint)
 
             data = self.do_get_query(endpoint=endpoint, headers=headers)
-
             # If request has failed, we log the error and continue to next iteration
             if not data:
                 return None
