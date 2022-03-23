@@ -3,6 +3,7 @@ from datetime import date, datetime, timedelta
 from urllib.parse import urlencode
 
 import requests
+from requests.exceptions import ConnectionError, ConnectTimeout, RetryError
 from requests.structures import CaseInsensitiveDict
 
 from aws_tools import Secret
@@ -264,6 +265,10 @@ class LinkedInClient:
                 )
 
                 data = self.do_get_query(endpoint=endpoint, headers=headers)
+                # If request has failed, we log the error and continue to next iteration
+                if not data:
+                    continue
+
                 response_key = url_params.get("response_datas_key", None)
 
                 tmp_result = []
@@ -291,6 +296,10 @@ class LinkedInClient:
             print(endpoint)
 
             data = self.do_get_query(endpoint=endpoint, headers=headers)
+
+            # If request has failed, we log the error and continue to next iteration
+            if not data:
+                return None
 
             response_key = url_params.get("response_datas_key", None)
             tmp_result = []
@@ -334,8 +343,24 @@ class LinkedInClient:
         endpoint="",
         headers={},
     ):
-        # response = requests.get(url=endpoint, headers=headers)
-        response = self.http_adapter.get(url=endpoint, headers=headers)
+        try:
+            response = self.http_adapter.get(url=endpoint, headers=headers)
+        except ConnectionError as e:
+            print("Error while connecting to db")
+            print(e)
+            return None
+        except ConnectTimeout as e:
+            print("Timeout connecting to db")
+            print(e)
+            return None
+        except RetryError as e:
+            print("Timeout connecting to db")
+            print(e)
+            return None
+        except Exception as e:
+            print("Unhandled exception occurs")
+            print(e)
+            return None
 
         if response.status_code != 200:
             print("Error while processing request")
