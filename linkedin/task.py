@@ -47,6 +47,17 @@ class Task:
             header=self.params["request"]["header"],
         )
 
+        if len(datas_from_source) == 0:
+            print(f"{self.name}: No new datas from source. Running next task.")
+            return None
+
+        if not datas_from_source:
+            print(
+                f"{self.name}: Failed retrieving datas from source. Skipping. Running"
+                " next task."
+            )
+            return None
+
         # Insert datas in destination
         if "insert" in self.actions:
             datas_obj = []
