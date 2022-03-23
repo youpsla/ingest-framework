@@ -10,6 +10,7 @@ from task import Task
 
 
 def lambda_handler(event, context):
+    print("Enter Lambda")
     main()
 
 
@@ -19,21 +20,21 @@ def main():
     destination = RedshiftClient()
     source = LinkedInClient(destination=destination)
 
-    # Task("daily_accounts_update", source, destination).run()
-    # Task("daily_campaigns_update", source, destination).run()
-    # Task("daily_social_metrics_update", source, destination).run()
-    # Task("creative_sponsored_video_daily_update", source, destination).run()
-    # Task(
-    #     "creative_sponsored_video__creative_name_daily_update", source, destination
-    # ).run()
+    Task("daily_accounts_update", source, destination).run()
+    Task("daily_campaigns_update", source, destination).run()
+    Task("daily_social_metrics_update", source, destination).run()
+    Task("creative_sponsored_video_daily_update", source, destination).run()
+    Task(
+        "creative_sponsored_video__creative_name_daily_update", source, destination
+    ).run()
 
     Task("pivot_creative_daily_update", source, destination).run()
-    # Task("account_pivot_campaign_daily_update", source, destination).run()
-    # Task("creative_url_daily_update", source, destination).run()
-    # Task("pivot_job_title_daily_update", source, destination).run()
-    # Task("campaign_groups_daily_update", source, destination).run()
+    Task("account_pivot_campaign_daily_update", source, destination).run()
+    Task("creative_url_daily_update", source, destination).run()
+    Task("pivot_job_title_daily_update", source, destination).run()
+    Task("campaign_groups_daily_update", source, destination).run()
 
-    ### Monthly tasks # noqa: E266
+    ## Monthly tasks # noqa: E266
     # Task("pivot_member_geo_monthly_update", source, destination).run()
     # Task("pivot_member_organization_monthly_update", source, destination).run()
 
