@@ -25,7 +25,7 @@ Resources:
     Type: AWS::Events::Rule
     Properties:
       Description: "jabmo-linkedin-ingest-daily-trigger"
-      ScheduleExpression: "cron(30 7 * * ? *)"
+      ScheduleExpression: "cron(00 10 * * ? *)"
       State: "ENABLED"
       Targets:
         - Arn: !GetAtt Function.Arn
