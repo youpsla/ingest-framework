@@ -725,7 +725,7 @@
         }
     },
     {
-        "pivot_job_title_daily_update": {
+        "pivot_job_title_monthly_update": {
             "actions": [
                 "insert"
             ],

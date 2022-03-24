@@ -27,14 +27,13 @@ def main():
     Task(
         "creative_sponsored_video__creative_name_daily_update", source, destination
     ).run()
-
     Task("pivot_creative_daily_update", source, destination).run()
     Task("account_pivot_campaign_daily_update", source, destination).run()
     Task("creative_url_daily_update", source, destination).run()
-    Task("pivot_job_title_daily_update", source, destination).run()
     Task("campaign_groups_daily_update", source, destination).run()
 
     ## Monthly tasks # noqa: E266
+    # Task("pivot_job_title_monthly_update", source, destination).run()
     # Task("pivot_member_geo_monthly_update", source, destination).run()
     # Task("pivot_member_organization_monthly_update", source, destination).run()
 
