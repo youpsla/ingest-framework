@@ -36,6 +36,7 @@ class SqlQuery:
 
     def run(self):
 
+        # TODO: Add logs and manage exception for query execute.
         db_connection = self.destination.db_connection
         if self.qtype == "select":
             self.sql = self.get_sql_select()
