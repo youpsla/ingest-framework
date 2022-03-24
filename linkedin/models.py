@@ -135,8 +135,12 @@ class Field:
             result = self.composite_pattern.format(**format_dict)
         if self.type == "function":
             if self.transform_function["type"] == "lstrip":
-                # return self.value.lstrip(self.transform_function["string_to_strip"])
-                result = self.value.lstrip(self.transform_function["string_to_strip"])
+                if isinstance(self.value, str):
+                    result = self.value.lstrip(
+                        self.transform_function["string_to_strip"]
+                    )
+                else:
+                    result = ""
             if (
                 self.transform_function["type"]
                 == "datetime_from_timestamp_in_milliseconds"
