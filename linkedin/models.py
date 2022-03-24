@@ -121,6 +121,44 @@ class Field:
         for k, v in self.field_params.items():
             setattr(self, k, v)
 
+    @staticmethod
+    def t_lstrip(pattern, value):
+        if not isinstance(value, str):
+            result = ""
+
+        else:
+            result = value.lstrip(pattern)
+
+        return result
+
+    @staticmethod
+    def t_milliseconds_to_datetime(value):
+        result = datetime.fromtimestamp(value / 1000.0)
+
+        return result
+
+    @staticmethod
+    def t_split(value, caracter, position):
+        try:
+            result = value.split(caracter)
+        except Exception as e:
+            print(
+                f"Error while splitting '{value}' with caracter {caracter} at position"
+                f" {position}"
+            )
+            print(e)
+            result = ""
+
+        # Sometimes Bing geo API returns only 2 locations instead of 3.
+        # This is an issue because we don't know which location is  not returned. # noqa: E501
+        # For example, it as returned "Belgrad, Serbia". It looks like region has been omitted. # noqa: E501
+        try:
+            result = result[position].strip()
+        except IndexError:
+            result = ""
+
+        return result
+
     @property
     def db_value(self, model=None):
         result = None
@@ -135,28 +173,20 @@ class Field:
             result = self.composite_pattern.format(**format_dict)
         if self.type == "function":
             if self.transform_function["type"] == "lstrip":
-                if not isinstance(self.value, str):
-                    result = ""
-
-                else:
-                    result = self.value.lstrip(
-                        self.transform_function["string_to_strip"]
-                    )
+                result = self.t_lstrip(
+                    self.transform_function["string_to_strip"], self.value
+                )
             if (
                 self.transform_function["type"]
                 == "datetime_from_timestamp_in_milliseconds"
             ):
-                result = datetime.fromtimestamp(self.value / 1000.0)
+                result = self.t_milliseconds_to_datetime(self.value)
             if self.transform_function["type"] == "split":
-                result = self.value.split(self.transform_function["split_caracter"])
-
-                # Sometimes Bing geo API returns only 2 locations instead of 3.
-                # This is an issue because we don't know which location is  not returned. # noqa: E501
-                # For example, it as returned "Belgrad, Serbia". It looks like region has been omitted. # noqa: E501
-                try:
-                    result = result[self.transform_function["split_position"]].strip()
-                except IndexError:
-                    result = ""
+                result = self.t_split(
+                    self.value,
+                    self.transform_function["split_caracter"],
+                    self.transform_function["split_position"],
+                )
 
         if self.type == "datetime_today":
             # return datetime.today()
