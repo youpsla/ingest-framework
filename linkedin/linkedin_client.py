@@ -333,7 +333,6 @@ class LinkedInClient:
             f"{'?q='+q if q else ''}"
             f"{'&' + urlencode(kwargs_tuple) if kwargs else ''}"
         )
-        print(endpoint)
         return endpoint
 
     def do_get_query(
