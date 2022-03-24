@@ -20,6 +20,7 @@ def main():
     destination = RedshiftClient()
     source = LinkedInClient(destination=destination)
 
+    ## Daily tasks tasks # noqa: E266
     Task("daily_accounts_update", source, destination).run()
     Task("daily_campaigns_update", source, destination).run()
     Task("daily_social_metrics_update", source, destination).run()
