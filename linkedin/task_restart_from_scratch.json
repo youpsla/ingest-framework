@@ -113,7 +113,6 @@
                             "type": "group",
                             "offset_type": "from_today",
                             "offset_unity": "days",
-                            "offset_value": "2000",
                             "offset_value": "1152",
                             "offset_range_position": "start_day",
                             "url_params": {
@@ -163,7 +162,6 @@
                     },
                     "statics": {
                         "timeGranularity": "DAILY",
-                        "start": "0",
                         "pivot": "CREATIVE",
                         "fields": "likes,dateRange,impressions,costInUsd,clicks,shares,costInLocalCurrency,pivot,pivotValue",
                         "projection": "(*,elements*(likes,dateRange(*),impressions,costInUsd,clicks,shares,costInLocalCurrency,pivot,pivotValue~))"
@@ -515,7 +513,6 @@
                             "type": "group",
                             "offset_type": "from_today",
                             "offset_unity": "days",
-                            "offset_value": "2000",
                             "offset_value": "1152",
                             "offset_range_position": "start_day",
                             "url_params": {
@@ -622,7 +619,6 @@
                             "type": "group",
                             "offset_type": "from_today",
                             "offset_unity": "days",
-                            "offset_value": "2000",
                             "offset_value": "1152",
                             "offset_range_position": "start_day",
                             "url_params": {
@@ -728,8 +724,6 @@
         }
     },
     {
-        "pivot_job_title_daily_update": {
-
         "pivot_job_title_monthly_update": {
             "actions": [
                 "insert"
@@ -773,7 +767,6 @@
                             "type": "group",
                             "offset_type": "from_today",
                             "offset_unity": "months",
-                            "offset_value": "2000",
                             "offset_value": "1152",
                             "offset_range_position": "start_day",
                             "url_params": {

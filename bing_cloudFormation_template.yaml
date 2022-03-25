@@ -1,0 +1,66 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: AWS::Serverless-2016-10-31
+Description: CloudFormation template for s3 bucket
+
+Resources:
+  # IngestLambdaSrcBucket:
+  #   Type: AWS::S3::Bucket
+  #   Description: Ingest code source dev
+  #   Properties:
+  #     BucketName: ingest-lambda-src-dev
+  #     Tags:
+  #       - Key: Application
+  #         Value: Ingest
+  IngestLambdaLayersBucket:
+    Type: AWS::S3::Bucket
+    Description: Ingest lambdas layers bucket
+    Properties:
+      BucketName: ingest-lambda-layers
+      Tags:
+        - Key: Application
+          Value: Ingest
+  BingAdsLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: !Sub "bingads-py38"
+      Description: py3.8 bingads sdk for ingest-bing-* lambdas
+      ContentUri: s3://ingest-lambda-layers/bingads.zip
+      CompatibleRuntimes:
+        - python3.8
+    Tags:
+      - Key: Application
+        Value: Ingest
+
+  Function:
+    Type: AWS::Serverless::Function
+    Properties:
+      Description: Ingest Bing V1a
+      Handler: Ingest.bing.main.lambda_handler
+      CodeUri: ./bing
+      Runtime: python3.8
+      Layers:
+        = { Ref: BingAdsLayer }
+      Role: arn:aws:iam::467882466042:role/Linkedin-lambda-dev-staging-rw
+      Timeout: 30
+      MemorySize: 512
+
+  # ScheduledRuleJabmoLinkedInIngestDaily:
+  #   Type: AWS::Events::Rule
+  #   Properties:
+  #     Description: "jabmo-linkedin-ingest-daily-trigger"
+  #     ScheduleExpression: "cron(00 9 * * ? *)"
+  #     State: "ENABLED"
+  #     Targets:
+  #       - Arn: !GetAtt Function.Arn
+  #         Id: "Function"
+  # PermissionRuleJabmoLinkedInIngestDaily:
+  #   Type: AWS::Lambda::Permission
+  #   Properties:
+  #     FunctionName:
+  #       Ref: Function
+  #     Action: "lambda:InvokeFunction"
+  #     Principal: "events.amazonaws.com"
+  #     SourceArn:
+  #       Fn::GetAtt:
+  #         - "ScheduledRuleJabmoLinkedInIngestDaily"
+  #         - "Arn"
