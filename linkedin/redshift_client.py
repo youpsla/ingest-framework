@@ -4,7 +4,6 @@ import psycopg2
 
 from aws_tools import Secret
 from envs import ENV_KEYS
-from sql_utils import SqlQuery
 
 
 class RedshiftClient:
@@ -14,14 +13,14 @@ class RedshiftClient:
 
     inputs:
     secret_env: Should be:
+    WEB_INGEST_PROD_RW_SECRET_NAME
     WEB_INGEST_PROD_RO_SECRET_NAME
     WEB_INGEST_DEV_RW_SECRET_NAME
     WEB_INGEST_DEV_RO_SECRET_NAME
 
-
     """
 
-    def __init__(self, auth_type="dev", mode="readwrite", dbname="snowplow"):
+    def __init__(self, auth_type="prod", mode="readwrite", dbname="snowplow"):
         self.auth_type = auth_type
         self.mode = mode
         self.dbname = dbname

@@ -9,6 +9,8 @@ from requests.packages.urllib3.util.retry import Retry
 DEFAULT_TIMEOUT = 10  # seconds
 
 
+# Define the retry strategy.
+# Details: https://findwork.dev/blog/advanced-usage-python-requests-timeouts-retries-hooks/
 retry_strategy = Retry(
     total=3,
     status_forcelist=[429, 500, 502, 503, 504],
@@ -27,6 +29,8 @@ def get_http_adapter():
 
 
 class TimeoutHTTPAdapter(HTTPAdapter):
+    """Used to set default timeout for all requests."""
+
     def __init__(self, *args, **kwargs):
         self.timeout = DEFAULT_TIMEOUT
         if "timeout" in kwargs:
