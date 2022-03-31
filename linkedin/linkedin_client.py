@@ -210,7 +210,7 @@ class LinkedInClient:
             if "rawsql" in v["type"]:
                 tmp = Model.get_from_raw_sql(self.destination, v["raw_sql"])
             else:
-                model = Model(v["filter_model"], destination=self.destination)
+                model = Model(v["filter_model"], db_engine=self.destination)
                 tmp = model.get_all(fields=v["all_fields"])
 
             kwargs_list = self.get_kwargs_list(v["kwargs_fields"], tmp)
@@ -274,6 +274,13 @@ class LinkedInClient:
                 tmp_result = []
                 if response_key:
                     data = data[response_key]
+                    if len(data) >= 15000:
+                        print(
+                            "LINKEDIN API error. Max elements of 15 000 per request"
+                            f" reached. Elments for enpoint {endpoint} will not be"
+                            " inserted in Db."
+                        )
+                        continue
                     for da in data:
                         tmp_result.append(da)
                 else:

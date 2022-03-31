@@ -11,14 +11,34 @@ from utils.various_utils import nested_get
 
 
 class Model:
-    def __init__(self, model_name, destination=None):
+    """Model of datas exctracted from source.
+    Source datas fields are Field instance.
+
+    Attributes:
+        xxxxxx: Dynamics attributes from json model description. Set by set_fields().
+        model_name: The name of the model. Use schema.table format.
+        db_engine: Used to query Db.
+
+    """
+
+    def __init__(self, model_name, db_engine=None):
         self.model_name = model_name
-        self.destination = destination
+        self.db_engine = db_engine
         self._fields_list = None
         self.set_fields()
 
     @property
     def params(self):
+        """Property to access model params stored in json file.
+
+        Returns:
+            A dict with params
+
+        Raises:
+            IOError: An error occurred accessing the smalltable.
+
+        TODO: Currently, source file is hardcoded.
+        """
         __location__ = os.path.realpath(
             os.path.join(os.getcwd(), os.path.dirname(__file__))
         )
@@ -27,6 +47,28 @@ class Model:
         for model_definition in f:
             if self.model_name in model_definition:
                 return model_definition[self.model_name]
+
+    @property
+    def fields_list(self):
+        """Property to the field list of the model.
+
+        Returns:
+            A dict with params
+
+        Raises:
+            IOError: An error occurred accessing the smalltable.
+
+        TODO: Currently, source file is hardcoded.
+        """
+        if not self._fields_list:
+            res = []
+            for i in vars(self).values():
+                if isinstance(i, Field):
+                    res.append(i)
+            self._fields_list = res
+            return res
+        else:
+            return self._fields_list
 
     def set_field(self, name, params):
         field = Field(name, params, self)
@@ -58,31 +100,19 @@ class Model:
             result.append(f)
         return result
 
-    @property
-    def fields_list(self):
-        if not self._fields_list:
-            res = []
-            for i in vars(self).values():
-                if isinstance(i, Field):
-                    res.append(i)
-            self._fields_list = res
-            return res
-        else:
-            return self._fields_list
-
     def get_all(self, fields=None):
-        q = SqlQuery(self.destination, "select", model=self, fields=fields)
+        q = SqlQuery(self.db_engine, "select", model=self, fields=fields)
         res = q.run()
         return res
 
     def get_max_for_field(self, field):
-        q = SqlQuery(self.destination, "select_max", max_field=field, model=self)
+        q = SqlQuery(self.db_engine, "select_max", max_field=field, model=self)
         res = q.run()
         return res
 
     @staticmethod
-    def get_from_raw_sql(destination, sql):
-        q = SqlQuery(destination, "raw_sql", raw_sql=sql)
+    def get_from_raw_sql(db_engine, sql):
+        q = SqlQuery(db_engine, "raw_sql", raw_sql=sql)
         res = q.run()
         return res
 
@@ -103,7 +133,7 @@ class Model:
                 f" '{today + relativedelta(day=31)}'"
             )
             q = SqlQuery(
-                self.destination, "select", model=self, where=where, fields=(id_field,)
+                self.db_engine, "select", model=self, where=where, fields=(id_field,)
             )
             res = q.run()
             return res
@@ -187,10 +217,13 @@ class Field:
                     self.transform_function["split_caracter"],
                     self.transform_function["split_position"],
                 )
+<<<<<<< HEAD
 
         if self.type == "datetime_today":
             # return datetime.today()
             result = datetime.today()
+=======
+>>>>>>> linkedin_new_schema
 
         return self.get_sql_escaped(result)
 
