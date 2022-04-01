@@ -34,7 +34,7 @@ def main():
     Task("campaign_groups_daily_update", source, destination).run()
 
     # Query ignored because:
-    # select max(start_date) from linkedin.pivot_creative; > 2021-05-24 00:00:00.000
+    # select max(start_date) from linkedin.pivot_creative; # 2021-05-24 00:00:00.000
     # Task("pivot_creative_daily_update", source, destination).run()
 
     ## Monthly tasks # noqa: E266
