@@ -217,13 +217,6 @@ class Field:
                     self.transform_function["split_caracter"],
                     self.transform_function["split_position"],
                 )
-<<<<<<< HEAD
-
-        if self.type == "datetime_today":
-            # return datetime.today()
-            result = datetime.today()
-=======
->>>>>>> linkedin_new_schema
 
         return self.get_sql_escaped(result)
 
