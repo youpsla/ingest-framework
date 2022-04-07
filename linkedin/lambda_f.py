@@ -10,7 +10,7 @@ from redshift_client import RedshiftClient
 from task import Task
 
 
-def lambda_handler(event, context):
+def main(event, context):
     print("Enter Linkedin Ingest Lambda.")
     main()
 
