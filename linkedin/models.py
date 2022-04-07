@@ -190,8 +190,6 @@ class Field:
 
         ## Attributes retrieved from from model.json.
         source_path: Contains a list of keys used to find the data in the source result dict.
-<<<<<<< HEAD
-<<<<<<< HEAD
         type: Define how to transform the retrieved sour value for inserting in Db. Can have one of the following values:
             - raw: The data collected from source will be insert as it ios in the Db. No tranformation.
             - exclude: This value will not be stored in the Db.
@@ -209,40 +207,6 @@ class Field:
             - string_to_strip: Used by t_lstrip(). String to be removed from the value retrieved from source API.
             - split_position: Define the position of the value to be returned by t_split()
             - split_caracter: Split caracter used by t_strip()
-
-=======
-        type: Can have one of the following values:
-            - raw: The data collected from source will be insert as it ios in the Db. No tranformation.
-            - exclude: This value will not be stored in the Db.
-            - function: Specify that the data collected from source will be transformed by "transform_function".
-            - transform_function: A dict with the following keys:
-                - type: The name of the transformation to apply.
-                - The name of the function used to set the "db_value". In reality, it's more the name of the transformation to apply. See "db_value" property.
-            - composite: Used when the value to be store in Db is a composition of values retrieved from Db.
-                         Use "composite_fields" and "composite_pattern" attributes (See below).
-            - composite fields: A dict. The key is the name of the model Field attribute containing value to aggregate. The value is the name of the placeholder in the "composite_pattern" attribute
-            - composite_pattern: A string representing the model used to format the composite field. Used with the python format() pattern.
->>>>>>> 3bdbe20 (Add docstrings 1)
-=======
-        type: Define how to transform the retrieved sour value for inserting in Db. Can have one of the following values:
-            - raw: The data collected from source will be insert as it ios in the Db. No tranformation.
-            - exclude: This value will not be stored in the Db.
-            - function: Specify that the data collected from source will be transformed by "transform_function".
-            - constant: The db_value used for this field is set in model.json
-        - composite: Used when the value to be store in Db is a composition of values retrieved from Db.
-                     Use "composite_fields" and "composite_pattern" attributes (See below).
-        - composite fields: A dict. The key is the name of the model Field attribute containing value to aggregate. The value is the name of the placeholder in the "composite_pattern" attribute
-        - composite_pattern: A string representing the model used to format the composite field. Used with the python format() pattern.
-        - transform_function: A dict with the following keys:
-            - type: The name of the transformation to apply.Can have one of the following values:
-                - lstrip: See t_lstrip()
-                - datetime_from_timestamp_in_milliseconds: See t_datetime_from_timestamp_in_milliseconds()
-                - t_split: See t_split()
-            - string_to_strip: Used by t_lstrip(). String to be removed from the value retrieved from source API.
-            - split_position: Define the position of the value to be returned by t_split()
-            - split_caracter: Split caracter used by t_strip()
-
->>>>>>> e95ed2c (Nice docstrings ...)
     """
 
     def __init__(self, field_name, field_params, model):
@@ -281,18 +245,18 @@ class Field:
     def t_milliseconds_to_datetime(value):
         """Transform an int representing a date in milliseconds to a datetime object.
 
-        Args:
-            value: An int.
+                Args:
+                    value: An int.
 
-        Returns:
-            result: A datetime object
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
+                Returns:
+                    result: A datetime object
+        <<<<<<< HEAD
+        <<<<<<< HEAD
+        =======
 
->>>>>>> 3bdbe20 (Add docstrings 1)
-=======
->>>>>>> e95ed2c (Nice docstrings ...)
+        >>>>>>> 3bdbe20 (Add docstrings 1)
+        =======
+        >>>>>>> e95ed2c (Nice docstrings ...)
         """
         result = datetime.fromtimestamp(value / 1000.0)
 
