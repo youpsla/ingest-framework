@@ -33,14 +33,17 @@ class Model:
     @property
     def params(self):
         """Property to access model params stored in json file.
+        Each time the property is accessed, the json file is read. Normally, this happen only ont time per task
 
-        Returns:
+        TODO: Currently, source file is hardcoded.
+
+
+        Returns: dict
             A dict with params
 
         Raises:
             IOError: An error occurred accessing the smalltable.
 
-        TODO: Currently, source file is hardcoded.
         """
         __location__ = os.path.realpath(
             os.path.join(os.getcwd(), os.path.dirname(__file__))
