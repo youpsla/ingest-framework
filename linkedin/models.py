@@ -15,7 +15,7 @@ class Model:
 
     Each attribute of type Field represent a data collected from the source.
     This class contains some methods for querying the Db.
-    Can have Fields with "exclude" attribute.
+    Can have Fields with "exclude" attribute. Those attribute will not be saved in Db.
 
     Attributes:
         model_name: The name of the model. Use "<schema>_<table>" format.
@@ -195,8 +195,8 @@ class Field:
             - exclude: This value will not be stored in the Db.
             - function: Specify that the data collected from source will be transformed by "transform_function".
             - constant: The db_value used for this field is set in model.json
-        - composite: Used when the value to be store in Db is a composition of values retrieved from Db.
-                     Use "composite_fields" and "composite_pattern" attributes (See below).
+            - composite: Used when the value to be store in Db is a composition of values retrieved from Db.
+                         Use "composite_fields" and "composite_pattern" attributes (See below).
         - composite fields: A dict. The key is the name of the model Field attribute containing value to aggregate. The value is the name of the placeholder in the "composite_pattern" attribute
         - composite_pattern: A string representing the model used to format the composite field. Used with the python format() pattern.
         - transform_function: A dict with the following keys:
@@ -226,11 +226,14 @@ class Field:
         """Transform a string using the lstrip function
 
         Args:
-            pattern: the string to be stripped from the value
-            value: The string being stripped.
+            pattern: str
+                String to be stripped from the value
+            value: str
+                The string being stripped.
 
         Returns:
-            result: The value stripped
+            result: str
+                The value stripped
 
         """
         if not isinstance(value, str):
@@ -245,18 +248,12 @@ class Field:
     def t_milliseconds_to_datetime(value):
         """Transform an int representing a date in milliseconds to a datetime object.
 
-                Args:
-                    value: An int.
+        Args:
+            value: An int.
 
-                Returns:
-                    result: A datetime object
-        <<<<<<< HEAD
-        <<<<<<< HEAD
-        =======
+        Returns:
+            result: A datetime object
 
-        >>>>>>> 3bdbe20 (Add docstrings 1)
-        =======
-        >>>>>>> e95ed2c (Nice docstrings ...)
         """
         result = datetime.fromtimestamp(value / 1000.0)
 
@@ -294,7 +291,7 @@ class Field:
                 f" {position}"
             )
             print(e)
-            result = ""
+            return ""
 
         # Sometimes Bing geo API returns only 2 locations instead of 3.
         # This is an issue because we don't know which location is  not returned. # noqa: E501
