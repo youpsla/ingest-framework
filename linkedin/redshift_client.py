@@ -25,6 +25,7 @@ class RedshiftClient:
         self.mode = mode
         self.dbname = dbname
         self._db_connection = None
+        self._write_results_db_connection = None
 
     @property
     def secret_name_env_key(self):
@@ -55,6 +56,22 @@ class RedshiftClient:
                 user=user, host=host, port=int(port), password=pwd, database=dbname
             )
             self._db_connection = connection
-            return self._db_connection
-        else:
-            return self._db_connection
+
+        return self._db_connection
+
+    @property
+    def write_results_db_connection(self):
+        if not self._write_results_db_connection:
+            credentials = Secret(self.secret_name).get_value()
+            user = credentials["username"]
+            pwd = credentials["password"]
+            host = credentials["host"]
+            port = credentials["port"]
+            dbname = self.dbname
+
+            connection = psycopg2.connect(
+                user=user, host=host, port=int(port), password=pwd, database=dbname
+            )
+            self._write_results_db_connection = connection
+
+        return self._write_results_db_connection

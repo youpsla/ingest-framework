@@ -1,8 +1,11 @@
 import json
+import logging
 import os
 
 from models import Model
 from sql_utils import SqlQuery
+
+logger = logging.getLogger(__name__)
 
 
 class Task:
@@ -38,96 +41,106 @@ class Task:
         return self.params["actions"]
 
     def run(self):
-        print(f"Starting task: {self.name}")
-        # with open("fixtures.json", "r") as f:
-        #     fix = json.load(f)
-        #     datas_from_source = fix["social_metrics"]["elements"]
+        try:
+            print(f"Starting task: {self.name}")
+            # with open("fixtures.json", "r") as f:
+            #     fix = json.load(f)
+            #     datas_from_source = fix["social_metrics"]["elements"]
 
-        # Retrieving datas from source
-        if self.params is not None:
-            datas_from_source = self.source.get(
-                task_params=self.params,
-                header=self.params["request"]["header"],
-            )
-        else:
-            print(f"No available params for task {self.name}. Running next task.")
-            return None
-
-        if len(datas_from_source) == 0:
-            print(f"{self.name}: No new datas from source. Running next task.")
-            return None
-
-        if not datas_from_source:
-            print(
-                f"{self.name}: Failed retrieving datas from source. Skipping. Running"
-                " next task."
-            )
-            return None
-
-        # Insert datas in destination
-        if "insert" in self.actions:
-            datas_obj = []
-            for d in datas_from_source:
-                elem = d["datas"]
-                if elem is not None:
-                    m = Model(self.model.model_name, self.destination)
-                    m.populate_values(elem)
-                    datas_obj.append(m)
-                    # del m
-            datas_values = []
-            # Search for new records and insert them.
-            if self.params["exclude_existing_in_db"]:
-                existing_ids = [
-                    r[self.params["exclude_key"]] for r in self.model.get_all()
-                ]
-                datas_obj = [
-                    r
-                    for r in datas_obj
-                    if getattr(
-                        r, self.params["destination_unique_key"]["value"]
-                    ).db_value
-                    not in existing_ids
-                ]
-                datas_values = [r.get_db_values_tuple() for r in datas_obj]
+            # Retrieving datas from source
+            if self.params is not None:
+                datas_from_source = self.source.get(
+                    task_params=self.params,
+                    header=self.params["request"]["header"],
+                )
             else:
-                datas_values = [r.get_db_values_tuple() for r in datas_obj]
+                print(f"No available params for task {self.name}. Running next task.")
+                return "Error"
 
-            print(
-                f"{self.name} - {self.model.model_name}: {len(datas_values)} record(s)"
-                " will be inserted"
+            if len(datas_from_source) == 0:
+                print(f"{self.name}: No new datas from source. Running next task.")
+                return "Success"
+
+            if not datas_from_source:
+                print(
+                    f"{self.name}: Failed retrieving datas from source. Skipping."
+                    " Running next task."
+                )
+                return None
+
+            # Insert datas in destination
+            if "insert" in self.actions:
+                datas_obj = []
+                for d in datas_from_source:
+                    elem = d["datas"]
+                    if elem is not None:
+                        m = Model(self.model.model_name, self.destination)
+                        m.populate_values(elem)
+                        datas_obj.append(m)
+                        # del m
+                datas_values = []
+                # Search for new records and insert them.
+                if self.params["exclude_existing_in_db"]:
+                    existing_ids = [
+                        r[self.params["exclude_key"]] for r in self.model.get_all()
+                    ]
+                    datas_obj = [
+                        r
+                        for r in datas_obj
+                        if getattr(
+                            r, self.params["destination_unique_key"]["value"]
+                        ).db_value
+                        not in existing_ids
+                    ]
+                    datas_values = [r.get_db_values_tuple() for r in datas_obj]
+                else:
+                    datas_values = [r.get_db_values_tuple() for r in datas_obj]
+
+                print(
+                    f"{self.name} - {self.model.model_name}:"
+                    f" {len(datas_values)} record(s) will be inserted"
+                )
+                self.insert(datas_values)
+
+            if "update" in self.actions:
+                datas_obj = []
+                for d in datas_from_source:
+                    if d["datas"] is not None:
+                        m = Model(self.model.model_name, self.destination)
+                        # m.set_field(
+                        #     self.params["db_query"]["fields"][0],
+                        #     m.params[self.params["db_query"]["fields"][0]],
+                        # )
+                        # m.set_field(
+                        #     d["where_field"],
+                        #     m.params[d["where_field"]],
+                        # )
+                        m.set_fields()
+                        m.populate_values(d["datas"])
+                        # setattr(getattr(m, d["where_field"]), "value", d["where_value"])
+
+                        where_dicts_list = []
+                        for v in self.params["db_query"]["keys"]:
+                            where_dicts_list.append({v: d["datas"][v]})
+
+                        values_dicts_list = []
+                        for v in self.params["db_query"]["fields"]:
+                            values_dicts_list.append({v[0]: d["datas"][v[1]]})
+
+                        self.update(
+                            values_dicts_list,
+                            where_dicts_list=where_dicts_list,
+                        )
+                        del m
+            return "Success"
+        except Exception as e:
+            logger.error(
+                f"ERROR occured while running task {self.name}:\n{e}\n\n Cancel all"
+                " tasks runned so far.\nRollback Db transaction.\n## ENDING LAMBDA"
             )
-            self.insert(datas_values)
+            self.destination.write_results_db_connection.rollback()
 
-        if "update" in self.actions:
-            datas_obj = []
-            for d in datas_from_source:
-                if d["datas"] is not None:
-                    m = Model(self.model.model_name, self.destination)
-                    # m.set_field(
-                    #     self.params["db_query"]["fields"][0],
-                    #     m.params[self.params["db_query"]["fields"][0]],
-                    # )
-                    # m.set_field(
-                    #     d["where_field"],
-                    #     m.params[d["where_field"]],
-                    # )
-                    m.set_fields()
-                    m.populate_values(d["datas"])
-                    # setattr(getattr(m, d["where_field"]), "value", d["where_value"])
-
-                    where_dicts_list = []
-                    for v in self.params["db_query"]["keys"]:
-                        where_dicts_list.append({v: d["datas"][v]})
-
-                    values_dicts_list = []
-                    for v in self.params["db_query"]["fields"]:
-                        values_dicts_list.append({v[0]: d["datas"][v[1]]})
-
-                    self.update(
-                        values_dicts_list,
-                        where_dicts_list=where_dicts_list,
-                    )
-                    del m
+            return "Error"
 
     def insert(self, data):
         sql_query = SqlQuery(
