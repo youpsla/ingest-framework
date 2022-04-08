@@ -39,14 +39,9 @@ DAILY_TASKS_LIST = [
 # Task("pivot_creative_daily_update", source, destination).run()
 
 MONTHLY_TASKS_LIST = [
-    "daily_campaigns_update",
-    "daily_campaigns_update",
-    "daily_social_metrics_update",
-    "creative_sponsored_video_daily_update",
-    "creative_sponsored_video__creative_name_daily_update",
-    "account_pivot_campaign_daily_update",
-    "creative_url_daily_update",
-    "campaign_groups_daily_update",
+    "pivot_job_title_monthly_update",
+    "pivot_member_geo_monthly_update",
+    "pivot_member_organization_monthly_update",
 ]
 
 
@@ -87,7 +82,9 @@ def main():
 
     # Monthly tasks run
     today = datetime.datetime.now()
-    if today.day == 1:
+    run_monthly = True if today.day == 1 else False
+    run_monthly = True
+    if run_monthly is True:
         logger.info(f"Monthly tasks run: {MONTHLY_TASKS_LIST}")
         for task_name in MONTHLY_TASKS_LIST:
             result = run_task(source, destination, task_name)
