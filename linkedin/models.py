@@ -96,10 +96,11 @@ class Model:
             self.set_field(k, v)
 
     def populate_values(self, source_values):
-        """Set the API retruned value for each field of,the model
+        """Set value attribute toall  model attributes of type Field
 
         Args:
-            source_values: The source API datas answer part
+            source_values: dict
+            The source API datas
 
         """
         for f in self.fields_list:
