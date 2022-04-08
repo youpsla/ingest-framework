@@ -282,7 +282,8 @@ class Field:
             position: The index of the split returned value list to use
 
         Returns:
-            result: A string. can be empty.
+            result: str
+            Could be the country, the region, the city or .....
 
         Raises:
             IndexError: Raise if split function fail. This could be the case when we try to retrieve at position x when split result doesn't contains enough elements.
@@ -291,21 +292,32 @@ class Field:
 
         """
         try:
-            result = value.split(caracter)
-        except IndexError as e:
-            print(
-                f"Error while splitting '{value}' with caracter {caracter} at position"
-                f" {position}"
-            )
+            splited_value_list = value.split(caracter)
+        except Exception as e:
+            print(f"Error while splitting '{value}' with caracter '{caracter}'")
             print(e)
             return ""
 
         # Sometimes Bing geo API returns only 2 locations instead of 3.
         # This is an issue because we don't know which location is  not returned. # noqa: E501
         # For example, if "Belgrad, Serbia" is returned, it looks like region has been omitted. # noqa: E501
+        # Then we return empty string.
+        # TODO: Set normal RESPONSE_LIST_LENGTH as json user input.
+        RESPONSE_LIST_LENGTH = 3
+        if not len(splited_value_list) == RESPONSE_LIST_LENGTH:
+            # We return only the country in cthis case. Country should always exist.
+            if position == 0:
+                try:
+                    result = splited_value_list[position].strip()
+                except IndexError:
+                    # TODO: Better manage here. If position > RESPONSE_LIST_LENGTH, raise. # noqa: E501
+                    result = ""
+            else:
+                return ""
         try:
-            result = result[position].strip()
+            result = splited_value_list[position].strip()
         except IndexError:
+            # TODO: Better manage here. If position > RESPONSE_LIST_LENGTH, raise.
             result = ""
 
         return result
