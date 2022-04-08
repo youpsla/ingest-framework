@@ -303,6 +303,7 @@ class Field:
         # For example, if "Belgrad, Serbia" is returned, it looks like region has been omitted. # noqa: E501
         # Then we return empty string.
         # TODO: Set normal RESPONSE_LIST_LENGTH as json user input.
+        # TODO: Test if position > RESPONSE_LIST_LENGTH, raise.
         RESPONSE_LIST_LENGTH = 3
         if not len(splited_value_list) == RESPONSE_LIST_LENGTH:
             # We return only the country in cthis case. Country should always exist.
@@ -310,14 +311,13 @@ class Field:
                 try:
                     result = splited_value_list[position].strip()
                 except IndexError:
-                    # TODO: Better manage here. If position > RESPONSE_LIST_LENGTH, raise. # noqa: E501
+
                     result = ""
             else:
                 return ""
         try:
             result = splited_value_list[position].strip()
         except IndexError:
-            # TODO: Better manage here. If position > RESPONSE_LIST_LENGTH, raise.
             result = ""
 
         return result
