@@ -1,7 +1,11 @@
+import logging
+
 from psycopg2 import extras
 from psycopg2.extras import RealDictCursor
 
 from CONFIG import SCHEMA_NAME
+
+logger = logging.getLogger(__name__)
 
 
 class SqlQuery:
@@ -36,43 +40,47 @@ class SqlQuery:
 
     def run(self):
 
-        # TODO: Add logs and manage exception for query execute.
+        write_results_db_connection = self.destination.write_results_db_connection
+        write_cur = write_results_db_connection.cursor()
+
         db_connection = self.destination.db_connection
-        if self.qtype == "select":
-            self.sql = self.get_sql_select()
-            with db_connection.cursor(cursor_factory=RealDictCursor) as cursor:
-                cursor.execute(self.sql)
-                db_connection.commit()
-                res = cursor.fetchall()
-                return res
-        elif self.qtype == "insert":
-            with db_connection.cursor() as cursor:
+        # cursor = db_connection.cursor()
+
+        try:
+            if self.qtype == "select":
+                with db_connection.cursor(cursor_factory=RealDictCursor) as cursor:
+                    self.sql = self.get_sql_select()
+                    cursor.execute(self.sql)
+                    return cursor.fetchall()
+            elif self.qtype == "insert":
                 self.sql = self.get_sql_insert()
                 extras.execute_values(
-                    cursor,
+                    write_cur,
                     self.sql,
                     self.values,
                 )
-                db_connection.commit()
-        elif self.qtype == "select_max":
-            self.sql = self.get_sql_select_max()
-            with db_connection.cursor() as cursor:
-                cursor.execute(self.sql, self.values)
-                db_connection.commit()
-                res = cursor.fetchall()
-                return res
-        elif self.qtype == "raw_sql":
-            with db_connection.cursor(cursor_factory=RealDictCursor) as cursor:
-                cursor.execute(self.raw_sql)
-                db_connection.commit()
-                res = cursor.fetchall()
-                return res
-        elif self.qtype == "update":
-            with db_connection.cursor() as cursor:
+            elif self.qtype == "select_max":
+                self.sql = self.get_sql_select_max()
+                with db_connection.cursor() as cursor:
+                    cursor.execute(self.sql, self.values)
+                    db_connection.commit()
+                return cursor.fetchall()
+            elif self.qtype == "raw_sql":
+                with db_connection.cursor(cursor_factory=RealDictCursor) as cursor:
+                    cursor.execute(self.raw_sql)
+                    db_connection.commit()
+                    return cursor.fetchall()
+            elif self.qtype == "update":
                 self.sql = self.get_sql_update()
-                cursor.execute(self.sql)
-                db_connection.commit()
-        return None
+                write_cur.execute(self.sql)
+        except Exception as e:
+            print(e)
+            logger.error(
+                f"Issue while executing the following sql query:\n{self.sql}.\nThe"
+                f" following error occur: {e}"
+            )
+            return "Error"
+        return "Success"
 
     def get_sql_select(self):
         sql = (
