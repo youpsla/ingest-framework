@@ -55,18 +55,18 @@ class Task:
                 )
             else:
                 print(f"No available params for task {self.name}. Running next task.")
-                return "Error"
+                return "error"
 
             if len(datas_from_source) == 0:
                 print(f"{self.name}: No new datas from source. Running next task.")
-                return "Success"
+                return "success"
 
             if not datas_from_source:
                 print(
                     f"{self.name}: Failed retrieving datas from source. Skipping."
                     " Running next task."
                 )
-                return None
+                return "error"
 
             # Insert datas in destination
             if "insert" in self.actions:
@@ -81,6 +81,7 @@ class Task:
                 datas_values = []
                 # Search for new records and insert them.
                 if self.params["exclude_existing_in_db"]:
+                    dede = self.model.get_all()
                     existing_ids = [
                         r[self.params["exclude_key"]] for r in self.model.get_all()
                     ]
@@ -132,7 +133,7 @@ class Task:
                             where_dicts_list=where_dicts_list,
                         )
                         del m
-            return "Success"
+            return "success"
         except Exception as e:
             logger.error(
                 f"ERROR occured while running task {self.name}:\n{e}\n\n Cancel all"
@@ -140,7 +141,7 @@ class Task:
             )
             self.destination.write_results_db_connection.rollback()
 
-            return "Error"
+            return "error"
 
     def insert(self, data):
         sql_query = SqlQuery(
