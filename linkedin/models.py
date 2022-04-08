@@ -274,9 +274,12 @@ class Field:
            This can affect data accuracy. I have no simple solution at the moment.
 
         Args:
-            value:
-            caracter:
-            position:
+            value: str
+            The string to be split
+
+            caracter: str
+            The caracter to split the value string on
+            position: The index of the split returned value list to use
 
         Returns:
             result: A string. can be empty.
