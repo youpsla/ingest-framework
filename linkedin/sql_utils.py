@@ -44,14 +44,14 @@ class SqlQuery:
         write_cur = write_results_db_connection.cursor()
 
         db_connection = self.destination.db_connection
-        cursor = db_connection.cursor()
+        # cursor = db_connection.cursor()
 
         try:
             if self.qtype == "select":
-                with db_connection.cursor() as cursor:
+                with db_connection.cursor(cursor_factory=RealDictCursor) as cursor:
                     self.sql = self.get_sql_select()
                     cursor.execute(self.sql)
-                return cursor.fetchall()
+                    return cursor.fetchall()
             elif self.qtype == "insert":
                 self.sql = self.get_sql_insert()
                 extras.execute_values(
@@ -69,7 +69,7 @@ class SqlQuery:
                 with db_connection.cursor(cursor_factory=RealDictCursor) as cursor:
                     cursor.execute(self.raw_sql)
                     db_connection.commit()
-                return cursor.fetchall()
+                    return cursor.fetchall()
             elif self.qtype == "update":
                 self.sql = self.get_sql_update()
                 write_cur.execute(self.sql)
@@ -77,7 +77,7 @@ class SqlQuery:
             print(e)
             logger.error(
                 f"Issue while executing the following sql query:\n{self.sql}.\nThe"
-                f" following error occur:\n{e}"
+                f" following error occur: {e}"
             )
             return "Error"
         return "Success"
