@@ -9,6 +9,14 @@ logger = logging.getLogger(__name__)
 
 
 class Task:
+    """This class manage lots of things. Some of them are not directly connected to linkedin and should be extract to a Client class.
+    TODO: Create Client class
+
+    - Retrieving task parameters from json file
+    - Creating the url to request and all associated operation (requesting Db for filter values, building args and kwargs, )
+    - Retrieving request result from source
+    """
+
     def __init__(self, name, source, destination) -> None:
         self.name = name
         self.source = source
