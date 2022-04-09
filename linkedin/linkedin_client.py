@@ -256,20 +256,47 @@ class LinkedInClient:
 
         return result
 
-    def get_filter_values_from_db(self, params=None):
+    def get_sql_list(self, db_fields=[], sql_datas=[]):
         """# noqa: E501
-        Get filters values from Bd to build three lists. One for each type of
+        In some table, we musy insert datas from other tables, datas not available in the API response.
+        For example, the "pivot_job_title_monthly_update" needs a "facet_id" field. This data is used for querying the source API BUT need to be writtten with anohter column name in another table.
+        We collect the "campaign_id" for filtering API and we must write this information in the "facet_id" column.
 
         Args:
-            args_fields: list
-                List of args fields
+            db_fields: list
+                List of dict. The form of each dict is: {"origin_key": name_of_the_origin_column, "target_key": name_of_the_destination_column}
             sql_datas: list
-                List of datas retrieved from db
+                List of dict. The form of each dict is:: {"name_of_origin_column": value}
 
 
         Returns:
-            a list which elements are string ef values to insert in url.
+            a list of dicts. The form of each dict is:: {"name_of_target_column": value}
             The returned list can be empty.
+        """
+        result = []
+        if not db_fields:
+            return db_fields
+        for d in sql_datas:
+            tmp_result = []
+            for f in db_fields:
+                tmp_result.append({f["origin_key"]: d[f["target_key"]]})
+            result.append(tmp_result)
+
+        return result
+
+    def get_filter_values_from_db(self, params=None):
+        """# noqa: E501
+        Build 3 list of dicts:
+        - kwargs_list: A list of dicts containing key and value for building endpoint kwargs
+        - args_list: A list of strings containing key and value for building endpoint args
+        - sql_list: A list of dicts containing key and value for writing in Db values retirieved from Db.
+
+        Args:
+            params: list
+                List of params as defined in task.json
+
+        Returns:
+            3 lists as explained above
         """
         if not params:
             return [], [], []
@@ -288,6 +315,16 @@ class LinkedInClient:
         return kwargs_list, args_list, sql_list
 
     def get_dynamics_params(self, params):
+        """# noqa: E501
+        Build dynamics params from json
+
+        Args:
+            params: list
+                List of params as defined in task.json
+
+        Returns:
+            A list of dicts. Each dict has the form: {"kwargs_name": value}
+        """
         dynamics_params = params.get("dynamics", {})
         result = []
         for n, p in dynamics_params.items():
@@ -299,9 +336,31 @@ class LinkedInClient:
         return result
 
     def get_statics_params(self, params):
+        """# noqa: E501
+        Build statics params from json
+
+        Args:
+            params: list
+                List of params as defined in task.json
+
+        Returns:
+            A list of dicts. Each dict has the form: {"kwargs_name": value}
+        """
         return [{k: v} for k, v in params.get("statics", {}).items()]
 
     def get(self, task_params, header=None):
+        """# noqa: E501
+        Build the endpoint, query the API.
+
+        Build a dict with API response AND add an entry with values from other table if necessary
+
+        Args:
+            task_params: dict
+                THe dictionary of the task params as imperted from the json definition.
+
+        Returns:
+            A list of dicts.
+        """
         headers = self.build_headers(header=header)
         url_params = task_params["url"]
         params = url_params.get("params", None)
@@ -389,6 +448,17 @@ class LinkedInClient:
         return [{"datas": d} for d in result]
 
     def build_headers(self, header=None):
+        """# noqa: E501
+        Build the header of the http request
+
+        Use the access_token and optionnal header defined in json.
+
+        Args:
+            header: dict
+
+        Returns:
+            A dict of the build header.
+        """
         headers = CaseInsensitiveDict()
         headers["Accept"] = "application/json"
         headers["cache-control"] = "no-cache"
@@ -400,6 +470,22 @@ class LinkedInClient:
         return headers
 
     def build_endpoint(self, base=None, category=None, q=None, kwargs=None, args=None):
+        """# noqa: E501
+        Build the enpoint url with all args, kwargs.
+
+        Use the access_token and optionnal header defined in json.
+
+        Args:
+            base: str
+                Base url as retrieved from json definition
+            category: str
+                The type of API call.
+            q: str
+                The type of the query. Can be "search" or "analytics" for linkedin
+
+        Returns:
+            A str representing an url
+        """
         if kwargs:
             kwargs_tuple = [(k, v) for f in kwargs for k, v in f.items()]
         endpoint = (
@@ -416,6 +502,18 @@ class LinkedInClient:
         endpoint="",
         headers={},
     ):
+        """# noqa: E501
+        Qurey the API endpoint
+
+        Args:
+            endpoint: str
+                The endpoint
+            headers: dict
+                Headers of the http request
+
+        Returns:
+            A json str repeenting the API response
+        """
         try:
             response = self.http_adapter.get(url=endpoint, headers=headers)
         except ConnectionError as e:
@@ -455,6 +553,19 @@ class LinkedInClient:
         data=None,
         headers=None,
     ):
+        """# noqa: E501
+        Qurey the API endpoint with a POST query for auth
+
+        Args:
+            endpoint: str
+                The endpoint
+            data:
+
+            headers:
+
+        Returns:
+            A json str repeenting the API response
+        """
         response = requests.post(url=endpoint, data=data, headers=headers)
 
         if response.status_code != 200:
