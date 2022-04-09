@@ -752,10 +752,10 @@
                                 ]
                             ],
                             "db_fields": [
-                                [
-                                    "campaign_id",
-                                    "facet_id"
-                                ]
+                                {
+                                    "origin_key": "campaign_id",
+                                    "destintation_key": "facet_id"
+                                }
                             ],
                             "all_fields": [
                                 "campaign_id"
