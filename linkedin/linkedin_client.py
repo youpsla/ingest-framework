@@ -48,9 +48,7 @@ class LinkedInAccessToken:
             "client_secret": self.client_secret_value["secret"],
         }
 
-        response = LinkedInClient.do_auth_post_query(
-            endpoint=endpoint, data=data
-        )
+        response = LinkedInClient.do_auth_post_query(endpoint=endpoint, data=data)
 
         access_token = response.json()["access_token"]
 
@@ -83,9 +81,7 @@ class LinkedInRefreshToken(Secret):
         # Launch Sentry alert. Refresh-token can only be refreshed manually. 1 year TTL.
         if self.will_expire_soon:
             # TODO: Launch alert on Sentry
-            print(
-                "LinkedIn API Refresh token will expire soon. Please renew it)"
-            )
+            print("LinkedIn API Refresh token will expire soon. Please renew it)")
 
     @property
     def value(self):
@@ -100,9 +96,7 @@ class LinkedInRefreshToken(Secret):
             "token": self.value,
         }
 
-        response = LinkedInClient.do_auth_post_query(
-            endpoint=endpoint, data=data
-        )
+        response = LinkedInClient.do_auth_post_query(endpoint=endpoint, data=data)
         expires_at = json.loads(response.text)["expires_at"]
 
         if expires_at < datetime.now().timestamp() + (7 * 24 * 3600):
@@ -111,17 +105,49 @@ class LinkedInRefreshToken(Secret):
         return False
 
 
-class Client:
-    pass
-
-
 class LinkedInClient:
+    """# noqa: E501
+    This object is responsbile of:
+    - Building API http requests
+    - Querying the API
+    - Filtering response datas
+    - Transforming datas
+    - Sending result to the task for insertion or update.
+
+    Attributes:
+        acces_token: str
+            The linkedIn access token.
+        destination: inst RedShiftClient
+            Used to instantiate Model for retrieving existing values in DB for filtering. Bad design here.
+            #TODO: Cleaner design. Find another logic than instatiating Model for retrieving existing in Db.
+
+    """
+
     def __init__(self, destination=None):
         self.access_token = LinkedInAccessToken().value
         self.destination = destination
         self.http_adapter = get_http_adapter()
 
     def get_dynamics_param(self, name, params, value):
+        """# noqa: E501
+        Build a dict for an endpoint kwarg. Envetually, transform the data collected from destination (Db).
+        At teh moment, only kwargs of type "date" are manage. Return None in other cases.
+
+        Args:
+            name: str
+            The name /key of kwarg
+
+            params: dict
+                kwarg description as found in task.json
+
+            value: str or int
+                The value retrieve from source
+
+        Returns:
+            a dict {name:value}
+            None is this kwargs is not of type "date".
+
+        """
         if params["value_type"] == "date":
             return {
                 name: params["url_query_parameter_value"].format(
@@ -130,12 +156,21 @@ class LinkedInClient:
                     year=value.year,
                 ),
             }
-        # if params["value_type"] == "db":
-        #     return (name, params["url_query_parameter_value"].format(value))
 
         return None
 
     def get_dynamics_group_params(self, params):
+        """# noqa: E501
+        Manage group fo params. Group fo params. It is used to set start and end date for http API queries. AS the offset_parameter is common to day, month, year I group them in a group.
+
+        Use offset_unity, offset_value found in params to calculate the date for, http request.
+        Args:
+            params: dict
+
+        Returns:
+            a dict {name:value}
+            None is this kwargs is not of type "date".
+        """
         url_params = params["url_params"]
         today = datetime.today()
         result = []
@@ -171,10 +206,18 @@ class LinkedInClient:
 
         return result
 
-    def get_formatted_kwarg(self):
-        pass
-
     def get_kwargs_list(self, kwargs_fields=[], sql_datas=[], urlencode=False):
+        """# noqa: E501
+        Manage group fo params. Group fo params. It is used to set start and end date for http API queries. AS the offset_parameter is common to day, month, year I group them in a group.
+
+        Use offset_unity, offset_value found in params to calculate the date for, http request.
+        Args:
+            params: dict
+
+        Returns:
+            a dict {name:value}
+            None is this kwargs is not of type "date".
+        """
         result = []
         for d in sql_datas:
             tmp_result = []
@@ -185,7 +228,23 @@ class LinkedInClient:
 
         return result
 
-    def get_args_list(self, args_fields=[], sql_datas=[], urlencode=False):
+    def get_args_list(self, args_fields=[], sql_datas=[]):
+
+        """# noqa: E501
+        Build the list of args for the endpoint http requets
+
+        Args:
+            args_fields: list
+                List of args fields
+            sql_datas: list
+                List of datas retrieved from db
+
+
+        Returns:
+            a list which elements are string ef values to insert in url.
+            The returned list can be empty.
+        """
+
         result = []
         if not args_fields:
             return args_fields
@@ -197,19 +256,21 @@ class LinkedInClient:
 
         return result
 
-    def get_sql_list(self, db_fields=[], sql_datas=[]):
-        result = []
-        if not db_fields:
-            return db_fields
-        for d in sql_datas:
-            tmp_result = []
-            for f in db_fields:
-                tmp_result.append({f[1]: d[f[0]]})
-            result.append(tmp_result)
-
-        return result
-
     def get_filter_values_from_db(self, params=None):
+        """# noqa: E501
+        Get filters values from Bd to build three lists. One for each type of
+
+        Args:
+            args_fields: list
+                List of args fields
+            sql_datas: list
+                List of datas retrieved from db
+
+
+        Returns:
+            a list which elements are string ef values to insert in url.
+            The returned list can be empty.
+        """
         if not params:
             return [], [], []
 
@@ -338,9 +399,7 @@ class LinkedInClient:
 
         return headers
 
-    def build_endpoint(
-        self, base=None, category=None, q=None, kwargs=None, args=None
-    ):
+    def build_endpoint(self, base=None, category=None, q=None, kwargs=None, args=None):
         if kwargs:
             kwargs_tuple = [(k, v) for f in kwargs for k, v in f.items()]
         endpoint = (
