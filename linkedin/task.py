@@ -9,12 +9,24 @@ logger = logging.getLogger(__name__)
 
 
 class Task:
-    """This class manage lots of things. Some of them are not directly connected to linkedin and should be extract to a Client class.
-    TODO: Create Client class
+    # TODO: Create a real Client class which contains method for params, model, ...
+    """# noqa: E501
+    This object represent a task. At the moment it's the manager of the workflow:
+    collect -> transform -> store
 
-    - Retrieving task parameters from json file
-    - Creating the url to request and all associated operation (requesting Db for filter values, building args and kwargs, )
-    - Retrieving request result from source
+    Attributes:
+        params: dict
+            All the parameters of the task collected form the Json file
+        model: inst Model
+            The model this task is associated with. Atm, a task can only write datas in one model/table.
+        actions: str
+            A list of actions this task will do on the Db. Actions can be "insert" or "update".
+
+    Methods:
+        run: Launch all task for running the Task. THis method launch process of retrieving datas from source, trandform datas and save in destination.
+        insert: Perform an insert in Db
+        update: Perform an update in Db.
+
     """
 
     def __init__(self, name, source, destination) -> None:
@@ -49,6 +61,15 @@ class Task:
         return self.params["actions"]
 
     def run(self):
+        """Collect, transform and store datas. Orchestrator between connectors.
+
+        Returns: str
+            "success" or "error"
+
+        Raises:
+            IOError: An error occurred accessing the smalltable.
+
+        """
         try:
             print(f"Starting task: {self.name}")
             # with open("fixtures.json", "r") as f:
@@ -89,7 +110,6 @@ class Task:
                 datas_values = []
                 # Search for new records and insert them.
                 if self.params["exclude_existing_in_db"]:
-                    dede = self.model.get_all()
                     existing_ids = [
                         r[self.params["exclude_key"]] for r in self.model.get_all()
                     ]
