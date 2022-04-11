@@ -255,10 +255,10 @@
                             ],
                             "kwargs_fields": [],
                             "db_fields": [
-                                [
-                                    "ugc_ref",
-                                    "ugc_ref"
-                                ]
+                                {
+                                    "origin_key": "ugc_ref",
+                                    "destination_key": "ugc_ref"
+                                }
                             ],
                             "all_fields": [
                                 "ugc_ref"
@@ -392,10 +392,10 @@
                                 ]
                             ],
                             "db_fields": [
-                                [
-                                    "campaign_id",
-                                    "facet_id"
-                                ]
+                                {
+                                    "origin_key": "campaign_id",
+                                    "destination_key": "facet_id"
+                                }
                             ],
                             "raw_sql": "select distinct(campaign_id) from {schema}.account_pivot_campaign where start_date between (select date_trunc('month', getdate() - interval '1 month')) and (select last_day(getdate() - interval '1 month'))"
                         }
@@ -498,10 +498,10 @@
                                 ]
                             ],
                             "db_fields": [
-                                [
-                                    "id",
-                                    "advertiser_id"
-                                ]
+                                {
+                                    "origin_key": "id",
+                                    "destination_key": "advertiser_id"
+                                }
                             ],
                             "filter_model": "accounts",
                             "all_fields": [
@@ -603,10 +603,10 @@
                                 ]
                             ],
                             "db_fields": [
-                                [
-                                    "id",
-                                    "facet_id"
-                                ]
+                                {
+                                    "origin_key": "id",
+                                    "destination_key": "facet_id"
+                                }
                             ],
                             "filter_model": "campaigns",
                             "all_fields": [
@@ -702,10 +702,10 @@
                             ],
                             "kwargs_fields": [],
                             "db_fields": [
-                                [
-                                    "creative_id",
-                                    "creative_id"
-                                ]
+                                {
+                                    "origin_key": "creative_id",
+                                    "destination_key": "creative_id"
+                                }
                             ],
                             "all_fields": [
                                 "creative_id"
@@ -754,7 +754,7 @@
                             "db_fields": [
                                 {
                                     "origin_key": "campaign_id",
-                                    "destintation_key": "facet_id"
+                                    "destination_key": "facet_id"
                                 }
                             ],
                             "all_fields": [
@@ -881,10 +881,10 @@
                                 ]
                             ],
                             "db_fields": [
-                                [
-                                    "campaign_id",
-                                    "facet_id"
-                                ]
+                                {
+                                    "origin_key": "campaign_id",
+                                    "destination_key": "facet_id"
+                                }
                             ],
                             "all_fields": [
                                 "campaign_id"
