@@ -167,6 +167,9 @@ class Task:
                 f"ERROR occured while running task {self.name}:\n{e}\n\n Cancel all"
                 " tasks runned so far.\nRollback Db transaction.\n## ENDING LAMBDA"
             )
+            import traceback
+
+            traceback.print_exc()
             self.destination.write_results_db_connection.rollback()
 
             return "error"
