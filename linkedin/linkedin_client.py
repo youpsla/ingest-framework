@@ -279,7 +279,7 @@ class LinkedInClient:
         for d in sql_datas:
             tmp_result = []
             for f in db_fields:
-                tmp_result.append({f["origin_key"]: d[f["target_key"]]})
+                tmp_result.append({f["destination_key"]: d[f["origin_key"]]})
             result.append(tmp_result)
 
         return result
