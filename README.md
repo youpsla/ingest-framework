@@ -118,58 +118,42 @@ This file contains a list of tasks. Here is an example of task:
 ### Task.json availables parameters
 
 #### **name**
-Type when tranformed to python dict: str
+Type after json.load: str
 
 The name of the task.
 
 #### **source**
-Type when tranformed to python dict: str
+Type after json.load: str
 
 The name of the source of the data. Can be "linkedin", "boing", ...
 
 #### **destination**
-Type when tranformed to python dict: str
+Type after json.load: str
 
 The name of the destination of the data. Can be "s3", "redshift", ...
 
 #### **model**
-Type when tranformed to python dict: str
+Type after json.load: str
 
 The name of the model of data. At the moment, it's the name of the table which is the target of datas.
 
 At the moment, it's not possible to insert datas in differents table when running a task. If you need that, define more than one task.
 
 #### **exclude_existing_in_db**
-Type when tranformed to python dict: boolean
+Type after json.load: boolean
 
 If set to True, the sysem will try to lookup in destination datas if a record with the same value for the already exists. The value of the "exclude_key" task parameter is used to compare.
 
 #### **exclude_key**
-Type when tranformed to python dict: str
+Type after json.load: str
 
 The name of the key to use to filter for already existing records.
 
 #### **url**
-Type when tranformed to python dict: dict
+Type after json.load: dict
 
-Contains all parameters necessary to build the endpoint query
-
-
+Contains all parameters necessary to build the endpoint query.
 
 
-Colons can be used to align columns.
 
-| key        | Description           | Example value  |
-| ------------- |:-------------:| -----:|
-| col 3 is      | right-aligned | code |
-| col 2 is      | centered      |   $12 |
-| zebra stripes | are neat      |    $1 |
 
-There must be at least 3 dashes separating each header cell.
-The outer pipes (|) are optional, and you don't need to make the 
-raw Markdown line up prettily. You can also use inline Markdown.
-
-Markdown | Less | Pretty
---- | --- | ---
-*Still* | `renders` | **nicely**
-1 | 2 | 3
