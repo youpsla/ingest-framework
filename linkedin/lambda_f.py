@@ -23,6 +23,8 @@ logger.addHandler(ch)
 
 logger.setLevel(logging.INFO)
 
+RUN_MODE = "dev"
+
 DAILY_TASKS_LIST = [
     "daily_accounts_update",
     "daily_campaigns_update",
@@ -34,7 +36,7 @@ DAILY_TASKS_LIST = [
     "campaign_groups_daily_update",
 ]
 
-# Query ignored because:
+# Task ignored because:
 # select max(start_date) from linkedin.pivot_creative; > 2021-05-24 00:00:00.000
 # Task("pivot_creative_daily_update", source, destination).run()
 
@@ -79,11 +81,12 @@ def main():
                 f"Error while running DAILY task{task_name}. All Db transactions have"
                 " been rollbacked. No datas write to destination."
             )
+            sys.exit()
 
     # Monthly tasks run
     today = datetime.datetime.now()
     run_monthly = True if today.day == 1 else False
-    run_monthly = True
+    # run_monthly = True
     if run_monthly is True:
         logger.info(f"Monthly tasks run: {MONTHLY_TASKS_LIST}")
         for task_name in MONTHLY_TASKS_LIST:
@@ -95,6 +98,7 @@ def main():
                     " transactions have been rollbacked. No datas write to"
                     " destination."
                 )
+                sys.exit()
 
     destination.write_results_db_connection.commit()
     destination.write_results_db_connection.close()
