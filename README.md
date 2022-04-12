@@ -357,7 +357,83 @@ A list of fields destination table field name. Used to filter retruned result of
 #### **raw_sql**
 Type after json.load: str
 
-A raw sql sstatement to run.
+A raw sql statement to retrieve datas for building endpoint or for inserting in destination.
+
+
+#### **dynamics**
+Contains definition of all kwargs which are dynamic but not collect datas from DB.
+It's the case for the date which vary everyday.
+
+It can contains parameters or group of parameters. Each one are dict.
+
+Example:
+```json
+    "dynamics": {
+        "start_date": {
+            "type": "group",
+            "offset_type": "from_today",
+            "offset_unity": "months",
+            "offset_value": "1",
+            "offset_range_position": "start_day",
+            "url_params": {
+                "dateRange.start.day": {
+                    "type": "filter_by",
+                    "value_type": "date",
+                    "url_query_parameter_value": "{day}",
+                    "offset": ""
+                },
+                "dateRange.start.month": {
+                    "type": "filter_by",
+                    "value_type": "date",
+                    "url_query_parameter_value": "{month}"
+                },
+                "dateRange.start.year": {
+                    "type": "filter_by",
+                    "value_type": "date",
+                    "url_query_parameter_value": "{year}"
+                }
+            }
+        },
+                "end_date": {
+                    "type": "group",
+                    "offset_type": "from_today",
+                    "offset_unity": "months",
+                    "offset_value": "1",
+                    "offset_range_position": "end_day",
+                    "url_params": {
+                        "dateRange.end.day": {
+                            "type": "filter_by",
+                            "value_type": "date",
+                            "url_query_parameter_value": "{day}",
+                            "offset": ""
+                        },
+                        "dateRange.end.month": {
+                            "type": "filter_by",
+                            "value_type": "date",
+                            "url_query_parameter_value": "{month}"
+                        },
+                        "dateRange.end.year": {
+                            "type": "filter_by",
+                            "value_type": "date",
+                            "url_query_parameter_value": "{year}"
+                        }
+                    }
+                }
+```
+At the moment, only dates are managed this way. Then keys are specifics for dates management.
+
+A group can have the following parameters:
+- type: If "group", it allow parameters for creating a value which will be used as a source for url_params.
+- offset_type: Not used at the moment. Will allow to define the start date before applying substraction defined by below parameters.
+- offset_unity: The unit used for "offset_value". Can be "months" or "days".
+- offset_value: Number of "offset_unity" to substract from "offset_type".
+- offset_range_position: Wether to use the start or the end of the date range defined.
+- url_params:
+    - type: Which function to apply to the value calculated at the group level.
+    - value_type: The type of the value.
+    - url_query_parameter_value: THe value to be used as the value for buiding kwarg.
+    
+
 
 
 
