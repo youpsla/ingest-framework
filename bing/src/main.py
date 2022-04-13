@@ -1,9 +1,17 @@
 import logging
+import time
 from datetime import datetime
 
-from bingads.v13.reporting import *
+from bingads.v13.reporting import ReportingServiceManager
 
-from auth_helper import *
+from auth_helper import (
+    DEVELOPER_TOKEN,
+    ENVIRONMENT,
+    AuthorizationData,
+    ServiceClient,
+    authenticate,
+    output_status_message,
+)
 
 # You must provide credentials in auth_helper.py.
 
@@ -38,12 +46,12 @@ REPORTS_NAME_LIST = [
 
 def main(authorization_data):
     # try:
-    output_status_message("#### Starting Ingest bing ####")
+    output_status_message("#### Starting Ingest bing ####")  # noqa :F405
 
     for report_name in REPORTS_NAME_LIST:
-        output_status_message(f"Running {report_name} task")
+        output_status_message(f"Running {report_name} task")  # noqa :F405
 
-        output_status_message("-----\nAwaiting Submit and Download...")
+        output_status_message("-----\nAwaiting Submit and Download...")  # noqa :F405
         report_request = get_report_request(authorization_data.account_id, report_name)
         submit_and_download(report_request, report_name)
 
