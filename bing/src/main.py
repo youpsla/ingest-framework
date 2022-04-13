@@ -196,34 +196,6 @@ def get_report_request(account_id, report_name):
 
     return result_report
 
-    campaign_performance_report_request = get_campaign_performance_report_request(
-        account_id=account_id,
-        aggregation=aggregation,
-        exclude_column_headers=exclude_column_headers,
-        exclude_report_footer=exclude_report_footer,
-        exclude_report_header=exclude_report_header,
-        report_file_format=REPORT_FILE_FORMAT,
-        return_only_complete_data=return_only_complete_data,
-        time=time,
-    )
-
-    user_location_performance_report_request = (
-        get_user_location_performance_report_request(
-            account_id=account_id,
-            aggregation=aggregation,
-            exclude_column_headers=exclude_column_headers,
-            exclude_report_footer=exclude_report_footer,
-            exclude_report_header=exclude_report_header,
-            report_file_format=REPORT_FILE_FORMAT,
-            return_only_complete_data=return_only_complete_data,
-            time=time,
-        )
-    )
-
-    professional_demographics_audience_report_request = ()
-
-    return user_location_performance_report_request
-
 
 def get_campaign_performance_report_request(
     account_id,
