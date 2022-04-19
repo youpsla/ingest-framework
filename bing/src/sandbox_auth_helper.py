@@ -3,6 +3,7 @@ import webbrowser
 from time import gmtime, strftime
 
 from bingads.authorization import AuthorizationData, OAuthDesktopMobileAuthCodeGrant
+from bingads.exceptions import *
 from bingads.service_client import ServiceClient
 from suds import WebFault
 
@@ -15,7 +16,7 @@ from suds import WebFault
 CLIENT_ID = "4c0b021c-00c3-4508-838f-d3127e8167ff"
 DEVELOPER_TOKEN = "BBD37VB98"
 ENVIRONMENT = "sandbox"
-REFRESH_TOKEN = "refresh.txt"
+REFRESH_TOKEN = "sandbox_refresh.txt"
 
 # Optional
 CLIENT_STATE = "ClientStateGoesHere"
