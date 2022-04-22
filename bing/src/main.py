@@ -4,14 +4,36 @@ from datetime import datetime
 
 from bingads.v13.reporting import ReportingServiceManager
 
-from auth_helper import (
-    DEVELOPER_TOKEN,
-    ENVIRONMENT,
-    AuthorizationData,
-    ServiceClient,
-    authenticate,
-    output_status_message,
-)
+from campaignmanagement_example_helper import output_array_of_campaign
+
+MODE = "prod"
+
+if MODE == "dev":
+    from sandbox_auth_helper import (
+        DEVELOPER_TOKEN,
+        ENVIRONMENT,
+        AuthorizationData,
+        ServiceClient,
+        authenticate,
+        output_status_message,
+    )
+else:
+    from auth_helper import (
+        DEVELOPER_TOKEN,
+        ENVIRONMENT,
+        AuthorizationData,
+        ServiceClient,
+        authenticate,
+        output_status_message,
+    )
+
+
+# Optionally you can include logging to output traffic, for example the SOAP request and response.
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logging.getLogger("suds.client").setLevel(logging.DEBUG)
+logging.getLogger("suds.transport.http").setLevel(logging.DEBUG)
 
 # You must provide credentials in auth_helper.py.
 
@@ -19,7 +41,7 @@ from auth_helper import (
 logger = logging.getLogger(__name__)
 
 # The report file extension type.
-REPORT_FILE_FORMAT = "Csv"
+REPORT_FILE_FORMAT = "Json"
 
 # Defineoutput type. If set to local, don't forget to set FILE_DIRECTORY to an existing local file.
 # OUTPUT_TYPE = "S3"
@@ -40,25 +62,45 @@ TIMEOUT_IN_MILLISECONDS = 3600000
 REPORTS_NAME_LIST = [
     # "campaign_performance_report",
     # "user_location_performance_report",
-    "professional_demographics_audience_report",
+    # "professional_demographics_audience_report",
+    # "account_performance_report_request",
+    "adgroup_performance_report_request",
+    # "ad_performance_report_request",
+    # "professional_demographic_audience_report_request",
 ]
 
 
 def main(authorization_data):
     # try:
-    output_status_message("#### Starting Ingest bing ####")  # noqa :F405
+    # output_status_message("#### Starting Ingest bing ####")  # noqa :F405
 
-    for report_name in REPORTS_NAME_LIST:
-        output_status_message(f"Running {report_name} task")  # noqa :F405
+    # for report_name in REPORTS_NAME_LIST:
+    #     output_status_message(f"Running {report_name} task")  # noqa :F405
 
-        output_status_message("-----\nAwaiting Submit and Download...")  # noqa :F405
-        report_request = get_report_request(authorization_data.account_id, report_name)
-        submit_and_download(report_request, report_name)
+    #     output_status_message("-----\nAwaiting Submit and Download...")  # noqa :F405
+    #     report_request = get_report_request(authorization_data.account_id, report_name)
+    #     submit_and_download(report_request, report_name)
 
     # except WebFault as ex:
     #     output_webfault_errors(ex)
     # except Exception as ex:
     #     output_status_message(ex)
+
+    # campaigns = campaign_service.GetCampaignsByAccountId(
+    #     AccountId=authorization_data.account_id, CampaignType=["Audience"]
+    # )
+
+    adTypes = campaign_service.factory.create("ArrayOfAdType")
+    adTypes.AdType.append("Image")
+    adTypes.AdType.append("ResponsiveAd")
+    ads = campaign_service.GetAdsByAdGroupId(
+        AdGroupId=1330410450882640, AdTypes=adTypes
+    )
+
+    print(ads)
+
+    output_status_message("Campaigns:")
+    # output_array_of_campaign(campaigns)
 
 
 def get_result_file_name(report_name):
@@ -133,7 +175,7 @@ def get_report_request(account_id, report_name):
     Use a sample report request or build your own.
     """
 
-    aggregation = "Monthly"
+    aggregation = "Daily"
     exclude_column_headers = False
     exclude_report_footer = False
     exclude_report_header = False
@@ -141,13 +183,13 @@ def get_report_request(account_id, report_name):
 
     start_date = reporting_service.factory.create("Date")
     start_date.Day = 1
-    start_date.Month = 3
+    start_date.Month = 1
     start_date.Year = 2022
     time.CustomDateRangeStart = start_date
 
     end_date = reporting_service.factory.create("Date")
-    end_date.Day = 31
-    end_date.Month = 3
+    end_date.Day = 12
+    end_date.Month = 4
     end_date.Year = 2022
     time.CustomDateRangeEnd = end_date
 
@@ -194,6 +236,54 @@ def get_report_request(account_id, report_name):
             time=time,
         )
 
+    if report_name == "account_performance_report_request":
+        result_report = get_account_performance_report_request(
+            account_id=account_id,
+            aggregation=aggregation,
+            exclude_column_headers=exclude_column_headers,
+            exclude_report_footer=exclude_report_footer,
+            exclude_report_header=exclude_report_header,
+            report_file_format=REPORT_FILE_FORMAT,
+            return_only_complete_data=return_only_complete_data,
+            time=time,
+        )
+
+    if report_name == "adgroup_performance_report_request":
+        result_report = get_adgroup_performance_report_request(
+            account_id=account_id,
+            aggregation=aggregation,
+            exclude_column_headers=exclude_column_headers,
+            exclude_report_footer=exclude_report_footer,
+            exclude_report_header=exclude_report_header,
+            report_file_format=REPORT_FILE_FORMAT,
+            return_only_complete_data=return_only_complete_data,
+            time=time,
+        )
+
+    if report_name == "ad_performance_report_request":
+        result_report = get_ad_performance_report_request(
+            account_id=account_id,
+            aggregation=aggregation,
+            exclude_column_headers=exclude_column_headers,
+            exclude_report_footer=exclude_report_footer,
+            exclude_report_header=exclude_report_header,
+            report_file_format=REPORT_FILE_FORMAT,
+            return_only_complete_data=return_only_complete_data,
+            time=time,
+        )
+
+    if report_name == "professional_demographic_audience_report_request":
+        result_report = get_professional_demographic_audience_report_request(
+            account_id=account_id,
+            aggregation=aggregation,
+            exclude_column_headers=exclude_column_headers,
+            exclude_report_footer=exclude_report_footer,
+            exclude_report_header=exclude_report_header,
+            report_file_format=REPORT_FILE_FORMAT,
+            return_only_complete_data=return_only_complete_data,
+            time=time,
+        )
+
     return result_report
 
 
@@ -206,6 +296,8 @@ def get_campaign_performance_report_request(
     report_file_format,
     return_only_complete_data,
     time,
+    # campaign_id=435766866,
+    campaign_id=None,
 ):
 
     report_request = reporting_service.factory.create(
@@ -220,8 +312,17 @@ def get_campaign_performance_report_request(
     report_request.Time = time
     report_request.ReportName = "My Campaign Performance Report"
     scope = reporting_service.factory.create("AccountThroughCampaignReportScope")
-    scope.AccountIds = {"long": [account_id]}
-    scope.Campaigns = None
+
+    if campaign_id:
+        campaigns = reporting_service.factory.create("ArrayOfCampaignReportScope")
+        campaign_report_scope = reporting_service.factory.create("CampaignReportScope")
+        campaign_report_scope.AccountId = account_id
+        campaign_report_scope.CampaignId = campaign_id
+        campaigns.CampaignReportScope.append(campaign_report_scope)
+        scope.Campaigns = campaigns
+    else:
+        scope.AccountIds = {"long": [account_id]}
+
     report_request.Scope = scope
 
     report_columns = reporting_service.factory.create(
@@ -229,14 +330,64 @@ def get_campaign_performance_report_request(
     )
     report_columns.CampaignPerformanceReportColumn.append(
         [
-            "TimePeriod",
+            # "TimePeriod",
+            "AccountId",
             "CampaignId",
             "CampaignName",
-            "DeviceType",
-            "Network",
+            "CampaignType",
+            "CampaignStatus",
             "Impressions",
             "Clicks",
+            "Ctr",
             "Spend",
+        ]
+    )
+    report_request.Columns = report_columns
+
+    return report_request
+
+
+def get_account_performance_report_request(
+    account_id,
+    aggregation,
+    exclude_column_headers,
+    exclude_report_footer,
+    exclude_report_header,
+    report_file_format,
+    return_only_complete_data,
+    time,
+):
+
+    report_request = reporting_service.factory.create("AccountPerformanceReportRequest")
+    report_request.Aggregation = aggregation
+    report_request.ExcludeColumnHeaders = exclude_column_headers
+    report_request.ExcludeReportFooter = exclude_report_footer
+    report_request.ExcludeReportHeader = exclude_report_header
+    report_request.Format = report_file_format
+    report_request.ReturnOnlyCompleteData = return_only_complete_data
+    report_request.Time = time
+    report_request.ReportName = "Accounts Performance Report"
+
+    scope = reporting_service.factory.create("AccountReportScope")
+    scope.AccountIds = {"long": [account_id]}
+
+    report_request.Scope = scope
+
+    report_columns = reporting_service.factory.create(
+        "ArrayOfAccountPerformanceReportColumn"
+    )
+    report_columns.AccountPerformanceReportColumn.append(
+        [
+            "AccountName",
+            "AccountNumber",
+            "AccountId",
+            "AccountStatus",
+            "Impressions",
+            "Clicks",
+            "Ctr",
+            "AverageCpc",
+            "Spend",
+            "TimePeriod",
         ]
     )
     report_request.Columns = report_columns
@@ -277,25 +428,23 @@ def get_user_location_performance_report_request(
     )
     report_columns.UserLocationPerformanceReportColumn.append(
         [
-            "TimePeriod",
+            # "TimePeriod",
             "AccountId",
             "AccountName",
             "AdGroupId",
             "AverageCpc",
             "CampaignId",
+            "LocationId",
+            "State",
             "City",
-            "Clicks",
+            "PostalCode",
+            "MetroArea",
             "Country",
             "County",
+            "Clicks",
             "Ctr",
-            "DeviceType",
             "Impressions",
-            "LocationId",
-            "MetroArea",
-            "Network",
-            "PostalCode",
             "Spend",
-            "State",
         ]
     )
     report_request.Columns = report_columns
@@ -304,6 +453,187 @@ def get_user_location_performance_report_request(
 
 
 def get_professional_demographics_audience_report_request(
+    account_id,
+    aggregation,
+    exclude_column_headers,
+    exclude_report_footer,
+    exclude_report_header,
+    report_file_format,
+    return_only_complete_data,
+    time,
+    campaign_id=435766866,
+    # campaign_id=None,
+):
+
+    report_request = reporting_service.factory.create(
+        "ProfessionalDemographicsAudienceReportRequest"
+    )
+    report_request.Aggregation = aggregation
+    report_request.ExcludeColumnHeaders = exclude_column_headers
+    report_request.ExcludeReportFooter = exclude_report_footer
+    report_request.ExcludeReportHeader = exclude_report_header
+    report_request.Format = report_file_format
+    report_request.ReturnOnlyCompleteData = return_only_complete_data
+    report_request.Time = time
+    report_request.ReportName = "Demographics Audience Report"
+    scope = reporting_service.factory.create("AccountThroughCampaignReportScope")
+
+    if campaign_id:
+        campaigns = reporting_service.factory.create("ArrayOfCampaignReportScope")
+        campaign_report_scope = reporting_service.factory.create("CampaignReportScope")
+        campaign_report_scope.AccountId = account_id
+        campaign_report_scope.CampaignId = campaign_id
+        campaigns.CampaignReportScope.append(campaign_report_scope)
+        scope.Campaigns = campaigns
+    else:
+        scope.AccountIds = {"long": [account_id]}
+
+    report_request.Scope = scope
+
+    report_columns = reporting_service.factory.create(
+        "ArrayOfProfessionalDemographicsAudienceReportColumn"
+    )
+    report_columns.AccountPerformanceReportColumn.append(
+        [
+            "AccountName",
+            "AccountNumber",
+            "AccountId",
+            "AccountStatus",
+            "Impressions",
+            "Clicks",
+            "Ctr",
+            "AverageCpc",
+            "Spend",
+            "TimePeriod",
+        ]
+    )
+    report_request.Columns = report_columns
+
+    return report_request
+
+
+def get_adgroup_performance_report_request(
+    account_id,
+    aggregation,
+    exclude_column_headers,
+    exclude_report_footer,
+    exclude_report_header,
+    report_file_format,
+    return_only_complete_data,
+    time,
+):
+
+    report_request = reporting_service.factory.create("AdGroupPerformanceReportRequest")
+    report_request.Aggregation = aggregation
+    report_request.ExcludeColumnHeaders = exclude_column_headers
+    report_request.ExcludeReportFooter = exclude_report_footer
+    report_request.ExcludeReportHeader = exclude_report_header
+    report_request.Format = report_file_format
+    report_request.ReturnOnlyCompleteData = return_only_complete_data
+    report_request.Time = time
+    report_request.ReportName = "Ad groups Performance Report"
+
+    scope = reporting_service.factory.create("AccountThroughAdGroupReportScope")
+
+    campaign_id = 435766866
+    campaign_id = None
+    if campaign_id:
+        campaigns = reporting_service.factory.create("ArrayOfCampaignReportScope")
+        campaign_report_scope = reporting_service.factory.create("CampaignReportScope")
+        campaign_report_scope.AccountId = account_id
+        campaign_report_scope.CampaignId = campaign_id
+        campaigns.CampaignReportScope.append(campaign_report_scope)
+        scope.Campaigns = campaigns
+    else:
+        scope.AccountIds = {"long": [account_id]}
+
+    report_request.Scope = scope
+
+    report_columns = reporting_service.factory.create(
+        "ArrayOfAdGroupPerformanceReportColumn"
+    )
+    report_columns.AdGroupPerformanceReportColumn.append(
+        [
+            "TimePeriod",
+            "AccountId",
+            "CampaignId",
+            "AdGroupId",
+            "AdGroupName",
+            "Status",
+            "Impressions",
+            "Clicks",
+            "Ctr",
+            "Spend",
+        ]
+    )
+    report_request.Columns = report_columns
+
+    return report_request
+
+
+def get_ad_performance_report_request(
+    account_id,
+    aggregation,
+    exclude_column_headers,
+    exclude_report_footer,
+    exclude_report_header,
+    report_file_format,
+    return_only_complete_data,
+    time,
+):
+
+    report_request = reporting_service.factory.create("AdPerformanceReportRequest")
+    report_request.Aggregation = aggregation
+    report_request.ExcludeColumnHeaders = exclude_column_headers
+    report_request.ExcludeReportFooter = exclude_report_footer
+    report_request.ExcludeReportHeader = exclude_report_header
+    report_request.Format = report_file_format
+    report_request.ReturnOnlyCompleteData = return_only_complete_data
+    report_request.Time = time
+    report_request.ReportName = "Ad Performance Report"
+
+    scope = reporting_service.factory.create("AccountThroughAdGroupReportScope")
+
+    # campaign_id = 435766866
+    campaign_id = None
+    if campaign_id:
+        campaigns = reporting_service.factory.create("ArrayOfCampaignReportScope")
+        campaign_report_scope = reporting_service.factory.create("CampaignReportScope")
+        campaign_report_scope.AccountId = account_id
+        campaign_report_scope.CampaignId = campaign_id
+        campaigns.CampaignReportScope.append(campaign_report_scope)
+        scope.Campaigns = campaigns
+    else:
+        scope.AccountIds = {"long": [account_id]}
+
+    report_request.Scope = scope
+
+    report_columns = reporting_service.factory.create(
+        "ArrayOfAdPerformanceReportColumn"
+    )
+    report_columns.AdPerformanceReportColumn.append(
+        [
+            "AccountId",
+            "CampaignId",
+            "AdGroupId",
+            "AdId",
+            "AdTitle",
+            "AdType",
+            "AdStatus",
+            "Impressions",
+            "Clicks",
+            "Ctr",
+            "Spend",
+            # "TimePeriod",
+            "DisplayUrl",
+        ]
+    )
+    report_request.Columns = report_columns
+
+    return report_request
+
+
+def get_professional_demographic_audience_report_request(
     account_id,
     aggregation,
     exclude_column_headers,
@@ -324,10 +654,22 @@ def get_professional_demographics_audience_report_request(
     report_request.Format = report_file_format
     report_request.ReturnOnlyCompleteData = return_only_complete_data
     report_request.Time = time
-    report_request.ReportName = "Demographics Audience Report"
+    report_request.ReportName = "Professional Demographic Audience Report"
+
     scope = reporting_service.factory.create("AccountThroughAdGroupReportScope")
-    scope.AccountIds = {"long": [account_id]}
-    scope.Campaigns = None
+
+    # campaign_id = 435766866
+    campaign_id = None
+    if campaign_id:
+        campaigns = reporting_service.factory.create("ArrayOfCampaignReportScope")
+        campaign_report_scope = reporting_service.factory.create("CampaignReportScope")
+        campaign_report_scope.AccountId = account_id
+        campaign_report_scope.CampaignId = campaign_id
+        campaigns.CampaignReportScope.append(campaign_report_scope)
+        scope.Campaigns = campaigns
+    else:
+        scope.AccountIds = {"long": [account_id]}
+
     report_request.Scope = scope
 
     report_columns = reporting_service.factory.create(
@@ -335,15 +677,18 @@ def get_professional_demographics_audience_report_request(
     )
     report_columns.ProfessionalDemographicsAudienceReportColumn.append(
         [
+            "AccountId",
             "AccountName",
             "AdGroupName",
             "CampaignId",
+            "AdGroupId",
             "CompanyName",
-            "Impressions",
             "IndustryName",
             "JobFunctionName",
-            "TimePeriod",
+            "Impressions",
+            "Clicks",
             "Spend",
+            "TimePeriod",
         ]
     )
     report_request.Columns = report_columns
@@ -374,6 +719,13 @@ if __name__ == "__main__":
 
     reporting_service = ServiceClient(
         service="ReportingService",
+        version=13,
+        authorization_data=authorization_data,
+        environment=ENVIRONMENT,
+    )
+
+    campaign_service = ServiceClient(
+        service="CampaignManagementService",
         version=13,
         authorization_data=authorization_data,
         environment=ENVIRONMENT,
