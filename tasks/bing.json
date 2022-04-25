@@ -1,0 +1,102 @@
+[
+    {
+        "daily_accounts_update": {
+            "actions": [
+                "insert"
+            ],
+            "source": "bingads",
+            "destination": "s3",
+            "model": "accounts",
+            "url": {
+                "response_datas_key": "elements",
+                "base": "https://api.linkedin.com/v2/",
+                "category": "adCampaignsV2",
+                "q": "search",
+                "params": {
+                    "db": {
+                        "_": {
+                            "type": "db",
+                            "args_fields": [],
+                            "kwargs_fields": [
+                                [
+                                    "id",
+                                    "urn:li:sponsoredAccount:{}",
+                                    "search.account.values[0]"
+                                ]
+                            ],
+                            "db_fields": [],
+                            "filter_model": "accounts",
+                            "all_fields": [
+                                "id"
+                            ]
+                        }
+                    },
+                    "dynamics": {
+                        "start_date": {
+                            "type": "group",
+                            "offset_type": "from_today",
+                            "offset_unity": "days",
+                            "offset_value": "1",
+                            "offset_range_position": "start_day",
+                            "url_params": {
+                                "dateRange.start.day": {
+                                    "type": "filter_by",
+                                    "value_type": "date",
+                                    "url_query_parameter_value": "{day}",
+                                    "offset": ""
+                                },
+                                "dateRange.start.month": {
+                                    "type": "filter_by",
+                                    "value_type": "date",
+                                    "url_query_parameter_value": "{month}"
+                                },
+                                "dateRange.start.year": {
+                                    "type": "filter_by",
+                                    "value_type": "date",
+                                    "url_query_parameter_value": "{year}"
+                                }
+                            }
+                        },
+                        "end_date": {
+                            "type": "group",
+                            "offset_type": "from_today",
+                            "offset_unity": "days",
+                            "offset_value": "1",
+                            "offset_range_position": "end_day",
+                            "url_params": {
+                                "dateRange.end.day": {
+                                    "type": "filter_by",
+                                    "value_type": "date",
+                                    "url_query_parameter_value": "{day}",
+                                    "offset": ""
+                                },
+                                "dateRange.end.month": {
+                                    "type": "filter_by",
+                                    "value_type": "date",
+                                    "url_query_parameter_value": "{month}"
+                                },
+                                "dateRange.end.year": {
+                                    "type": "filter_by",
+                                    "value_type": "date",
+                                    "url_query_parameter_value": "{year}"
+                                }
+                            }
+                        }
+                    },
+                    "statics": {
+                        "sort.field": "ID",
+                        "sort.order": "DESCENDING",
+                        "start": "0"
+                    }
+                }
+            },
+            "request": {
+                "header": null
+            },
+            "destination_unique_key": {
+                "type": "raw",
+                "value": "id"
+            }
+        }
+    }
+]

@@ -41,7 +41,7 @@ logging.getLogger("suds.transport.http").setLevel(logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 # The report file extension type.
-REPORT_FILE_FORMAT = "Json"
+REPORT_FILE_FORMAT = "Csv"
 
 # Defineoutput type. If set to local, don't forget to set FILE_DIRECTORY to an existing local file.
 # OUTPUT_TYPE = "S3"
@@ -60,47 +60,266 @@ FILE_DIRECTORY = "/Users/alain/Projects/tmp/"
 TIMEOUT_IN_MILLISECONDS = 3600000
 
 REPORTS_NAME_LIST = [
-    # "campaign_performance_report",
+    "campaign_performance_report",
     # "user_location_performance_report",
     # "professional_demographics_audience_report",
     # "account_performance_report_request",
-    "adgroup_performance_report_request",
+    # "adgroup_performance_report_request",
     # "ad_performance_report_request",
     # "professional_demographic_audience_report_request",
 ]
 
 
 def main(authorization_data):
-    # try:
-    # output_status_message("#### Starting Ingest bing ####")  # noqa :F405
+    try:
+        output_status_message("#### Starting Ingest bing ####")  # noqa :F405
 
-    # for report_name in REPORTS_NAME_LIST:
-    #     output_status_message(f"Running {report_name} task")  # noqa :F405
+        for report_name in REPORTS_NAME_LIST:
+            output_status_message(f"Running {report_name} task")  # noqa :F405
 
-    #     output_status_message("-----\nAwaiting Submit and Download...")  # noqa :F405
-    #     report_request = get_report_request(authorization_data.account_id, report_name)
-    #     submit_and_download(report_request, report_name)
+            output_status_message(
+                "-----\nAwaiting Submit and Download..."
+            )  # noqa :F405
+            report_request = get_report_request(
+                authorization_data.account_id, report_name
+            )
+            submit_and_download(report_request, report_name)
 
-    # except WebFault as ex:
-    #     output_webfault_errors(ex)
-    # except Exception as ex:
-    #     output_status_message(ex)
+    except WebFault as ex:
+        output_webfault_errors(ex)
+    except Exception as ex:
+        output_status_message(ex)
 
-    # campaigns = campaign_service.GetCampaignsByAccountId(
-    #     AccountId=authorization_data.account_id, CampaignType=["Audience"]
-    # )
 
-    adTypes = campaign_service.factory.create("ArrayOfAdType")
-    adTypes.AdType.append("Image")
-    adTypes.AdType.append("ResponsiveAd")
-    ads = campaign_service.GetAdsByAdGroupId(
-        AdGroupId=1330410450882640, AdTypes=adTypes
+class BingAdsClient:
+    def __init__(self, **kwargs):
+        self.authorization_data = AuthorizationData(
+            account_id=None,
+            customer_id=None,
+            developer_token=DEVELOPER_TOKEN,
+            authentication=None,
+        )
+
+        self.reporting_service_manager = ReportingServiceManager(
+            authorization_data=self.authorization_data,
+            poll_interval_in_milliseconds=5000,
+            environment=ENVIRONMENT,
+        )
+
+        authenticate(self.authorization_data)
+
+        self.params = None
+        self.model = None
+
+    def get_zip_datas(self, params):
+        kwargs_list, args_list, sql_list = (
+            self.get_filter_values_from_db(params.get("db", None))
+            if params
+            else ([], [], [])
+        )
+
+        dynamics_params = self.get_dynamics_params(params)
+        statics_params = self.get_statics_params(params)
+
+        kwargs = dynamics_params + statics_params
+
+        from itertools import zip_longest
+
+        zip_datas = list(zip_longest(sql_list, kwargs_list, args_list))
+
+        return zip_datas, kwargs
+
+    def get(self, model=None):
+        # task_name = task_params.keys()[0]
+        # report_request = get_report_request(authorization_data.account_id, task_name)
+        # submit_and_download(report_request, task_name)
+
+        zip_datas, kwargs = self.get_zip_datas(self.params["url"])
+
+        result = []
+        return [{"datas": d} for d in result]
+
+    def get_report_request(self):
+
+        aggregation = "Daily"
+        exclude_column_headers = False
+        exclude_report_footer = True
+        exclude_report_header = True
+        time = reporting_service.factory.create("ReportTime")
+
+        start_date = reporting_service.factory.create("Date")
+        start_date.Day = 1
+        start_date.Month = 1
+        start_date.Year = 2022
+        time.CustomDateRangeStart = start_date
+
+        end_date = reporting_service.factory.create("Date")
+        end_date.Day = 12
+        end_date.Month = 4
+        end_date.Year = 2022
+        time.CustomDateRangeEnd = end_date
+
+        # You can either use a custom date range or predefined time.
+        # time.PredefinedTime = "Yesterday"
+        time.ReportTimeZone = "BrusselsCopenhagenMadridParis"
+        time.CustomDateRangeStart = start_date
+        time.CustomDateRangeEnd = end_date
+        return_only_complete_data = True
+
+        if self.task_name == "user_location_performance_report":
+            result_report = get_user_location_performance_report_request(
+                account_id=self.account_id,
+                aggregation=aggregation,
+                exclude_column_headers=exclude_column_headers,
+                exclude_report_footer=exclude_report_footer,
+                exclude_report_header=exclude_report_header,
+                report_file_format=REPORT_FILE_FORMAT,
+                return_only_complete_data=return_only_complete_data,
+                time=time,
+            )
+
+        if report_name == "professional_demographics_audience_report":
+            result_report = get_professional_demographics_audience_report_request(
+                account_id=account_id,
+                aggregation=aggregation,
+                exclude_column_headers=exclude_column_headers,
+                exclude_report_footer=exclude_report_footer,
+                exclude_report_header=exclude_report_header,
+                report_file_format=REPORT_FILE_FORMAT,
+                return_only_complete_data=return_only_complete_data,
+                time=time,
+            )
+
+        if report_name == "campaign_performance_report":
+            result_report = get_campaign_performance_report_request(
+                account_id=account_id,
+                aggregation=aggregation,
+                exclude_column_headers=exclude_column_headers,
+                exclude_report_footer=exclude_report_footer,
+                exclude_report_header=exclude_report_header,
+                report_file_format=REPORT_FILE_FORMAT,
+                return_only_complete_data=return_only_complete_data,
+                time=time,
+            )
+
+        if report_name == "account_performance_report_request":
+            result_report = get_account_performance_report_request(
+                account_id=account_id,
+                aggregation=aggregation,
+                exclude_column_headers=exclude_column_headers,
+                exclude_report_footer=exclude_report_footer,
+                exclude_report_header=exclude_report_header,
+                report_file_format=REPORT_FILE_FORMAT,
+                return_only_complete_data=return_only_complete_data,
+                time=time,
+            )
+
+        if report_name == "adgroup_performance_report_request":
+            result_report = get_adgroup_performance_report_request(
+                account_id=account_id,
+                aggregation=aggregation,
+                exclude_column_headers=exclude_column_headers,
+                exclude_report_footer=exclude_report_footer,
+                exclude_report_header=exclude_report_header,
+                report_file_format=REPORT_FILE_FORMAT,
+                return_only_complete_data=return_only_complete_data,
+                time=time,
+            )
+
+        if report_name == "ad_performance_report_request":
+            result_report = get_ad_performance_report_request(
+                account_id=account_id,
+                aggregation=aggregation,
+                exclude_column_headers=exclude_column_headers,
+                exclude_report_footer=exclude_report_footer,
+                exclude_report_header=exclude_report_header,
+                report_file_format=REPORT_FILE_FORMAT,
+                return_only_complete_data=return_only_complete_data,
+                time=time,
+            )
+
+        if report_name == "professional_demographic_audience_report_request":
+            result_report = get_professional_demographic_audience_report_request(
+                account_id=account_id,
+                aggregation=aggregation,
+                exclude_column_headers=exclude_column_headers,
+                exclude_report_footer=exclude_report_footer,
+                exclude_report_header=exclude_report_header,
+                report_file_format=REPORT_FILE_FORMAT,
+                return_only_complete_data=return_only_complete_data,
+                time=time,
+            )
+
+        return result_report
+
+
+def submit_and_download(self, report_request, report_name):
+    """Submit the download request and then use the ReportingDownloadOperation result to
+    track status until the report is complete e.g. either using
+    ReportingDownloadOperation.track() or ReportingDownloadOperation.get_status()."""
+
+    # global reporting_service_manager
+    reporting_download_operation = reporting_service_manager.submit_download(
+        report_request
     )
 
-    print(ads)
+    # You may optionally cancel the track() operation after a specified time interval.
+    # reporting_operation_status = reporting_download_operation.track(
+    #     timeout_in_milliseconds=TIMEOUT_IN_MILLISECONDS
+    # )
 
-    output_status_message("Campaigns:")
-    # output_array_of_campaign(campaigns)
+    # You can use ReportingDownloadOperation.track() to poll until complete as shown above,
+    # or use custom polling logic with get_status() as shown below.
+    for i in range(10):
+        time.sleep(reporting_service_manager.poll_interval_in_milliseconds / 1000.0)
+
+        download_status = reporting_download_operation.get_status()
+
+        if download_status.status == "Success":
+            break
+
+    result_file_path = reporting_download_operation.download_result_file(
+        result_file_directory=FILE_DIRECTORY,
+        result_file_name=get_result_file_name(report_name),
+        decompress=True,
+        overwrite=True,  # Set this value true if you want to overwrite the same file.
+        timeout_in_milliseconds=TIMEOUT_IN_MILLISECONDS,  # You may optionally cancel the download after a specified time interval.
+    )
+
+    output_status_message("Download result file: {0}".format(result_file_path))
+
+
+class ReportRequest:
+    def __init__(self, authorization_data=None, aggregation="Daily"):
+        self.authorization_data = authorization_data
+        self.reporting_service = ServiceClient(
+            service="ReportingService",
+            version=13,
+            authorization_data=authorization_data,
+            environment=ENVIRONMENT,
+        )
+        self.aggregation = aggregation
+
+        self.exclude_column_headers = False
+        self.exclude_report_footer = True
+        self.exclude_report_header = True
+
+    def get_custom_date_range(self):
+        time = self.reporting_service.factory.create("ReportTime")
+
+        start_date = self.reporting_service.factory.create("Date")
+        start_date.Day = 1
+        start_date.Month = 1
+        start_date.Year = 2022
+        time.CustomDateRangeStart = start_date
+
+        end_date = self.reporting_service.factory.create("Date")
+        end_date.Day = 12
+        end_date.Month = 4
+        end_date.Year = 2022
+        time.CustomDateRangeEnd = end_date
+
+        return time
 
 
 def get_result_file_name(report_name):
@@ -134,42 +353,6 @@ def get_result_file_name(report_name):
     return result_file_name
 
 
-def submit_and_download(report_request, report_name):
-    """Submit the download request and then use the ReportingDownloadOperation result to
-    track status until the report is complete e.g. either using
-    ReportingDownloadOperation.track() or ReportingDownloadOperation.get_status()."""
-
-    global reporting_service_manager
-    reporting_download_operation = reporting_service_manager.submit_download(
-        report_request
-    )
-
-    # You may optionally cancel the track() operation after a specified time interval.
-    # reporting_operation_status = reporting_download_operation.track(
-    #     timeout_in_milliseconds=TIMEOUT_IN_MILLISECONDS
-    # )
-
-    # You can use ReportingDownloadOperation.track() to poll until complete as shown above,
-    # or use custom polling logic with get_status() as shown below.
-    for i in range(10):
-        time.sleep(reporting_service_manager.poll_interval_in_milliseconds / 1000.0)
-
-        download_status = reporting_download_operation.get_status()
-
-        if download_status.status == "Success":
-            break
-
-    result_file_path = reporting_download_operation.download_result_file(
-        result_file_directory=FILE_DIRECTORY,
-        result_file_name=get_result_file_name(report_name),
-        decompress=True,
-        overwrite=True,  # Set this value true if you want to overwrite the same file.
-        timeout_in_milliseconds=TIMEOUT_IN_MILLISECONDS,  # You may optionally cancel the download after a specified time interval.
-    )
-
-    output_status_message("Download result file: {0}".format(result_file_path))
-
-
 def get_report_request(account_id, report_name):
     """
     Use a sample report request or build your own.
@@ -177,8 +360,8 @@ def get_report_request(account_id, report_name):
 
     aggregation = "Daily"
     exclude_column_headers = False
-    exclude_report_footer = False
-    exclude_report_header = False
+    exclude_report_footer = True
+    exclude_report_header = True
     time = reporting_service.factory.create("ReportTime")
 
     start_date = reporting_service.factory.create("Date")
@@ -296,8 +479,8 @@ def get_campaign_performance_report_request(
     report_file_format,
     return_only_complete_data,
     time,
-    # campaign_id=435766866,
-    campaign_id=None,
+    campaign_id=435766866,
+    # campaign_id=None,
 ):
 
     report_request = reporting_service.factory.create(
@@ -321,7 +504,9 @@ def get_campaign_performance_report_request(
         campaigns.CampaignReportScope.append(campaign_report_scope)
         scope.Campaigns = campaigns
     else:
-        scope.AccountIds = {"long": [account_id]}
+        pass
+
+    # scope.AccountIds = {"long": [account_id]}
 
     report_request.Scope = scope
 

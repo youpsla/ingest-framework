@@ -7,8 +7,8 @@ from typing import List, Tuple
 import boto3
 from botocore.exceptions import ClientError
 
-from constants import ENVS_LIST
-from s3wrappers import BucketWrapper, ObjectWrapper
+from .constants import ENVS_LIST
+from .s3wrappers import BucketWrapper, ObjectWrapper
 
 
 class Client:
@@ -20,7 +20,7 @@ class Client:
     def check_env(env):
         if env not in ENVS_LIST:
             raise AttributeError(
-                "Argument 'env' has to be: {}".format(
+                "Argument 'env' has to be: {}\n".format(
                     "\n".join(["- " + i for i in ENVS_LIST])
                 )
             )
@@ -43,7 +43,6 @@ class S3Client(Client):
         self.application = application
         self.task = task
         self.bucket_name = "linkedin-ingest-dev-staging"
-        self.tmp_prefix = "ingest/tmp/"
         self.date = date
         self._task_full_path = None
         self._bucket = None
@@ -167,3 +166,5 @@ class S3Client(Client):
         )
 
         print(response)
+
+    def

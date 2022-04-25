@@ -19,6 +19,7 @@ Resources:
         Variables:
           WEB_INGEST_DEV_RW_SECRET_NAME: jabmo/db/redshift/web-ingest/dev/rw
           SENTRY_DNS: https://47e2fc82fc674f428f2b3e931eddace7@o1035237.ingest.sentry.io/6094713
+          RUNNING_ENV: development
 
   ScheduledRuleJabmoLinkedInIngestDaily:
     Type: AWS::Events::Rule
@@ -28,6 +29,9 @@ Resources:
       State: "ENABLED"
       Targets:
         - Arn: !GetAtt Function.Arn
+          Id: "Function"
+        - Input: "{ 'tasks_file_path': '/tasks/linkedin.json' }"
+          Arn: !GetAtt Function.Arn
           Id: "Function"
   PermissionRuleJabmoLinkedInIngestDaily:
     Type: AWS::Lambda::Permission

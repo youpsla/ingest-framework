@@ -1,0 +1,18 @@
+[
+    {
+        "accounts": {
+            "AccountId": {
+                "type": "raw"
+            },
+            "AccountName": {
+                "type": "raw"
+            },
+            "AccountNumber": {
+                "type": "raw"
+            },
+            "AccountStatus": {
+                "type": "raw"
+            }
+        }
+    }
+]

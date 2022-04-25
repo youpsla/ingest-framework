@@ -8,7 +8,7 @@ from bingads.exceptions import FileDownloadException
 from bingads.v13.reporting import ReportingDownloadOperation
 from bingads.v13.reporting.reporting_operation import TlsHttpAdapter
 
-from ..main import OUTPUT_TYPE, S3_BUCKET, S3_DIRECTORY
+from ..bingads_client import OUTPUT_TYPE, S3_BUCKET, S3_DIRECTORY
 
 
 class S3Storage:
