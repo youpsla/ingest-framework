@@ -29,17 +29,19 @@ class Model:
 
     """
 
-    def __init__(self, model_name, db_engine=None, params_file_path=None):
+    def __init__(self, model_name, db_engine=None, channel=None):
         self.model_name = model_name
         self.db_engine = db_engine
+        self.channel = channel
         self.params_file_path = None
         self._fields_list = None
+        self._params = None
         self.set_fields()
 
     @property
     def params(self):
         """Property to access model params stored in json file.
-        Each time the property is accessed, the json file is read. Normally, this happen only ont time per task
+        Each time the property is accessed, the json file is read. Normally, this happens only ont time per task
 
         TODO: Currently, source file is hardcoded.
 
@@ -51,14 +53,19 @@ class Model:
             IOError: An error occurred accessing the smalltable.
 
         """
-        __location__ = os.path.realpath(
-            os.path.join(os.getcwd(), os.path.dirname(__file__))
-        )
-        with open(os.path.join(__location__, "models.json"), "r") as f:
-            f = json.load(f)
-        for model_definition in f:
-            if self.model_name in model_definition:
-                return model_definition[self.model_name]
+        if self._params is None:
+            __location__ = os.path.realpath(
+                os.path.join(os.getcwd(), os.path.dirname(__file__), "../", "models")
+            )
+            with open(os.path.join(__location__, f"{self.channel}.json"), "r") as f:
+                f = json.load(f)
+                if len(f) == 0:
+                    return None
+                for model_definition in f:
+                    if self.model_name in model_definition:
+                        return model_definition[self.model_name]
+        else:
+            return self._params
 
     @property
     def fields_list(self):

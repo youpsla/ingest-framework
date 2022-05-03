@@ -189,6 +189,9 @@ def search_accounts_by_user_id(customer_service, user_id):
         else:
             found_last_page = True
 
+    for acc in accounts:
+        print(acc.Name)
+
     return {"AdvertiserAccount": accounts}
 
 
