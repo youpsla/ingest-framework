@@ -176,7 +176,6 @@ class Client:
             from itertools import zip_longest
 
             zip_data = list(zip_longest(sql_list, kwargs_list, args_list))
-            # zip_datas = list(zip_longest(sql_list, kwargs_list, args_list))[0:2]
             return zip_data
         return None
 
@@ -416,7 +415,6 @@ class BingAdsClient(Client):
 
         db_params = self.get_db_params(self.task)
         kwargs = self.get_kwargs(query_params)
-        # db_params, kwargs = self.get_zipped_data(self.task) or ([], [])
 
         result = []
         request = ServiceRequest(
@@ -736,11 +734,6 @@ class ServiceRequest:
             return result
 
         if self.task.name == "daily_ads_update":
-            # import logging
-
-            # logging.basicConfig(level=logging.INFO)
-            # logging.getLogger("suds.client").setLevel(logging.DEBUG)
-            # logging.getLogger("suds.transport.http").setLevel(logging.DEBUG)
 
             adTypes = self.service.factory.create("ArrayOfAdType")
             adTypes.AdType.append("AppInstall")
@@ -756,7 +749,6 @@ class ServiceRequest:
             result = self.service.GetAdsByAdGroupId(AdTypes=adTypes, **self.param[0])
             result = recursive_asdict(result)
             result = nested_get(result, self.task.params["url"]["response_data_key"])
-            print(result)
             return result
 
         raise ValueError("Unknown task name")
