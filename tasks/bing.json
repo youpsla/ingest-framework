@@ -2,100 +2,167 @@
     {
         "daily_accounts_update": {
             "actions": [
-                "insert"
+                "insert",
+                "update"
             ],
-            "source": "bingads",
-            "destination": "s3",
+            "source": "bing",
+            "destination": "redshift",
             "model": "accounts",
             "url": {
-                "response_datas_key": "elements",
-                "base": "https://api.linkedin.com/v2/",
-                "category": "adCampaignsV2",
-                "q": "search",
+                "type": "service",
+                "service_name": "CustomerManagementService",
+                "response_data_key": [
+                    "AccountInfo"
+                ]
+            },
+            "destination_unique_key": {
+                "type": "raw",
+                "value": "id"
+            },
+            "exclude_existing_in_db": true,
+            "exclude_key": "id",
+            "update_key": "id"
+        }
+    },
+    {
+        "daily_campaigns_update": {
+            "actions": [
+                "insert",
+                "update"
+            ],
+            "source": "bing",
+            "destination": "redshift",
+            "model": "campaigns",
+            "exclude_existing_in_db": true,
+            "destination_unique_key": {
+                "type": "raw",
+                "value": "Id"
+            },
+            "exclude_key": "id",
+            "update_key": "id",
+            "url": {
+                "type": "service",
+                "service_name": "CampaignManagementService",
+                "response_data_key": [
+                    "Campaign"
+                ],
                 "params": {
                     "db": {
                         "_": {
                             "type": "db",
-                            "args_fields": [],
-                            "kwargs_fields": [
+                            "db_fields": [
                                 [
                                     "id",
-                                    "urn:li:sponsoredAccount:{}",
-                                    "search.account.values[0]"
+                                    "AccountId"
                                 ]
                             ],
-                            "db_fields": [],
                             "filter_model": "accounts",
                             "all_fields": [
                                 "id"
                             ]
                         }
                     },
-                    "dynamics": {
-                        "start_date": {
-                            "type": "group",
-                            "offset_type": "from_today",
-                            "offset_unity": "days",
-                            "offset_value": "1",
-                            "offset_range_position": "start_day",
-                            "url_params": {
-                                "dateRange.start.day": {
-                                    "type": "filter_by",
-                                    "value_type": "date",
-                                    "url_query_parameter_value": "{day}",
-                                    "offset": ""
-                                },
-                                "dateRange.start.month": {
-                                    "type": "filter_by",
-                                    "value_type": "date",
-                                    "url_query_parameter_value": "{month}"
-                                },
-                                "dateRange.start.year": {
-                                    "type": "filter_by",
-                                    "value_type": "date",
-                                    "url_query_parameter_value": "{year}"
-                                }
-                            }
-                        },
-                        "end_date": {
-                            "type": "group",
-                            "offset_type": "from_today",
-                            "offset_unity": "days",
-                            "offset_value": "1",
-                            "offset_range_position": "end_day",
-                            "url_params": {
-                                "dateRange.end.day": {
-                                    "type": "filter_by",
-                                    "value_type": "date",
-                                    "url_query_parameter_value": "{day}",
-                                    "offset": ""
-                                },
-                                "dateRange.end.month": {
-                                    "type": "filter_by",
-                                    "value_type": "date",
-                                    "url_query_parameter_value": "{month}"
-                                },
-                                "dateRange.end.year": {
-                                    "type": "filter_by",
-                                    "value_type": "date",
-                                    "url_query_parameter_value": "{year}"
-                                }
-                            }
-                        }
-                    },
                     "statics": {
-                        "sort.field": "ID",
-                        "sort.order": "DESCENDING",
-                        "start": "0"
+                        "CampaignType": [
+                            "Search Audience DynamicSearchAds Shopping"
+                        ]
                     }
                 }
+            }
+        }
+    },
+    {
+        "daily_adgroups_update": {
+            "actions": [
+                "insert",
+                "update"
+            ],
+            "source": "bing",
+            "destination": "redshift",
+            "model": "adgroups",
+            "exclude_existing_in_db": true,
+            "destination_unique_key": {
+                "type": "raw",
+                "value": "Id"
             },
-            "request": {
-                "header": null
-            },
+            "exclude_key": "id",
+            "update_key": "Id",
+            "url": {
+                "type": "service",
+                "service_name": "CampaignManagementService",
+                "response_data_key": [
+                    "AdGroup"
+                ],
+                "params": {
+                    "db": {
+                        "_": {
+                            "type": "db",
+                            "db_fields": [
+                                [
+                                    "id",
+                                    "CampaignId"
+                                ]
+                            ],
+                            "filter_model": "campaigns",
+                            "all_fields": [
+                                "id"
+                            ]
+                        }
+                    }
+                }
+            }
+        }
+    },
+    {
+        "daily_ads_update": {
+            "actions": [
+                "insert",
+                "update"
+            ],
+            "source": "bing",
+            "destination": "redshift",
+            "model": "ads",
+            "exclude_existing_in_db": true,
             "destination_unique_key": {
                 "type": "raw",
                 "value": "id"
+            },
+            "exclude_key": "id",
+            "update_key": "id",
+            "url": {
+                "type": "service",
+                "service_name": "CampaignManagementService",
+                "response_data_key": [
+                    "Ad"
+                ],
+                "params": {
+                    "db": {
+                        "_": {
+                            "type": "db",
+                            "db_fields": [
+                                [
+                                    "id",
+                                    "AdGroupId"
+                                ]
+                            ],
+                            "filter_model": "adgroups",
+                            "all_fields": [
+                                "id"
+                            ]
+                        }
+                    },
+                    "statics": {
+                        "AdTypes": [
+                            "AppInstall",
+                            "DynamicSearch",
+                            "ExpandedText",
+                            "Product",
+                            "ResponsiveAd",
+                            "ResponsiveSearchAd",
+                            "Text"
+                        ]
+                    }
+                }
             }
         }
     }

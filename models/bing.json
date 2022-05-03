@@ -1,0 +1,120 @@
+[
+    {
+        "accounts": {
+            "id": {
+                "type": "raw",
+                "source_path": [
+                    "Id"
+                ]
+            },
+            "name": {
+                "type": "raw",
+                "source_path": [
+                    "Name"
+                ]
+            },
+            "number": {
+                "type": "raw",
+                "source_path": [
+                    "Number"
+                ]
+            },
+            "accountlifecyclestatus": {
+                "type": "raw",
+                "source_path": [
+                    "AccountLifeCycleStatus"
+                ]
+            },
+            "pausereason": {
+                "type": "raw",
+                "source_path": [
+                    "PauseReason"
+                ]
+            }
+        },
+        "campaigns": {
+            "Id": {
+                "type": "raw",
+                "source_path": [
+                    "Id"
+                ]
+            },
+            "Name": {
+                "type": "raw",
+                "source_path": [
+                    "Name"
+                ]
+            },
+            "CampaignType": {
+                "type": "raw",
+                "source_path": [
+                    "CampaignType"
+                ]
+            },
+            "Status": {
+                "type": "raw",
+                "source_path": [
+                    "Status"
+                ]
+            },
+            "AccountId": {
+                "type": "raw",
+                "source_path": [
+                    "AccountId"
+                ]
+            }
+        },
+        "adgroups": {
+            "Id": {
+                "type": "raw",
+                "source_path": [
+                    "Id"
+                ]
+            },
+            "Name": {
+                "type": "raw",
+                "source_path": [
+                    "Name"
+                ]
+            },
+            "Status": {
+                "type": "raw",
+                "source_path": [
+                    "Status"
+                ]
+            },
+            "CampaignId": {
+                "type": "raw",
+                "source_path": [
+                    "CampaignId"
+                ]
+            }
+        },
+        "ads": {
+            "id": {
+                "type": "raw",
+                "source_path": [
+                    "Id"
+                ]
+            },
+            "type": {
+                "type": "raw",
+                "source_path": [
+                    "Type"
+                ]
+            },
+            "status": {
+                "type": "raw",
+                "source_path": [
+                    "Status"
+                ]
+            },
+            "adgroupid": {
+                "type": "raw",
+                "source_path": [
+                    "AdGroupId"
+                ]
+            }
+        }
+    }
+]

@@ -4,7 +4,9 @@ from datetime import datetime
 
 from bingads.v13.reporting import ReportingServiceManager
 
-from campaignmanagement_example_helper import output_array_of_campaign
+from src.client import Client
+
+# from campaignmanagement_example_helper import output_array_of_campaign
 
 MODE = "prod"
 
@@ -18,7 +20,7 @@ if MODE == "dev":
         output_status_message,
     )
 else:
-    from auth_helper import (
+    from bing.src.auth_helper import (
         DEVELOPER_TOKEN,
         ENVIRONMENT,
         AuthorizationData,
@@ -91,8 +93,9 @@ def main(authorization_data):
         output_status_message(ex)
 
 
-class BingAdsClient:
-    def __init__(self, **kwargs):
+class BingAdsClient(Client):
+    def __init__(self, params=None, **kwargs):
+        super().__init__(params)
         self.authorization_data = AuthorizationData(
             account_id=None,
             customer_id=None,
@@ -108,33 +111,17 @@ class BingAdsClient:
 
         authenticate(self.authorization_data)
 
-        self.params = None
+        self.params = params
         self.model = None
 
-    def get_zip_datas(self, params):
-        kwargs_list, args_list, sql_list = (
-            self.get_filter_values_from_db(params.get("db", None))
-            if params
-            else ([], [], [])
-        )
-
-        dynamics_params = self.get_dynamics_params(params)
-        statics_params = self.get_statics_params(params)
-
-        kwargs = dynamics_params + statics_params
-
-        from itertools import zip_longest
-
-        zip_datas = list(zip_longest(sql_list, kwargs_list, args_list))
-
-        return zip_datas, kwargs
-
-    def get(self, model=None):
+    def get(self, model=None, **_ignored):
         # task_name = task_params.keys()[0]
         # report_request = get_report_request(authorization_data.account_id, task_name)
         # submit_and_download(report_request, task_name)
 
         zip_datas, kwargs = self.get_zip_datas(self.params["url"])
+        print(zip_datas)
+        print(kwargs)
 
         result = []
         return [{"datas": d} for d in result]

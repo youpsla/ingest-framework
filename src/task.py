@@ -2,16 +2,12 @@ import json
 import logging
 import os
 
+from src.client_helper import get_client
 from src.utils.sql_utils import SqlQuery
 
 from .model import Model
 
 logger = logging.getLogger(__name__)
-
-
-class BingTask(Task):
-    def __init__(self):
-        super().__init()
 
 
 class Task:
@@ -23,12 +19,28 @@ class Task:
     - Retrieving request result from source
     """
 
-    def __init__(self, channel, name, source, destination) -> None:
+    _source = None
+    _destination = None
+
+    def __init__(self, channel, name, running_env) -> None:
         self.channel = channel
         self.name = name
-        self.source = source
-        self.destination = destination
+        self.running_env = running_env
         self._params = None
+
+    @property
+    def source(self):
+        if not self._source:
+            source_name = self.params["source"]
+            self._source = get_client(self.running_env, source_name, self)
+        return self._source
+
+    @property
+    def destination(self):
+        if not self._destination:
+            destination_name = self.params["destination"]
+            self._destination = get_client(self.running_env, destination_name, self)
+        return self._destination
 
     @property
     def params(self):
@@ -38,7 +50,6 @@ class Task:
             )
             with open(os.path.join(__location__, f"{self.channel}.json"), "r") as f:
                 f = json.load(f)
-                print(f)
                 if len(f) == 0:
                     return None
             for task_definition in f:
@@ -50,7 +61,9 @@ class Task:
 
     @property
     def model(self):
-        return Model(self.params["model"], db_engine=self.destination)
+        return Model(
+            self.params["model"], db_engine=self.destination, channel=self.channel
+        )
 
     @property
     def actions(self):
@@ -62,17 +75,18 @@ class Task:
         result = None
 
         if self.params is not None:
+            # TODO: Remove header as it is not used by bing. Pass other params as group.
             result = self.source.get(
                 task_params=self.params,
-                header=self.params["request"]["header"],
             )
         else:
             print(f"No available params for task {self.name}. Running next task.")
             return "error"
 
-        if len(result) == 0:
-            print(f"{self.name}: No new datas from source. Running next task.")
-            return "success"
+        # TODO: Manage result returned by get() method. Remove "runniong next task as we raise error now for interrupting workflow"
+        # if len(result) == 0:
+        #     print(f"{self.name}: No new datas from source. Running next task.")
+        #     return "success"
 
         if not result:
             print(
@@ -84,94 +98,102 @@ class Task:
         return result
 
     def run(self):
-        try:
-            print(f"Starting task: {self.name}")
-            # with open("fixtures.json", "r") as f:
-            #     fix = json.load(f)
-            #     datas_from_source = fix["social_metrics"]["elements"]
+        # try:
+        print(f"Starting task: {self.name}")
+        # with open("fixtures.json", "r") as f:
+        #     fix = json.load(f)
+        #     datas_from_source = fix["social_metrics"]["elements"]
 
-            # Retrieving datas from source
-            source_data = self.get_data_from_source()
+        # Retrieving datas from source
+        source_data = self.get_data_from_source()
 
-            if "download" in self.actions:
-                model = Model(self.model.model_name, self.destination)
-                self.source.params = self.params
-                result = self.source.submit_and_download(model)
-                print(result)
+        if "download" in self.actions:
+            model = Model(self.model.model_name, self.destination, self.channel)
+            self.source.params = self.params
+            result = self.source.submit_and_download()
 
-            # Insert datas in destination
-            if "insert" in self.actions:
-                datas_obj = []
-                for d in source_data:
-                    elem = d["datas"]
-                    if elem is not None:
-                        m = Model(self.model.model_name, self.destination)
-                        m.populate_values(elem)
-                        datas_obj.append(m)
-                        # del m
-                datas_values = []
-                # Search for new records and insert them.
-                if self.params["exclude_existing_in_db"]:
-                    existing_ids = [
-                        r[self.params["exclude_key"]] for r in self.model.get_all()
-                    ]
-                    datas_obj = [
-                        r
-                        for r in datas_obj
-                        if getattr(
-                            r, self.params["destination_unique_key"]["value"]
-                        ).db_value
-                        not in existing_ids
-                    ]
-                    datas_values = [r.get_db_values_tuple() for r in datas_obj]
-                else:
-                    datas_values = [r.get_db_values_tuple() for r in datas_obj]
+        # Insert datas in destination
+        if "insert" in self.actions:
+            datas_obj = []
+            for d in source_data:
+                elem = d["datas"]
+                if elem is not None:
+                    m = Model(
+                        self.model.model_name, self.destination, channel=self.channel
+                    )
+                    m.populate_values(elem)
+                    datas_obj.append(m)
+            datas_values = []
+            # Search for new records and insert them.
+            if self.params["exclude_existing_in_db"]:
+                existing_ids = [
+                    str(r[self.params["exclude_key"]]) for r in self.model.get_all()
+                ]
+                datas_obj = [
+                    r
+                    for r in datas_obj
+                    if getattr(
+                        r, self.params["destination_unique_key"]["value"]
+                    ).db_value
+                    not in existing_ids
+                ]
+                datas_values = [r.get_db_values_tuple() for r in datas_obj]
+            else:
+                datas_values = [r.get_db_values_tuple() for r in datas_obj]
 
-                logger.info(
-                    f"{self.name} - {self.model.model_name}:"
-                    f" {len(datas_values)} record(s) will be inserted"
-                )
-                self.insert(datas_values)
-
-            if "update" in self.actions:
-                datas_obj = []
-                for d in source_data:
-                    if d["datas"] is not None:
-                        m = Model(self.model.model_name, self.destination)
-                        # m.set_field(
-                        #     self.params["db_query"]["fields"][0],
-                        #     m.params[self.params["db_query"]["fields"][0]],
-                        # )
-                        # m.set_field(
-                        #     d["where_field"],
-                        #     m.params[d["where_field"]],
-                        # )
-                        m.set_fields()
-                        m.populate_values(d["datas"])
-                        # setattr(getattr(m, d["where_field"]), "value", d["where_value"])
-
-                        where_dicts_list = []
-                        for v in self.params["db_query"]["keys"]:
-                            where_dicts_list.append({v: d["datas"][v]})
-
-                        values_dicts_list = []
-                        for v in self.params["db_query"]["fields"]:
-                            values_dicts_list.append({v[0]: d["datas"][v[1]]})
-
-                        self.update(
-                            values_dicts_list,
-                            where_dicts_list=where_dicts_list,
-                        )
-                        del m
-            return "success"
-        except Exception as e:
-            logger.error(
-                f"ERROR occured while running task {self.name}:\n{e}\n\n Cancel all"
-                " tasks runned so far.\nRollback Db transaction.\n## ENDING LAMBDA"
+            logger.info(
+                f"{self.name} - {self.model.model_name}:"
+                f" {len(datas_values)} record(s) will be inserted"
             )
-            self.destination.write_results_db_connection.rollback()
+            self.insert(datas_values)
 
-            return "error"
+        if "update" in self.actions:
+            datas_obj = []
+            for d in source_data:
+                if d["datas"] is not None:
+                    m = Model(
+                        self.model.model_name, self.destination, channel=self.channel
+                    )
+                    # m.set_field(
+                    #     self.params["db_query"]["fields"][0],
+                    #     m.params[self.params["db_query"]["fields"][0]],
+                    # )
+                    # m.set_field(
+                    #     d["where_field"],
+                    #     m.params[d["where_field"]],
+                    # )
+                    m.set_fields()
+                    m.populate_values(d["datas"])
+                    # setattr(getattr(m, d["where_field"]), "value", d["where_value"])
+                    datas_obj.append(m)
+
+            data_values = [r.get_db_values_tuple() for r in datas_obj]
+
+            # where_dicts_list = []
+            # for v in self.params["db_query"]["keys"]:
+            #     where_dicts_list.append({v: d["datas"][v]})
+
+            model_fields_list = self.model.fields_list
+            values_dicts_list = [
+                {model_fields_list[values.index(v)].name: v for v in values}
+                for values in data_values
+            ]
+
+            self.update(values_dicts_list, self.params["update_key"])
+        return True, self.destination
+        # except Exception as e:
+        #     logger.error(
+        #         f"ERROR occured while running task {self.name}:\n{e}\n\n Cancel all"
+        #         " tasks runned so far.\nRollback Db transaction.\n## ENDING LAMBDA"
+        #     )
+        #     self.destination.rollback()
+        #     raise Exception(
+        #         "Current running task has failed. All write operation(s) have been"
+        #         " rollbacked."
+        #     )
+        # TODO: Update linkedin client to implemùent rollback method
+
+        return "error"
 
     def insert(self, data):
         sql_query = SqlQuery(
@@ -183,13 +205,12 @@ class Task:
         )
         sql_query.run()
 
-    def update(self, values_dicts_list, where_dicts_list=None):
+    def update(self, values_dicts_list, update_key):
         sql_query = SqlQuery(
             self.destination,
             "update",
-            fields=self.params["db_query"]["fields"],
             values=values_dicts_list,
             model=self.model,
-            where=where_dicts_list,
+            update_key=update_key,
         )
         sql_query.run()
