@@ -1,5 +1,4 @@
-from bing.src.auth_helper import *
-
+from src.clients.bing.auth_helper import *
 from tests.customermanagement_example_helper import *
 
 # You must provide credentials in auth_helper.py.

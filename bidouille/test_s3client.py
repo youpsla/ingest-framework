@@ -1,7 +1,7 @@
 from datetime import datetime
 
-from src.application import Application
-from src.client import S3Client
+from src.commons.application import Application
+from src.commons.client import S3Client
 
 # pytest should be run like this: PYTHONPATH=. python -m pytest
 

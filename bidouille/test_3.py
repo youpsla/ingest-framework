@@ -1,7 +1,7 @@
 # Optionally you can include logging to output traffic, for example the SOAP request and response.
 # import logging
 
-from bing.src.auth_helper import *
+from src.clients.bing.auth_helper import *
 from suds.client import Client
 from suds.sudsobject import asdict
 
@@ -33,18 +33,33 @@ def main(authorization_data):
 
     # for d in dede:
     ## Get campaigns informations
-    print("dodo")
-    dede = campaign_service.GetCampaignsByAccountId(
-        CampaignType=["Search Audience DynamicSearchAds Shopping"],
-        AccountId=authorization_data.account_id,
+    # print("dodo")
+    # dede = campaign_service.GetCampaignsByAccountId(
+    #     CampaignType=["Search Audience DynamicSearchAds Shopping"],
+    #     AccountId=authorization_data.account_id,
+    # )
+
+    # print("dodo")
+    # dede = campaign_service.GetMediaMetaDataByAccountId(
+    #     MediaEnabledEntities="ResponsiveAd", PageInfo=None
+    # )
+
+    # 7559316666939
+    dede = campaign_service.GetMediaAssociations(
+        MediaEnabledEntities="ResponsiveAd ImageAdExtension",
+        MediaIds={"long": [7559219463432]},
     )
+
     dada = recursive_asdict(dede)
+    print(dada)
     import pprint
 
+    print("dede")
     print(pprint.pprint(dada))
-    print(len(dada["Campaign"]))
+    print("zaza")
 
-    # pass
+
+# pass
 
 
 def recursive_asdict(d):

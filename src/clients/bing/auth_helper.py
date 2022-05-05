@@ -1,6 +1,7 @@
+import os
 import sys
 import webbrowser
-from time import gmtime, strftime
+from shutil import copyfile
 
 from bingads.authorization import (
     AuthorizationData,
@@ -19,7 +20,14 @@ CLIENT_SECRET = "ErL7Q~pcKVQXPjMnwHfM3cCGgSGUcvFylpfPt"
 REDIRECT_URL = "https://login.microsoftonline.com/common/oauth2/nativeclient"
 
 
-REFRESH_TOKEN = "refresh.txt"
+LOCAL_REFRESH_TOKEN = "tmp/refresh.txt"
+# Trick to allow usage on AWS Lambda as only /tmp is writable
+if os.environ.get("AWS_EXECUTION_ENV") is not None:
+    copyfile(LOCAL_REFRESH_TOKEN, "/tmp/refresh.txt")
+    REFRESH_TOKEN = "/tmp/refresh.txt"
+else:
+    REFRESH_TOKEN = LOCAL_REFRESH_TOKEN
+
 
 # Optional
 CLIENT_STATE = "ClientStateGoesHere"
@@ -188,9 +196,6 @@ def search_accounts_by_user_id(customer_service, user_id):
             page_index += 1
         else:
             found_last_page = True
-
-    for acc in accounts:
-        print(acc.Name)
 
     return {"AdvertiserAccount": accounts}
 
