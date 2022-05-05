@@ -1,4 +1,4 @@
-from bing.src.auth_helper import *
+from src.clients.bing.auth_helper import *
 
 from bulk_service_manager_helper import *
 from output_helper import *
@@ -6,16 +6,16 @@ from output_helper import *
 # You must provide credentials in auth_helper.py.
 
 
-logging.basicConfig(level=logging.INFO)
-logging.getLogger("suds.client").setLevel(logging.DEBUG)
-logging.getLogger("suds.transport.http").setLevel(logging.DEBUG)
+# logging.basicConfig(level=logging.INFO)
+# logging.getLogger("suds.client").setLevel(logging.DEBUG)
+# logging.getLogger("suds.transport.http").setLevel(logging.DEBUG)
 
 
 def main(authorization_data):
 
     try:
         # Download all campaigns, ad groups, and ads in the account.
-        entities = ["Campaigns"]
+        entities = 'Campaigns', 'AdGroups', 'Ads'
 
         # DownloadParameters is used for Option A below.
         download_parameters = DownloadParameters(
@@ -44,15 +44,15 @@ def main(authorization_data):
         # return results. The BulkServiceManager abstracts the details of checking for result file
         # completion, and you don't have to write any code for results polling.
 
-        output_status_message("-----\nAwaiting Background Completion...")
-        background_completion(download_parameters)
+        # output_status_message("-----\nAwaiting Background Completion...")
+        # background_completion(download_parameters)
 
         # Option B - Submit and Download with BulkServiceManager
         # Submit the download request and then use the BulkDownloadOperation result to
         # track status yourself using BulkServiceManager.get_status().
 
-        # output_status_message("-----\nAwaiting Submit and Download...")
-        # submit_and_download(submit_download_parameters)
+        output_status_message("-----\nAwaiting Submit and Download...")
+        submit_and_download(submit_download_parameters)
 
         # Option C - Download Results with BulkServiceManager
         # If for any reason you have to resume from a previous application state,
@@ -178,5 +178,7 @@ if __name__ == "__main__":
     )
 
     authenticate(authorization_data)
+
+    print(authorization_data.account_id)
 
     main(authorization_data)

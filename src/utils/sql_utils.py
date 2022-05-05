@@ -1,16 +1,15 @@
 import logging
 
-from linkedin.CONFIG import SCHEMA_NAME
-from psycopg2 import extras
+from psycopg2 import ProgrammingError, extras
 from psycopg2.extras import RealDictCursor
-
-logger = logging.getLogger(__name__)
+from src.commons.utils.custom_logger import logger
+from src.envs import SCHEMA_NAME
 
 
 class SqlQuery:
     def __init__(
         self,
-        destination,
+        db_connection,
         qtype,
         fields=None,
         values=None,
@@ -23,7 +22,7 @@ class SqlQuery:
         self.qtype = qtype
         self.fields = fields
         self.values = values
-        self.destination = destination
+        self.db_connection = db_connection
         self.model = model
         self.max_field = max_field
         self._raw_sql = raw_sql
@@ -32,12 +31,13 @@ class SqlQuery:
         self.update_key = update_key
         self._values_list = None
 
-        write_results_db_connection = self.destination.write_results_db_connection
-        self.write_cur = write_results_db_connection.cursor()
-
     @property
     def raw_sql(self):
-        return self._raw_sql.format(schema=SCHEMA_NAME)
+        try:
+            result = self._raw_sql.format(schema=SCHEMA_NAME)
+        except Exception:
+            result = self._raw_sql
+        return result
 
     @property
     def schema_table(self):
@@ -53,68 +53,64 @@ class SqlQuery:
             self._values_list = [[i for i in v.values()] for v in self.values]
         return self._values_list
 
+    def copy_from_s3(self):
+        pass
+
     def run(self):
 
-        write_results_db_connection = self.destination.write_results_db_connection
-        write_cur = write_results_db_connection.cursor()
+        # write_results_db_connection = self.destination.write_results_db_connection
+        # write_cur = write_results_db_connection.cursor()
 
-        db_connection = self.destination.db_connection
+        # db_connection = self.destination.db_connection
         # cursor = db_connection.cursor()
-
-        try:
-            if self.qtype == "select":
-                with db_connection.cursor(cursor_factory=RealDictCursor) as cursor:
+        with self.db_connection.cursor(cursor_factory=RealDictCursor) as cursor:
+            try:
+                if self.qtype == "select":
                     self.sql = self.get_sql_select()
                     cursor.execute(self.sql)
-                    return cursor.fetchall()
-            elif self.qtype == "insert":
-                with db_connection.cursor() as cursor:
+                elif self.qtype == "insert":
                     self.sql = self.get_sql_insert(self.schema_table)
                     extras.execute_values(
                         cursor,
                         self.sql,
                         self.values,
                     )
-                    db_connection.commit()
-            elif self.qtype == "select_max":
-                self.sql = self.get_sql_select_max()
-                with db_connection.cursor() as cursor:
+                elif self.qtype == "select_max":
+                    self.sql = self.get_sql_select_max()
                     cursor.execute(self.sql, self.values)
-                    db_connection.commit()
-                return cursor.fetchall()
-            elif self.qtype == "raw_sql":
-                with db_connection.cursor(cursor_factory=RealDictCursor) as cursor:
+                elif self.qtype == "raw_sql":
                     cursor.execute(self.raw_sql)
-                    db_connection.commit()
                     return cursor.fetchall()
-            elif self.qtype == "update":
-                with db_connection.cursor() as cursor:
+                elif self.qtype == "write_raw_sql":
+                    cursor.execute(self.raw_sql)
+                elif self.qtype == "update":
                     # 1) Creation of the tmp(stage) table
                     create_sql = self.create_tmp_stage_table()
                     cursor.execute(create_sql)
-
                     # 2) Insert self.values in tmp table
-                    sql_insert = self.get_sql_insert("bing.staging")
+                    sql_insert = self.get_sql_insert(self.stage_table_name)
                     extras.execute_values(
                         cursor,
                         sql_insert,
                         self.values_list,
                     )
-                    db_connection.commit()
                     # 3) Do the update
                     self.sql = self.get_sql_update()
                     cursor.execute(self.sql)
 
-                    db_connection.commit()
+                result = []
+                try:
+                    result = cursor.fetchall()
+                except ProgrammingError:
+                    pass
 
-        except Exception as e:
-            print(e)
-            logger.error(
-                f"Issue while executing the following sql query:\n{self.sql}.\nThe"
-                f" following error occur: {e}"
-            )
-            return "Error"
-        return "Success"
+            except Exception as e:
+                logger.error(
+                    f"Issue while executing the following sql query:\n{self.sql}.\nThe"
+                    f" following error occur: {e}"
+                )
+                raise RuntimeError
+            return result
 
     def get_sql_select(self):
         sql = (

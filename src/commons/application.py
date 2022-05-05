@@ -23,8 +23,9 @@ class Application:
     def is_valid_app_name(self):
         if self.app_name not in APPLICATIONS_LIST:
             raise AttributeError(
-                "Attribute 'app_name' is {}. He must be one of the following:\n {}"
-                .format(self.app_name, "\n".join(["- " + i for i in APPLICATIONS_LIST]))
+                "Attribute 'app_name' is {}. He must be one of the following:\n {}".format(
+                    self.app_name, "\n".join(["- " + i for i in APPLICATIONS_LIST])
+                )
             )
         else:
             return True

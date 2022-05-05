@@ -7,7 +7,7 @@ import pytest
 module_path = Path(__file__).parent.parent
 sys.path.append(os.path.join(module_path))
 
-from src.application import Application  # noqa: E402
+from src.commons.application import Application  # noqa: E402
 
 
 def test_is_valid_app_name():

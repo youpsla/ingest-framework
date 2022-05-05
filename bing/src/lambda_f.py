@@ -1,38 +1,15 @@
-# TODO: Put all insert and update Db requests in a transaction for commiting at the end of completion of the group of tasks.# noqa E:501
-# TODO: Create a list of task in lambda_f.py. This allow better error and logging messages (Add running task name).# noqa E:501
 # TODO: manage logger for having logger output in terminal when running locally + cleanup print statements
 
 
-import logging
 import os
 import sys
 import time
 
+from src.clients.redshift.redshift_client import RedshiftClient
+from src.commons.task import Task
+from src.utils.custom_logger import logger
+
 sys.path.append(os.path.join(os.path.dirname(__file__)))
-
-
-import logging
-
-from src.task import Task
-
-# Enable suds logging
-# logging.basicConfig(level=logging.INFO)
-# logging.getLogger("suds.client").setLevel(logging.DEBUG)
-# logging.getLogger("suds.transport.http").setLevel(logging.DEBUG)
-
-
-logger = logging.getLogger(__name__)
-
-
-if logging.getLogger().hasHandlers():
-    # The Lambda environment pre-configures a handler logging to stderr. If a handler is already configured,
-    # `.basicConfig` does not execute. Thus we set the level directly.
-    logging.getLogger().setLevel(logging.INFO)
-else:
-    logging.basicConfig(level=logging.INFO)
-
-logger = logging.getLogger(__name__)
-
 
 SOURCE_CHANNEL = "bing"
 
@@ -41,12 +18,13 @@ DAILY_TASKS_LIST = [
     "daily_campaigns_update",
     "daily_adgroups_update",
     "daily_ads_update",
+    "daily_geo_metrics_update",
+    "daily_geo_metrics_update_s3_to_reshift",
+    "daily_demographic_metrics_update",
+    "daily_demographic_metrics_update_s3_to_reshift",
 ]
 
-
-MONTHLY_TASKS_LIST = [
-    # "daily_campaigns_update",
-]
+MONTHLY_TASKS_LIST = []
 
 
 def get_running_env():
@@ -57,13 +35,11 @@ def get_running_env():
 
 
 def lambda_handler(event, context):
-    print("Enter Linkedin Ingest Lambda.")
-    print(context)
     channel = "bing"
     main(channel)
 
 
-def run_task(channel, task_name, running_env):
+def run_task(channel, task_name, running_env, db_connection):
     """Runs a task
 
     Returns:
@@ -72,7 +48,10 @@ def run_task(channel, task_name, running_env):
         A dict with params
     """
     result, destination = Task(
-        channel=channel, name=task_name, running_env=running_env
+        channel=channel,
+        name=task_name,
+        running_env=running_env,
+        db_connection=db_connection,
     ).run()
     return result, destination
 
@@ -87,8 +66,12 @@ def main(channel):
     logger.info(f"Daily tasks run: {DAILY_TASKS_LIST}")
     workflow_result = []
     destination = None
+
+    db_connection = RedshiftClient().db_connection
+    with db_connection.cursor() as cursor:
+        cursor.execute("BEGIN;")
     for task_name in DAILY_TASKS_LIST:
-        result, destination = run_task(channel, task_name, running_env)
+        result, destination = run_task(channel, task_name, running_env, db_connection)
         workflow_result.append(result)
         # if result != "success":
         #     destination.rollback()
@@ -110,8 +93,9 @@ def main(channel):
     #                 " transactions have been rollbacked. No datas write to"
     #                 " destination."
     #             )
-    destination.write_results_db_connection.commit()
-    destination.write_results_db_connection.close()
+    with db_connection.cursor() as cursor:
+        cursor.execute("COMMIT;")
+        # Transfer from tmp dir to s3
     logger.info("All tasks have runned successfully. Daily Worflow ended with success.")
 
     end = time.time()

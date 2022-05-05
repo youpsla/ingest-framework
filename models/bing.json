@@ -33,31 +33,31 @@
             }
         },
         "campaigns": {
-            "Id": {
+            "id": {
                 "type": "raw",
                 "source_path": [
                     "Id"
                 ]
             },
-            "Name": {
+            "name": {
                 "type": "raw",
                 "source_path": [
                     "Name"
                 ]
             },
-            "CampaignType": {
+            "campaigntype": {
                 "type": "raw",
                 "source_path": [
                     "CampaignType"
                 ]
             },
-            "Status": {
+            "status": {
                 "type": "raw",
                 "source_path": [
                     "Status"
                 ]
             },
-            "AccountId": {
+            "accountid": {
                 "type": "raw",
                 "source_path": [
                     "AccountId"
@@ -65,25 +65,25 @@
             }
         },
         "adgroups": {
-            "Id": {
+            "id": {
                 "type": "raw",
                 "source_path": [
                     "Id"
                 ]
             },
-            "Name": {
+            "name": {
                 "type": "raw",
                 "source_path": [
                     "Name"
                 ]
             },
-            "Status": {
+            "status": {
                 "type": "raw",
                 "source_path": [
                     "Status"
                 ]
             },
-            "CampaignId": {
+            "campaignid": {
                 "type": "raw",
                 "source_path": [
                     "CampaignId"
@@ -110,6 +110,198 @@
                 ]
             },
             "adgroupid": {
+                "type": "raw",
+                "source_path": [
+                    "AdGroupId"
+                ]
+            }
+        },
+        "media": {
+            "id": {
+                "type": "raw",
+                "source_path": [
+                    "Id"
+                ]
+            },
+            "type": {
+                "type": "raw",
+                "source_path": [
+                    "Name"
+                ]
+            },
+            "url": {
+                "type": "raw",
+                "source_path": [
+                    "Status"
+                ]
+            },
+            "campaignid": {
+                "type": "raw",
+                "source_path": [
+                    "CampaignId"
+                ]
+            }
+        },
+        "demographic_metrics": {
+            "time_period": {
+                "type": "raw",
+                "source_path": [
+                    "Id"
+                ]
+            },
+            "account_id": {
+                "type": "raw",
+                "source_path": [
+                    "Id"
+                ]
+            },
+            "account_name": {
+                "type": "raw",
+                "source_path": [
+                    "Id"
+                ]
+            },
+            "campaign_id": {
+                "type": "raw",
+                "source_path": [
+                    "Type"
+                ]
+            },
+            "adgroup_id": {
+                "type": "raw",
+                "source_path": [
+                    "Status"
+                ]
+            },
+            "adgroup_name": {
+                "type": "raw",
+                "source_path": [
+                    "Status"
+                ]
+            },
+            "company_name": {
+                "type": "raw",
+                "source_path": [
+                    "AdGroupId"
+                ]
+            },
+            "industry_name": {
+                "type": "raw",
+                "source_path": [
+                    "AdGroupId"
+                ]
+            },
+            "job_function": {
+                "type": "raw",
+                "source_path": [
+                    "AdGroupId"
+                ]
+            },
+            "impressions": {
+                "type": "raw",
+                "source_path": [
+                    "AdGroupId"
+                ]
+            },
+            "clicks": {
+                "type": "raw",
+                "source_path": [
+                    "AdGroupId"
+                ]
+            },
+            "spend": {
+                "type": "raw",
+                "source_path": [
+                    "AdGroupId"
+                ]
+            }
+        },
+        "geo_metrics": {
+            "time_period": {
+                "type": "raw",
+                "source_path": [
+                    "AdGroupId"
+                ]
+            },
+            "account_id": {
+                "type": "raw",
+                "source_path": [
+                    "Id"
+                ]
+            },
+            "account_name": {
+                "type": "raw",
+                "source_path": [
+                    "Id"
+                ]
+            },
+            "adgroup_id": {
+                "type": "raw",
+                "source_path": [
+                    "Status"
+                ]
+            },
+            "adgroup_name": {
+                "type": "raw",
+                "source_path": [
+                    "Status"
+                ]
+            },
+            "campaign_id": {
+                "type": "raw",
+                "source_path": [
+                    "Type"
+                ]
+            },
+            "country": {
+                "type": "raw",
+                "source_path": [
+                    "AdGroupId"
+                ]
+            },
+            "county": {
+                "type": "raw",
+                "source_path": [
+                    "AdGroupId"
+                ]
+            },
+            "state": {
+                "type": "raw",
+                "source_path": [
+                    "AdGroupId"
+                ]
+            },
+            "city": {
+                "type": "raw",
+                "source_path": [
+                    "AdGroupId"
+                ]
+            },
+            "postal_code": {
+                "type": "raw",
+                "source_path": [
+                    "AdGroupId"
+                ]
+            },
+            "metro_area": {
+                "type": "raw",
+                "source_path": [
+                    "AdGroupId"
+                ]
+            },
+            "impressions": {
+                "type": "raw",
+                "source_path": [
+                    "AdGroupId"
+                ]
+            },
+            "clicks": {
+                "type": "raw",
+                "source_path": [
+                    "AdGroupId"
+                ]
+            },
+            "spend": {
                 "type": "raw",
                 "source_path": [
                     "AdGroupId"

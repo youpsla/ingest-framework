@@ -1,4 +1,4 @@
-ENV_KEYS = {
+DB_SECRET_NAMES = {
     "redshift": {
         "dev": {
             "readonly": "WEB_INGEST_DEV_RO_SECRET_NAME",
@@ -10,3 +10,11 @@ ENV_KEYS = {
         },
     },
 }
+
+
+# SCHEMA_NAME = "aa_staging_linkedin"
+# SCHEMA_NAME = "aa_dev_linkedin"
+# SCHEMA_NAME = "linkedin"
+SCHEMA_NAME = "bing"
+
+

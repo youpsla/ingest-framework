@@ -1,9 +1,21 @@
+import logging
 import os
 
 import psycopg2
+from src.clients.aws.aws_tools import Secret
+from src.envs import DB_SECRET_NAMES
 
-from src.envs import ENV_KEYS
-from src.tools.aws_tools import Secret
+logger = logging.getLogger(__name__)
+
+
+if logging.getLogger().hasHandlers():
+    # The Lambda environment pre-configures a handler logging to stderr. If a handler is already configured,
+    # `.basicConfig` does not execute. Thus we set the level directly.
+    logging.getLogger().setLevel(logging.INFO)
+else:
+    logging.basicConfig(level=logging.INFO)
+
+logger = logging.getLogger(__name__)
 
 
 class RedshiftClient:
@@ -29,7 +41,7 @@ class RedshiftClient:
 
     @property
     def secret_name_env_key(self):
-        return ENV_KEYS["redshift"][self.auth_type][self.mode]
+        return DB_SECRET_NAMES["redshift"][self.auth_type][self.mode]
 
     @property
     def secret_name(self):
@@ -45,6 +57,7 @@ class RedshiftClient:
     @property
     def db_connection(self):
         if not self._db_connection:
+            logger.info(f"Secret name: {self.secret_name}")
             credentials = Secret(self.secret_name).get_value()
             user = credentials["username"]
             pwd = credentials["password"]

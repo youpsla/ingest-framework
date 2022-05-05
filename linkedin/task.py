@@ -29,10 +29,11 @@ class Task:
 
     """
 
-    def __init__(self, name, source, destination) -> None:
+    def __init__(self, name, source, destination, db_connection) -> None:
         self.name = name
         self.source = source
         self.destination = destination
+        self.db_connection = db_connection
         self._params = None
 
     @property
@@ -54,7 +55,7 @@ class Task:
 
     @property
     def model(self):
-        return Model(self.params["model"], db_engine=self.destination)
+        return Model(self.params["model"], db_connection=self.db_connection)
 
     @property
     def actions(self):
@@ -103,7 +104,9 @@ class Task:
                 for d in datas_from_source:
                     elem = d["datas"]
                     if elem is not None:
-                        m = Model(self.model.model_name, self.destination)
+                        m = Model(
+                            self.model.model_name, db_connection=self.db_connection
+                        )
                         m.populate_values(elem)
                         datas_obj.append(m)
                         # del m
@@ -135,7 +138,9 @@ class Task:
                 datas_obj = []
                 for d in datas_from_source:
                     if d["datas"] is not None:
-                        m = Model(self.model.model_name, self.destination)
+                        m = Model(
+                            self.model.model_name, db_connection=self.db_connection
+                        )
                         # m.set_field(
                         #     self.params["db_query"]["fields"][0],
                         #     m.params[self.params["db_query"]["fields"][0]],

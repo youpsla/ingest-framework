@@ -6,8 +6,9 @@ import json
 import os
 from datetime import datetime
 
-from .utils.sql_utils import SqlQuery
-from .utils.various_utils import nested_get
+from src.utils.custom_logger import logger
+from src.utils.sql_utils import SqlQuery
+from src.utils.various_utils import nested_get
 
 
 class ModelManager:
@@ -24,14 +25,14 @@ class Model:
 
     Attributes:
         model_name: The name of the model. Use "<schema>_<table>" format.
-        db_engine: Used to query Db (Instance of SqlQuery)
+        db_connection: Used to query Db (Instance of SqlQuery)
         _fields_list: List of attributes of type Field.
 
     """
 
-    def __init__(self, model_name, db_engine=None, channel=None):
+    def __init__(self, model_name, db_connection=None, channel=None):
         self.model_name = model_name
-        self.db_engine = db_engine
+        self.db_connection = db_connection
         self.channel = channel
         self.params_file_path = None
         self._fields_list = None
@@ -55,7 +56,7 @@ class Model:
         """
         if self._params is None:
             __location__ = os.path.realpath(
-                os.path.join(os.getcwd(), os.path.dirname(__file__), "../", "models")
+                os.path.join(os.getcwd(), os.path.dirname(__file__), "../../", "models")
             )
             with open(os.path.join(__location__, f"{self.channel}.json"), "r") as f:
                 f = json.load(f)
@@ -88,6 +89,10 @@ class Model:
             return res
         else:
             return self._fields_list
+
+    @property
+    def fields_name_list(self):
+        return [m.name for m in self.fields_list]
 
     def set_field(self, name, params):
         """Set the attribute of type Field to self (Model).
@@ -149,7 +154,7 @@ class Model:
             A list of tuples. each tuple representing a record of the query result.
 
         """
-        q = SqlQuery(self.db_engine, "select", model=self, fields=fields)
+        q = SqlQuery(self.db_connection, "select", model=self, fields=fields)
         res = q.run()
         return res
 
@@ -163,25 +168,25 @@ class Model:
             A list of tuple with one tuple containing the max value.
 
         """
-        q = SqlQuery(self.db_engine, "select_max", max_field=field, model=self)
+        q = SqlQuery(self.db_connection, "select_max", max_field=field, model=self)
         res = q.run()
         return res
 
     @staticmethod
-    def get_from_raw_sql(db_engine, sql):
+    def get_from_raw_sql(db_connection, sql):
         """Allow to query the Db with raw sql.
 
         Mainly used for retrieving from teh db values used to build the request endpoint.
 
         Args:
-            db_engine:
+            db_connection:
             sql: A string repsenting the sql query.
 
         Returns:
             A list of tuple with one tuple containing the max value.
 
         """
-        q = SqlQuery(db_engine, "raw_sql", raw_sql=sql)
+        q = SqlQuery(db_connection, "raw_sql", raw_sql=sql)
         res = q.run()
         return res
 
@@ -303,11 +308,11 @@ class Field:
         try:
             result = value.split(caracter)
         except IndexError as e:
-            print(
+            logger.info(
                 f"Error while splitting '{value}' with caracter {caracter} at position"
                 f" {position}"
             )
-            print(e)
+            logger.info(e)
             return ""
 
         # Sometimes Bing geo API returns only 2 locations instead of 3.
