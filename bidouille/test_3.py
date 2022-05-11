@@ -1,6 +1,8 @@
 # Optionally you can include logging to output traffic, for example the SOAP request and response.
 # import logging
 
+import json
+
 from src.clients.bing.auth_helper import *
 from suds.client import Client
 from suds.sudsobject import asdict

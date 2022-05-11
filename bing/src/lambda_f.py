@@ -18,10 +18,10 @@ DAILY_TASKS_LIST = [
     "daily_campaigns_update",
     "daily_adgroups_update",
     "daily_ads_update",
-    "daily_geo_metrics_update",
-    "daily_geo_metrics_update_s3_to_reshift",
-    "daily_demographic_metrics_update",
-    "daily_demographic_metrics_update_s3_to_reshift",
+    # "daily_geo_metrics_update",
+    # "daily_geo_metrics_update_s3_to_reshift",
+    # "daily_demographic_metrics_update",
+    # "daily_demographic_metrics_update_s3_to_reshift",
 ]
 
 MONTHLY_TASKS_LIST = []

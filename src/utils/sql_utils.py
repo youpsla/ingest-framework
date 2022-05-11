@@ -2,8 +2,8 @@ import logging
 
 from psycopg2 import ProgrammingError, extras
 from psycopg2.extras import RealDictCursor
-from src.commons.utils.custom_logger import logger
 from src.envs import SCHEMA_NAME
+from src.utils.custom_logger import logger
 
 
 class SqlQuery:

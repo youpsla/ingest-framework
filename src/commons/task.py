@@ -2,6 +2,8 @@ import json
 import logging
 import os
 
+from src.clients.bing.bing_client import ReportManager
+
 # from src.clients.bing.bing_client import ReportManager
 from src.commons.client_helper import get_client
 from src.commons.model import Model
