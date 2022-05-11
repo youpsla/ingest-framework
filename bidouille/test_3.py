@@ -43,7 +43,7 @@ def main(authorization_data):
 
     # print("dodo")
     # dede = campaign_service.GetMediaMetaDataByAccountId(
-    #     MediaEnabledEntities="ResponsiveAd", PageInfo=None
+    #     MediaEnabledEntities="ResponsiveAd ImageAdExtension", PageInfo=None
     # )
 
     # 7559316666939
@@ -53,12 +53,10 @@ def main(authorization_data):
     )
 
     dada = recursive_asdict(dede)
-    print(dada)
     import pprint
 
-    print("dede")
-    print(pprint.pprint(dada))
-    print("zaza")
+    pprint.pprint(dada)
+    print(len(dada["MediaMetaData"]))
 
 
 # pass

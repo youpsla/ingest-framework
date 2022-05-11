@@ -116,7 +116,7 @@
                 ]
             }
         },
-        "media": {
+        "medias": {
             "id": {
                 "type": "raw",
                 "source_path": [
@@ -126,19 +126,35 @@
             "type": {
                 "type": "raw",
                 "source_path": [
-                    "Name"
+                    "MediaType"
                 ]
             },
             "url": {
                 "type": "raw",
                 "source_path": [
-                    "Status"
+                    "Representations",
+                    "MediaRepresentation",
+                    "Url"
                 ]
-            },
-            "campaignid": {
+            }
+        },
+        "media_associations": {
+            "entity_id": {
                 "type": "raw",
                 "source_path": [
-                    "CampaignId"
+                    "MediaAssociation", "EntityId"
+                ]
+            },
+            "media_enabled_entity": {
+                "type": "raw",
+                "source_path": [
+                    "MediaAssociation", "MediaEnabledEntity"
+                ]
+            },
+            "media_id": {
+                "type": "raw",
+                "source_path": [
+                    "MediaAssociation", "MediaId"
                 ]
             }
         },
