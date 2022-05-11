@@ -18,10 +18,10 @@ DAILY_TASKS_LIST = [
     "daily_campaigns_update",
     "daily_adgroups_update",
     "daily_ads_update",
-    # "daily_geo_metrics_update",
-    # "daily_geo_metrics_update_s3_to_reshift",
-    # "daily_demographic_metrics_update",
-    # "daily_demographic_metrics_update_s3_to_reshift",
+    "daily_geo_metrics_update",
+    "daily_geo_metrics_update_s3_to_reshift",
+    "daily_demographic_metrics_update",
+    "daily_demographic_metrics_update_s3_to_reshift",
 ]
 
 MONTHLY_TASKS_LIST = []
@@ -35,8 +35,7 @@ def get_running_env():
 
 
 def lambda_handler(event, context):
-    channel = "bing"
-    main(channel)
+    main(SOURCE_CHANNEL)
 
 
 def run_task(channel, task_name, running_env, db_connection):
@@ -65,13 +64,12 @@ def main(channel):
     # Daily tasks run
     logger.info(f"Daily tasks run: {DAILY_TASKS_LIST}")
     workflow_result = []
-    destination = None
 
     db_connection = RedshiftClient().db_connection
     with db_connection.cursor() as cursor:
         cursor.execute("BEGIN;")
     for task_name in DAILY_TASKS_LIST:
-        result, destination = run_task(channel, task_name, running_env, db_connection)
+        result, _ = run_task(channel, task_name, running_env, db_connection)
         workflow_result.append(result)
         # if result != "success":
         #     destination.rollback()
@@ -105,6 +103,5 @@ def main(channel):
 
 
 if __name__ == "__main__":
-    channel = "bing"
     os.environ["RUNNING_ENV"] = "development"
-    main(channel)
+    main(SOURCE_CHANNEL)
