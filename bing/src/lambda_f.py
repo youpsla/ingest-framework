@@ -5,6 +5,7 @@ import os
 import sys
 import time
 
+# Import redshift here for being able to rollback()/commit() transaction.
 from src.clients.redshift.redshift_client import RedshiftClient
 from src.commons.task import Task
 from src.utils.custom_logger import logger
@@ -94,7 +95,9 @@ def main(channel):
     with db_connection.cursor() as cursor:
         cursor.execute("COMMIT;")
         # Transfer from tmp dir to s3
-    logger.info("All tasks have runned successfully. Daily Worflow ended with success.")
+    logger.info(
+        "All tasks have runned successfully. Daily Worflow ended with success."
+    )
 
     end = time.time()
     logger.info(end - start)
