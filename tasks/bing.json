@@ -170,6 +170,87 @@
         }
     },
     {
+        "daily_medias_update": {
+            "actions": [
+                "insert",
+                "update"
+            ],
+            "source": "bing",
+            "destination": "redshift",
+            "model": "medias",
+            "destination_unique_key": {
+                "type": "raw",
+                "value": "id"
+            },
+            "exclude_existing_in_db": true,
+            "exclude_key": "id",
+            "update_key": "id",
+            "url": {
+                "type": "service",
+                "service_name": "CampaignManagementService",
+                "response_data_key": [
+                    "MediaMetaData"
+                ],
+                "params": {
+                    "statics": {
+                        "MediaEnabledEntities": [
+                            "ResponsiveAd ImageAdExtension"
+                        ],
+                        "PageInfo" : [null]
+                    }
+                }
+            }
+        }
+    },
+    {
+        "daily_media_associations_update": {
+            "actions": [
+                "insert",
+                "update"
+            ],
+            "source": "bing",
+            "destination": "redshift",
+            "request_data_source": "redshift",
+            "model": "campaigns",
+            "exclude_existing_in_db": false,
+            "destination_unique_key": {
+                "type": "raw",
+                "value": "id"
+            },
+            "exclude_key": "id",
+            "update_key": "id",
+            "url": {
+                "type": "service",
+                "service_name": "CampaignManagementService",
+                "response_data_key": [
+                    "MediaAssociations", "ArrayOfMediaAssociation"
+                ],
+                "params": {
+                    "db": {
+                        "_": {
+                            "type": "db",
+                            "db_fields": [
+                                [
+                                    "id",
+                                    "MediaIds"
+                                ]
+                            ],
+                            "filter_model": "medias",
+                            "all_fields": [
+                                "id"
+                            ]
+                        }
+                    },
+                    "statics": {
+                        "CampaignType": [
+                            "Search Audience DynamicSearchAds Shopping"
+                        ]
+                    }
+                }
+            }
+        }
+    },
+    {
         "daily_geo_metrics_update": {
             "actions": [
                 "download",
