@@ -159,170 +159,35 @@
             }
         },
         "demographic_metrics": {
-            "time_period": {
-                "type": "raw",
-                "source_path": [
-                    "Id"
-                ]
-            },
-            "account_id": {
-                "type": "raw",
-                "source_path": [
-                    "Id"
-                ]
-            },
-            "account_name": {
-                "type": "raw",
-                "source_path": [
-                    "Name"
-                ]
-            },
-            "campaign_id": {
-                "type": "raw",
-                "source_path": [
-                    "Type"
-                ]
-            },
-            "adgroup_id": {
-                "type": "raw",
-                "source_path": [
-                    "Status"
-                ]
-            },
-            "adgroup_name": {
-                "type": "raw",
-                "source_path": [
-                    "Status"
-                ]
-            },
-            "company_name": {
-                "type": "raw",
-                "source_path": [
-                    "AdGroupId"
-                ]
-            },
-            "industry_name": {
-                "type": "raw",
-                "source_path": [
-                    "AdGroupId"
-                ]
-            },
-            "job_function": {
-                "type": "raw",
-                "source_path": [
-                    "AdGroupId"
-                ]
-            },
-            "impressions": {
-                "type": "raw",
-                "source_path": [
-                    "AdGroupId"
-                ]
-            },
-            "clicks": {
-                "type": "raw",
-                "source_path": [
-                    "AdGroupId"
-                ]
-            },
-            "spend": {
-                "type": "raw",
-                "source_path": [
-                    "AdGroupId"
-                ]
-            }
+            "time_period": null,
+            "account_id": null,
+            "account_name": null,
+            "campaign_id": null,
+            "adgroup_id": null,
+            "adgroup_name": null,
+            "company_name": null,
+            "industry_name": null,
+            "job_function": null,
+            "impressions": null,
+            "clicks": null,
+            "spend": null
         },
         "user_location_metrics": {
-            "time_period": {
-                "type": "raw",
-                "source_path": [
-                    "TimePeriod"
-                ]
-            },
-            "account_id": {
-                "type": "raw",
-                "source_path": [
-                    "Id"
-                ]
-            },
-            "account_name": {
-                "type": "raw",
-                "source_path": [
-                    "Id"
-                ]
-            },
-            "adgroup_id": {
-                "type": "raw",
-                "source_path": [
-                    "Status"
-                ]
-            },
-            "adgroup_name": {
-                "type": "raw",
-                "source_path": [
-                    "Status"
-                ]
-            },
-            "campaign_id": {
-                "type": "raw",
-                "source_path": [
-                    "Type"
-                ]
-            },
-            "country": {
-                "type": "raw",
-                "source_path": [
-                    "AdGroupId"
-                ]
-            },
-            "county": {
-                "type": "raw",
-                "source_path": [
-                    "AdGroupId"
-                ]
-            },
-            "state": {
-                "type": "raw",
-                "source_path": [
-                    "AdGroupId"
-                ]
-            },
-            "city": {
-                "type": "raw",
-                "source_path": [
-                    "AdGroupId"
-                ]
-            },
-            "postal_code": {
-                "type": "raw",
-                "source_path": [
-                    "AdGroupId"
-                ]
-            },
-            "metro_area": {
-                "type": "raw",
-                "source_path": [
-                    "AdGroupId"
-                ]
-            },
-            "impressions": {
-                "type": "raw",
-                "source_path": [
-                    "AdGroupId"
-                ]
-            },
-            "clicks": {
-                "type": "raw",
-                "source_path": [
-                    "AdGroupId"
-                ]
-            },
-            "spend": {
-                "type": "raw",
-                "source_path": [
-                    "AdGroupId"
-                ]
-            }
+            "time_period": null,
+            "account_id": null,
+            "account_name": null,
+            "adgroup_id": null,
+            "adgroup_name": null,
+            "campaign_id": null,
+            "country": null,
+            "county": null,
+            "state": null,
+            "city": null,
+            "postal_code": null,
+            "metro_area": null,
+            "impressions": null,
+            "clicks": null,
+            "spend": null
         },
         "geographic_metrics": {
             "time_period": null,
