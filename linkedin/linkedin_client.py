@@ -2,6 +2,7 @@ import json
 from datetime import date, datetime, timedelta
 from urllib.parse import urlencode
 
+import dateutil.relativedelta
 import requests
 from requests.exceptions import ConnectionError, ConnectTimeout, RetryError
 from requests.structures import CaseInsensitiveDict
@@ -47,7 +48,9 @@ class LinkedInAccessToken:
             "client_secret": self.client_secret_value["secret"],
         }
 
-        response = LinkedInClient.do_auth_post_query(endpoint=endpoint, data=data)
+        response = LinkedInClient.do_auth_post_query(
+            endpoint=endpoint, data=data
+        )
 
         access_token = response.json()["access_token"]
 
@@ -80,7 +83,9 @@ class LinkedInRefreshToken(Secret):
         # Launch Sentry alert. Refresh-token can only be refreshed manually. 1 year TTL.
         if self.will_expire_soon:
             # TODO: Launch alert on Sentry
-            print("LinkedIn API Refresh token will expire soon. Please renew it)")
+            print(
+                "LinkedIn API Refresh token will expire soon. Please renew it)"
+            )
 
     @property
     def value(self):
@@ -95,7 +100,9 @@ class LinkedInRefreshToken(Secret):
             "token": self.value,
         }
 
-        response = LinkedInClient.do_auth_post_query(endpoint=endpoint, data=data)
+        response = LinkedInClient.do_auth_post_query(
+            endpoint=endpoint, data=data
+        )
         expires_at = json.loads(response.text)["expires_at"]
 
         if expires_at < datetime.now().timestamp() + (7 * 24 * 3600):
@@ -140,17 +147,17 @@ class LinkedInClient:
                 result.append(self.get_dynamics_param(k, v, start_date))
 
         if params["offset_unity"] == "months":
-            last_day_of_prev_month = date.today().replace(day=1) - timedelta(days=1)
-            start_day_of_prev_month = date.today().replace(day=1) - timedelta(
-                days=last_day_of_prev_month.day
-            )
-            # tmp = {params["offset_unity"]: int(params["offset_value"])}
-            # if params["offset_range_position"] == "start_day":
 
-            # if params["offset_range_position"] == "start_day":
+            today = date.today()
+            last_day_of_prev_month = (
+                today
+                - dateutil.relativedelta.relativedelta(
+                    months=int(params["offset_value"]) - 1
+                )
+            ).replace(day=1) - timedelta(days=1)
 
-            # start_date = today - timedelta(**tmp)
-            # # end_date = today - timedelta(**tmp)
+            start_day_of_prev_month = last_day_of_prev_month.replace(day=1)
+
             for k, v in url_params.items():
                 result.append(
                     self.get_dynamics_param(
@@ -274,6 +281,7 @@ class LinkedInClient:
                 tmp_result = []
                 if response_key:
                     data = data[response_key]
+                    print(len(data))
                     if len(data) >= 15000:
                         print(
                             "LINKEDIN API error. Max elements of 15 000 per request"
@@ -330,7 +338,9 @@ class LinkedInClient:
 
         return headers
 
-    def build_endpoint(self, base=None, category=None, q=None, kwargs=None, args=None):
+    def build_endpoint(
+        self, base=None, category=None, q=None, kwargs=None, args=None
+    ):
         if kwargs:
             kwargs_tuple = [(k, v) for f in kwargs for k, v in f.items()]
         endpoint = (
