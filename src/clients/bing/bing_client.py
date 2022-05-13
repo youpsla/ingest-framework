@@ -70,7 +70,7 @@ class BingAdsClient(Client):
 
         result = []
         if self.task.name in [
-            "daily_geo_metrics_update",
+            "daily_user_location_metrics_update",
             "daily_demographic_metrics_update",
             "daily_geographic_metrics_update",
         ]:
@@ -508,7 +508,7 @@ class ReportRequest:
         return report_request
 
     def get(self):
-        if self.task.name == "daily_geo_metrics_update":
+        if self.task.name == "daily_user_location_metrics_update":
             return self.get_user_location_performance_report_request()
         if self.task.name == "daily_demographic_metrics_update":
             return self.professional_demographics_audience_report_request()

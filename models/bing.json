@@ -232,7 +232,7 @@
                 ]
             }
         },
-        "geo_metrics": {
+        "user_location_metrics": {
             "time_period": {
                 "type": "raw",
                 "source_path": [
