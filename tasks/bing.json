@@ -251,7 +251,7 @@
         }
     },
     {
-        "daily_geo_metrics_update": {
+        "daily_user_location_metrics_update": {
             "actions": [
                 "download",
                 "transfer"
@@ -549,15 +549,15 @@
         }
     },
     {
-        "daily_geo_metrics_update_s3_to_reshift": {
+        "daily_user_location_metrics_update_s3_to_reshift": {
             "actions": [
                 "copy"
             ],
             "source": "s3",
             "destination": "redshift",
-            "model": "geo_metrics",
+            "model": "user_location_metrics",
             "request_data_source": "redshift",
-            "s3_source_task": "daily_geo_metrics_update",
+            "s3_source_task": "daily_user_location_metrics_update",
             "url": {}
         }
     },

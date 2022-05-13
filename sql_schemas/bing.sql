@@ -85,7 +85,7 @@ DISTSTYLE AUTO
 ;
 -- ALTER TABLE bing.demographic_metrics owner to jabmo;
 
-CREATE TABLE IF NOT EXISTS bing.geo_metrics
+CREATE TABLE IF NOT EXISTS bing.user_location_metrics
 (
 	jab_id INT IDENTITY(1,1)
 	,jab_created_at TIMESTAMP WITHOUT TIME ZONE   ENCODE az64 default sysdate
@@ -107,7 +107,7 @@ CREATE TABLE IF NOT EXISTS bing.geo_metrics
 )
 DISTSTYLE AUTO
 ;
--- ALTER TABLE bing.geo_metrics owner to jabmo;
+-- ALTER TABLE bing.user_location_metrics owner to jabmo;
 
 CREATE TABLE IF NOT EXISTS bing.medias
 (
