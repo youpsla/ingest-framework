@@ -46,17 +46,17 @@ class Client:
                 result.append(self.get_dynamics_param(k, v, start_date))
 
         if params["offset_unity"] == "months":
-            last_day_of_prev_month = date.today().replace(day=1) - timedelta(days=1)
-            start_day_of_prev_month = date.today().replace(day=1) - timedelta(
-                days=last_day_of_prev_month.day
-            )
-            # tmp = {params["offset_unity"]: int(params["offset_value"])}
-            # if params["offset_range_position"] == "start_day":
 
-            # if params["offset_range_position"] == "start_day":
+            today = date.today()
+            last_day_of_prev_month = (
+                today
+                - dateutil.relativedelta.relativedelta(
+                    months=int(params["offset_value"]) - 1
+                )
+            ).replace(day=1) - timedelta(days=1)
 
-            # start_date = today - timedelta(**tmp)
-            # # end_date = today - timedelta(**tmp)
+            start_day_of_prev_month = last_day_of_prev_month.replace(day=1)
+
             for k, v in url_params.items():
                 result.append(
                     self.get_dynamics_param(
@@ -116,7 +116,9 @@ class Client:
                 tmp = Model.get_from_raw_sql(db_connection, v["raw_sql"])
             else:
                 model = Model(
-                    v["filter_model"], db_connection=db_connection, channel=channel
+                    v["filter_model"],
+                    db_connection=db_connection,
+                    channel=channel,
                 )
                 tmp = model.get_all(fields=v["all_fields"])
 
