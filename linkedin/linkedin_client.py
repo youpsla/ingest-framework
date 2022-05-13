@@ -177,7 +177,6 @@ class LinkedInClient:
         if params["offset_unity"] == "days":
             tmp = {params["offset_unity"]: int(params["offset_value"])}
             start_date = today - timedelta(**tmp)
-            # end_date = today - timedelta(**tmp)
             for k, v in url_params.items():
                 result.append(self.get_dynamics_param(k, v, start_date))
 
@@ -392,7 +391,7 @@ class LinkedInClient:
                 )
 
                 data = self.do_get_query(endpoint=endpoint, headers=headers)
-                # If request has failed, we log the error and continue to next iteration
+                # If no data continue to next iteration
                 if not data:
                     continue
 
@@ -430,7 +429,7 @@ class LinkedInClient:
             )
 
             data = self.do_get_query(endpoint=endpoint, headers=headers)
-            # If request has failed, we log the error and continue to next iteration
+            # If no data continue to next iteration
             if not data:
                 return None
 
