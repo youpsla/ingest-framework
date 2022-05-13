@@ -441,6 +441,101 @@
         }
     },
     {
+        "daily_geographic_metrics_update": {
+            "actions": [
+                "download",
+                "transfer"
+            ],
+            "source": "bing",
+            "destination": "s3",
+            "request_data_source": "redshift",
+            "url": {
+                "type": "service",
+                "service_name": "ReportingService",
+                "params": {
+                    "db": {
+                        "_": {
+                            "type": "db",
+                            "db_fields": [
+                                [
+                                    "id",
+                                    "AccountIds"
+                                ]
+                            ],
+                            "filter_model": "accounts",
+                            "all_fields": [
+                                "id"
+                            ]
+                        }
+                    },
+                    "statics": {
+                        "AdTypes": [
+                            "AppInstall",
+                            "DynamicSearch",
+                            "ExpandedText",
+                            "Product",
+                            "ResponsiveAd",
+                            "ResponsiveSearchAd",
+                            "Text"
+                        ]
+                    },
+                    "dynamics": {
+                        "start_date": {
+                            "type": "group",
+                            "offset_type": "from_today",
+                            "offset_unity": "days",
+                            "offset_value": "100",
+                            "offset_range_position": "start_day",
+                            "url_params": {
+                                "dateRange.start.day": {
+                                    "type": "filter_by",
+                                    "value_type": "date",
+                                    "url_query_parameter_value": "{day}",
+                                    "offset": ""
+                                },
+                                "dateRange.start.month": {
+                                    "type": "filter_by",
+                                    "value_type": "date",
+                                    "url_query_parameter_value": "{month}"
+                                },
+                                "dateRange.start.year": {
+                                    "type": "filter_by",
+                                    "value_type": "date",
+                                    "url_query_parameter_value": "{year}"
+                                }
+                            }
+                        },
+                        "end_date": {
+                            "type": "group",
+                            "offset_type": "from_today",
+                            "offset_unity": "days",
+                            "offset_value": "1",
+                            "offset_range_position": "end_day",
+                            "url_params": {
+                                "dateRange.end.day": {
+                                    "type": "filter_by",
+                                    "value_type": "date",
+                                    "url_query_parameter_value": "{day}",
+                                    "offset": ""
+                                },
+                                "dateRange.end.month": {
+                                    "type": "filter_by",
+                                    "value_type": "date",
+                                    "url_query_parameter_value": "{month}"
+                                },
+                                "dateRange.end.year": {
+                                    "type": "filter_by",
+                                    "value_type": "date",
+                                    "url_query_parameter_value": "{year}"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    {
         "daily_demographic_metrics_update_s3_to_reshift": {
             "actions": [
                 "copy"
@@ -463,6 +558,19 @@
             "model": "geo_metrics",
             "request_data_source": "redshift",
             "s3_source_task": "daily_geo_metrics_update",
+            "url": {}
+        }
+    },
+    {
+        "daily_geographic_metrics_update_s3_to_reshift": {
+            "actions": [
+                "copy"
+            ],
+            "source": "s3",
+            "destination": "redshift",
+            "model": "geographic_metrics",
+            "request_data_source": "redshift",
+            "s3_source_task": "daily_geographic_metrics_update",
             "url": {}
         }
     }

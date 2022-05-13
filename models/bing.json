@@ -174,7 +174,7 @@
             "account_name": {
                 "type": "raw",
                 "source_path": [
-                    "Id"
+                    "Name"
                 ]
             },
             "campaign_id": {
@@ -236,7 +236,7 @@
             "time_period": {
                 "type": "raw",
                 "source_path": [
-                    "AdGroupId"
+                    "TimePeriod"
                 ]
             },
             "account_id": {
@@ -323,6 +323,23 @@
                     "AdGroupId"
                 ]
             }
+        },
+        "geographic_metrics": {
+            "time_period": null,
+            "account_id": null,
+            "account_name": null,
+            "adgroup_id": null,
+            "adgroup_name": null,
+            "campaign_id": null,
+            "country": null,
+            "state": null,
+            "county": null,
+            "city": null,
+            "postal_code": null,
+            "metro_area": null,
+            "impressions": null,
+            "clicks": null,
+            "spend": null
         }
     }
 ]
