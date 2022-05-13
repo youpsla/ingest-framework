@@ -188,7 +188,7 @@ class ServiceRequest:
             adTypes.AdType.append("Text")
 
             # TODO: Generic way of managing params here
-            result = self.service.GetMediaMetaDataByAccountId(
+            result = self.service.GetAdsByAdGroupId(
                 AdTypes=adTypes, **self.param[0]
             )
             result = recursive_asdict(result)
