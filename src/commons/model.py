@@ -56,9 +56,13 @@ class Model:
         """
         if self._params is None:
             __location__ = os.path.realpath(
-                os.path.join(os.getcwd(), os.path.dirname(__file__), "../../", "models")
+                os.path.join(
+                    os.getcwd(), os.path.dirname(__file__), "../../", "models"
+                )
             )
-            with open(os.path.join(__location__, f"{self.channel}.json"), "r") as f:
+            with open(
+                os.path.join(__location__, f"{self.channel}.json"), "r"
+            ) as f:
                 f = json.load(f)
                 if len(f) == 0:
                     return None
@@ -168,7 +172,9 @@ class Model:
             A list of tuple with one tuple containing the max value.
 
         """
-        q = SqlQuery(self.db_connection, "select_max", max_field=field, model=self)
+        q = SqlQuery(
+            self.db_connection, "select_max", max_field=field, model=self
+        )
         res = q.run()
         return res
 
@@ -240,8 +246,9 @@ class Field:
 
     def set_attributes_from_params(self):
         """Set attributes from the model.json file."""
-        for k, v in self.field_params.items():
-            setattr(self, k, v)
+        if self.field_params:
+            for k, v in self.field_params.items():
+                setattr(self, k, v)
 
     @staticmethod
     def t_lstrip(pattern, value):
