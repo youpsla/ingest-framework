@@ -168,7 +168,9 @@ class S3Client(Client):
             object_key = self.get_object_key()
 
             try:
-                self.client.upload_file(source_file_path, self.bucket_name, object_key)
+                self.client.upload_file(
+                    source_file_path, self.bucket_name, object_key
+                )
                 os.remove(source_file_path)
             except ClientError as e:
                 logger.error(e)
@@ -205,7 +207,9 @@ class S3Client(Client):
     def copy_from_tmp_objects_list_to_final_dest(self):
         for obj in self.tmp_objects_list:
             dest_obj = ObjectWrapper(self.bucket.Object(f"{obj.key[:-4]}"))
-            dest_obj.copy_from(CopySource={"Bucket": self.bucket_name, "Key": obj.key})
+            dest_obj.copy_from(
+                CopySource={"Bucket": self.bucket_name, "Key": obj.key}
+            )
             dest_obj.wait_until_exists()
 
     def rollback(self):
