@@ -188,7 +188,9 @@ class ServiceRequest:
             adTypes.AdType.append("Text")
 
             # TODO: Generic way of managing params here
-            result = self.service.GetAdsByAdGroupId(**self.param[0])
+            result = self.service.GetAdsByAdGroupId(
+                **self.param[0], AdTypes=adTypes
+            )
             result = recursive_asdict(result)
             result = nested_get(
                 result, self.task.params["url"]["response_data_key"]
