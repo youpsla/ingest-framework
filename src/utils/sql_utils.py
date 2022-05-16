@@ -133,8 +133,11 @@ class SqlQuery:
 
     def create_tmp_stage_table(self):
         sql_create_tmp_table = (
-            "DROP TABLE bing.staging; create table IF NOT EXISTS bing.staging"
-            " (like {schema_table});".format(schema_table=self.schema_table)
+            "DROP TABLE IF EXISTS {stage_table_name}; create table IF NOT EXISTS {stage_table_name}"
+            " (like {schema_table});".format(
+                schema_table=self.schema_table,
+                stage_table_name=self.stage_table_name,
+            )
         )
         return sql_create_tmp_table
 
