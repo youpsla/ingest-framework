@@ -173,8 +173,7 @@ class S3Client(Client):
                 )
                 os.remove(source_file_path)
             except ClientError as e:
-                logger.error(e)
-                return False
+                raise ClientError(e)
         return True
 
     def upload_from_file_like_object(self, data):
