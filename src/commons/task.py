@@ -42,13 +42,17 @@ class Task:
     def destination(self):
         if not self._destination:
             destination_name = self.params["destination"]
-            self._destination = get_client(self.running_env, destination_name, self)
+            self._destination = get_client(
+                self.running_env, destination_name, self
+            )
         return self._destination
 
     @property
     def request_data_source(self):
         if not self._request_data_source:
-            request_data_source_name = self.params.get("request_data_source", None)
+            request_data_source_name = self.params.get(
+                "request_data_source", None
+            )
             self._request_data_source = get_client(
                 self.running_env, request_data_source_name, self
             )
@@ -58,9 +62,13 @@ class Task:
     def params(self):
         if self._params is None:
             __location__ = os.path.realpath(
-                os.path.join(os.getcwd(), os.path.dirname(__file__), "../../", "tasks")
+                os.path.join(
+                    os.getcwd(), os.path.dirname(__file__), "../../", "tasks"
+                )
             )
-            with open(os.path.join(__location__, f"{self.channel}.json"), "r") as f:
+            with open(
+                os.path.join(__location__, f"{self.channel}.json"), "r"
+            ) as f:
                 f = json.load(f)
                 if len(f) == 0:
                     return None
@@ -74,7 +82,9 @@ class Task:
     @property
     def model(self):
         return Model(
-            self.params["model"], db_connection=self.db_connection, channel=self.channel
+            self.params["model"],
+            db_connection=self.db_connection,
+            channel=self.channel,
         )
 
     @property
@@ -98,7 +108,9 @@ class Task:
             )
 
         if not result:
-            logger.info(f"{self.name}: No data from source." " Running next task.")
+            logger.info(
+                f"{self.name}: No data from source." " Running next task."
+            )
 
         return result
 
@@ -117,7 +129,8 @@ class Task:
             for d in source_data:
                 elem = d["datas"]
                 ReportManager(
-                    authorization_data=d["authorization_data"], report_request=elem
+                    authorization_data=d["authorization_data"],
+                    report_request=elem,
                 ).submit_and_download()
 
         if "transfer" in self.actions:
@@ -142,15 +155,31 @@ class Task:
             datas_values = []
             # Search for new records and insert them.
             if self.params["exclude_existing_in_db"]:
+                # existing_ids = [
+                #     str(r[self.params["exclude_key"]]) for r in self.model.get_all()
+                # ]
                 existing_ids = [
-                    str(r[self.params["exclude_key"]]) for r in self.model.get_all()
+                    "".join(
+                        str(r[e])
+                        for e in [
+                            d for d in self.params["destination_unique_keys"]
+                        ]
+                    )
+                    for r in self.model.get_all()
                 ]
+
+                # api_ids = [
+                #     "".join([str(r[e]) for e in self.params['exclude_keys']) for r in api_data
+                # ]
+                # existing_ids = [
+                #     str(r[e]) for r in self.model.get_all() for e in self.params['exclude_keys']
+                # ]
                 datas_obj = [
                     r
                     for r in datas_obj
-                    if getattr(
-                        r, self.params["destination_unique_key"]["value"]
-                    ).db_value
+                    if r.get_fields_value_as_string(
+                        self.params["destination_unique_keys"]
+                    )
                     not in existing_ids
                 ]
                 datas_values = [r.get_db_values_tuple() for r in datas_obj]
