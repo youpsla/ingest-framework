@@ -15,10 +15,7 @@
                     "AccountInfo"
                 ]
             },
-            "destination_unique_key": {
-                "type": "raw",
-                "value": "id"
-            },
+            "destination_unique_keys": ["id"],
             "exclude_existing_in_db": true,
             "exclude_key": "id",
             "update_key": "id"
@@ -35,10 +32,7 @@
             "request_data_source": "redshift",
             "model": "campaigns",
             "exclude_existing_in_db": true,
-            "destination_unique_key": {
-                "type": "raw",
-                "value": "id"
-            },
+            "destination_unique_keys": ["id"],
             "exclude_key": "id",
             "update_key": "id",
             "url": {
@@ -83,10 +77,7 @@
             "request_data_source": "redshift",
             "model": "adgroups",
             "exclude_existing_in_db": true,
-            "destination_unique_key": {
-                "type": "raw",
-                "value": "id"
-            },
+            "destination_unique_keys": ["id"],
             "exclude_key": "id",
             "update_key": "id",
             "url": {
@@ -126,10 +117,7 @@
             "request_data_source": "redshift",
             "model": "ads",
             "exclude_existing_in_db": true,
-            "destination_unique_key": {
-                "type": "raw",
-                "value": "id"
-            },
+            "destination_unique_keys": ["id"],
             "exclude_key": "id",
             "update_key": "id",
             "url": {
@@ -178,10 +166,7 @@
             "source": "bing",
             "destination": "redshift",
             "model": "medias",
-            "destination_unique_key": {
-                "type": "raw",
-                "value": "id"
-            },
+            "destination_unique_keys": ["id"],
             "exclude_existing_in_db": true,
             "exclude_key": "id",
             "update_key": "id",
@@ -282,7 +267,7 @@
                             "type": "group",
                             "offset_type": "from_today",
                             "offset_unity": "days",
-                            "offset_value": "1",
+                            "offset_value": "150",
                             "offset_range_position": "start_day",
                             "url_params": {
                                 "dateRange.start.day": {
@@ -307,7 +292,7 @@
                             "type": "group",
                             "offset_type": "from_today",
                             "offset_unity": "days",
-                            "offset_value": "1",
+                            "offset_value": "2",
                             "offset_range_position": "end_day",
                             "url_params": {
                                 "dateRange.end.day": {
@@ -377,7 +362,7 @@
                             "type": "group",
                             "offset_type": "from_today",
                             "offset_unity": "days",
-                            "offset_value": "1",
+                            "offset_value": "150",
                             "offset_range_position": "start_day",
                             "url_params": {
                                 "dateRange.start.day": {
@@ -402,7 +387,7 @@
                             "type": "group",
                             "offset_type": "from_today",
                             "offset_unity": "days",
-                            "offset_value": "1",
+                            "offset_value": "2",
                             "offset_range_position": "end_day",
                             "url_params": {
                                 "dateRange.end.day": {
@@ -472,7 +457,7 @@
                             "type": "group",
                             "offset_type": "from_today",
                             "offset_unity": "days",
-                            "offset_value": "1",
+                            "offset_value": "150",
                             "offset_range_position": "start_day",
                             "url_params": {
                                 "dateRange.start.day": {
@@ -497,7 +482,7 @@
                             "type": "group",
                             "offset_type": "from_today",
                             "offset_unity": "days",
-                            "offset_value": "1",
+                            "offset_value": "2",
                             "offset_range_position": "end_day",
                             "url_params": {
                                 "dateRange.end.day": {
