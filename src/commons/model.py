@@ -162,6 +162,9 @@ class Model:
         res = q.run()
         return res
 
+    def get_fields_value_as_string(self, fields):
+        return "".join([getattr(self, f).db_value for f in fields])
+
     def get_max_for_field(self, field):
         """Get max value for a specific field.
 
