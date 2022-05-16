@@ -205,25 +205,18 @@
     {
         "daily_media_associations_update": {
             "actions": [
-                "insert",
-                "update"
+                "insert"
             ],
             "source": "bing",
             "destination": "redshift",
-            "request_data_source": "redshift",
-            "model": "campaigns",
-            "exclude_existing_in_db": false,
-            "destination_unique_key": {
-                "type": "raw",
-                "value": "id"
-            },
-            "exclude_key": "id",
-            "update_key": "id",
+            "model": "media_associations",
+            "exclude_existing_in_db": true,
+            "destination_unique_keys": ["entity_id", "media_id"],
             "url": {
                 "type": "service",
                 "service_name": "CampaignManagementService",
                 "response_data_key": [
-                    "MediaAssociations", "ArrayOfMediaAssociation"
+                    "MediaAssociations", "ArrayOfMediaAssociation", "MediaAssociation"
                 ],
                 "params": {
                     "db": {
@@ -240,11 +233,6 @@
                                 "id"
                             ]
                         }
-                    },
-                    "statics": {
-                        "CampaignType": [
-                            "Search Audience DynamicSearchAds Shopping"
-                        ]
                     }
                 }
             }

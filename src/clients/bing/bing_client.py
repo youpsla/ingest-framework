@@ -188,9 +188,7 @@ class ServiceRequest:
             adTypes.AdType.append("Text")
 
             # TODO: Generic way of managing params here
-            result = self.service.GetAdsByAdGroupId(
-                AdTypes=adTypes, **self.param[0]
-            )
+            result = self.service.GetAdsByAdGroupId(**self.param[0])
             result = recursive_asdict(result)
             result = nested_get(
                 result, self.task.params["url"]["response_data_key"]
@@ -201,6 +199,25 @@ class ServiceRequest:
 
             result = self.service.GetMediaMetaDataByAccountId(
                 **self.kwargs[0],
+            )
+
+            result = recursive_asdict(result)
+            result = nested_get(
+                result, self.task.params["url"]["response_data_key"]
+            )
+            return result
+
+        if self.task.name == "daily_media_associations_update":
+
+            result = self.service.GetMediaAssociations(
+                MediaEnabledEntities="ResponsiveAd ImageAdExtension",
+                **{
+                    list(self.param[0].keys())[0]: {
+                        "long": [list(self.param[0].values())[0]]
+                    }
+                }
+                # setattr(scope, list(p.keys())[0], {"long": [list(p.values())[0]]})
+                # **self.param[0],
             )
 
             result = recursive_asdict(result)

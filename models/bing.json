@@ -142,19 +142,19 @@
             "entity_id": {
                 "type": "raw",
                 "source_path": [
-                    "MediaAssociation", "EntityId"
+                    "EntityId"
                 ]
             },
             "media_enabled_entity": {
                 "type": "raw",
                 "source_path": [
-                    "MediaAssociation", "MediaEnabledEntity"
+                    "MediaEnabledEntity"
                 ]
             },
             "media_id": {
                 "type": "raw",
                 "source_path": [
-                    "MediaAssociation", "MediaId"
+                    "MediaId"
                 ]
             }
         },
