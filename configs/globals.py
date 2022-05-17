@@ -1,15 +1,14 @@
 import os
 import sys
 
-from src.utils.various_utils import get_running_env, get_schema_name
+from src.utils.various_utils import get_schema_name
 
 #### User defined variables ####
 CHANNEL = "bing"
 ###############################
+os.environ["INGEST_CURRENT_CHANNEL"] = CHANNEL
 
-CONFIGS_DIRECTORY_PATH = "configs"
-
-SCHEMA_NAME = get_schema_name(CHANNEL, get_running_env())
+SCHEMA_NAME = get_schema_name(CHANNEL)
 
 
 if os.environ.get("AWS_EXECUTION_ENV") is None:
