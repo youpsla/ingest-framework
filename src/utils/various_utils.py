@@ -40,6 +40,6 @@ def get_running_env():
     return running_env
 
 
-def get_schema_name(channel, running_env):
-    schema_name = channel + "." + running_env
+def get_schema_name(channel):
+    schema_name = channel + "_" + get_running_env()
     return schema_name

@@ -1,6 +1,10 @@
 DB_SECRET_NAMES = {
     "redshift": {
-        "dev": {
+        "development": {
+            "readonly": "WEB_INGEST_DEV_RO_SECRET_NAME",
+            "readwrite": "WEB_INGEST_DEV_RW_SECRET_NAME",
+        },
+        "staging": {
             "readonly": "WEB_INGEST_DEV_RO_SECRET_NAME",
             "readwrite": "WEB_INGEST_DEV_RW_SECRET_NAME",
         },
@@ -10,13 +14,3 @@ DB_SECRET_NAMES = {
         },
     },
 }
-
-
-# SCHEMA_NAME = "aa_staging_linkedin"
-# SCHEMA_NAME = "aa_dev_linkedin"
-# SCHEMA_NAME = "linkedin"
-SCHEMA_NAME = "bing_dev"
-
-
-def get_schema_name():
-    pass
