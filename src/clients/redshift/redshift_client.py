@@ -32,8 +32,7 @@ class RedshiftClient:
 
     """
 
-    def __init__(self, auth_type="dev", mode="readwrite", dbname="snowplow", **_unused):
-        self.auth_type = auth_type
+    def __init__(self, mode="readwrite", dbname="snowplow", **_unused):
         self.mode = mode
         self.dbname = dbname
         self._db_connection = None
@@ -41,7 +40,7 @@ class RedshiftClient:
 
     @property
     def secret_name_env_key(self):
-        return DB_SECRET_NAMES["redshift"][self.auth_type][self.mode]
+        return DB_SECRET_NAMES["redshift"][os.environ["RUNNING_ENV"]][self.mode]
 
     @property
     def secret_name(self):
@@ -66,7 +65,11 @@ class RedshiftClient:
             dbname = self.dbname
 
             connection = psycopg2.connect(
-                user=user, host=host, port=int(port), password=pwd, database=dbname
+                user=user,
+                host=host,
+                port=int(port),
+                password=pwd,
+                database=dbname,
             )
             self._db_connection = connection
 
@@ -83,7 +86,11 @@ class RedshiftClient:
             dbname = self.dbname
 
             connection = psycopg2.connect(
-                user=user, host=host, port=int(port), password=pwd, database=dbname
+                user=user,
+                host=host,
+                port=int(port),
+                password=pwd,
+                database=dbname,
             )
             self._write_results_db_connection = connection
 
