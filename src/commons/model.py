@@ -39,6 +39,12 @@ class Model:
         self._params = None
         self.set_fields()
 
+    def get_params_json_file_path(self):
+        app_home = os.environ["APPLICATION_HOME"]
+        return os.path.realpath(
+            os.path.join(app_home, "configs", self.channel, "models.json")
+        )
+
     @property
     def params(self):
         """Property to access model params stored in json file.
@@ -55,14 +61,8 @@ class Model:
 
         """
         if self._params is None:
-            __location__ = os.path.realpath(
-                os.path.join(
-                    os.getcwd(), os.path.dirname(__file__), "../../", "models"
-                )
-            )
-            with open(
-                os.path.join(__location__, f"{self.channel}.json"), "r"
-            ) as f:
+            """Get task params from Json file. Store as property for reuse."""
+            with open(self.get_params_json_file_path(), "r") as f:
                 f = json.load(f)
                 if len(f) == 0:
                     return None

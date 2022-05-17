@@ -25,13 +25,7 @@ from src.utils.various_utils import nested_get, recursive_asdict
 REPORT_FILE_FORMAT = "Csv"
 
 # The directory for the report files.
-FILE_DIRECTORY = "/Users/alain/Projects/tmp/"
-
-if os.environ.get("AWS_EXECUTION_ENV") is not None:
-    FILE_DIRECTORY = "/tmp"
-else:
-    FILE_DIRECTORY = "/Users/alain/Projects/tmp/"
-
+FILE_DIRECTORY = "/tmp"
 
 TIMEOUT_IN_MILLISECONDS = 3600000
 
