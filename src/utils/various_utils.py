@@ -1,10 +1,6 @@
-# def nested_get(dic, keys):
-#     try:
-#         for key in keys:
-#             dic = dic[key]
-#         return dic
-#     except Exception as e:
-#         return None
+import os
+
+from suds.sudsobject import asdict
 
 
 def nested_get(dic, keys):
@@ -15,11 +11,8 @@ def nested_get(dic, keys):
             else:
                 dic = dic[key]
         return dic
-    except Exception as e:
+    except Exception:
         return None
-
-
-from suds.sudsobject import asdict
 
 
 def recursive_asdict(d):
@@ -38,3 +31,15 @@ def recursive_asdict(d):
         else:
             out[k] = "%s" % v
     return out
+
+
+def get_running_env():
+    running_env = os.environ.get("RUNNING_ENV")
+    if not running_env:
+        raise ValueError("RUNNING_ENV cannot be None.")
+    return running_env
+
+
+def get_schema_name(channel, running_env):
+    schema_name = channel + "." + running_env
+    return schema_name

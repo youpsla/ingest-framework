@@ -3,23 +3,22 @@
 
 import json
 import os
-import sys
 import time
 
-from configs.globals import *
+# Temporary solution. This import allow init of some envs variables
+# TODO: Envs management needs better system.
+from configs.globals import CHANNEL
 
 # Import redshift here for being able to rollback()/commit() transaction.
 from src.clients.redshift.redshift_client import RedshiftClient
 from src.commons.task import Task
 from src.utils.custom_logger import logger
 
-SOURCE_CHANNEL = "bing"
-
 
 def get_params_json_file_path():
     app_home = os.environ["APPLICATION_HOME"]
     return os.path.realpath(
-        os.path.join(app_home, "configs", SOURCE_CHANNEL, "channel.json")
+        os.path.join(app_home, "configs", CHANNEL, "channel.json")
     )
 
 
@@ -29,18 +28,11 @@ def get_channel_params():
     return f
 
 
-def get_running_env():
-    running_env = os.environ.get("RUNNING_ENV")
-    if not running_env:
-        raise ValueError("RUNNING_ENV cannot be None.")
-    return running_env
-
-
 def lambda_handler(event, context):
-    main(SOURCE_CHANNEL)
+    main()
 
 
-def run_task(channel, task_name, running_env, db_connection):
+def run_task(channel, task_name, db_connection):
     """Runs a task
 
     Returns:
@@ -51,51 +43,27 @@ def run_task(channel, task_name, running_env, db_connection):
     result, destination = Task(
         channel=channel,
         name=task_name,
-        running_env=running_env,
         db_connection=db_connection,
     ).run()
     return result, destination
 
 
-def main(channel):
+def main():
     logger.info("### Starting Ingest lambda ###")
     start = time.time()
 
-    running_env = get_running_env()
     channel_params = get_channel_params()
 
     # Daily tasks run
     logger.info(f"Daily tasks run: {channel_params['daily_tasks_list']}")
-    # workflow_result = []
 
     db_connection = RedshiftClient().db_connection
     with db_connection.cursor() as cursor:
         cursor.execute("BEGIN;")
-    for task_name in channel_params["daily_tasks_list"]:
-        result, _ = run_task(
-            channel_params["name"], task_name, running_env, db_connection
-        )
-        # workflow_result.append(result)
-        # if result != "success":
-        #     destination.rollback()
-        #     logger.error(
-        #         f"Error while running DAILY task{task_name}. All Db transactions have"
-        #         " been rollbacked. No datas write to destination."
-        #     )
 
-    # Monthly tasks run
-    # today = datetime.datetime.now()
-    # if today.day == 1:
-    #     logger.info(f"Monthly tasks run: {MONTHLY_TASKS_LIST}")
-    #     for task_name in MONTHLY_TASKS_LIST:
-    #         result = run_task(source, destination, task_name)
-    #         if result != "success":
-    #             destination.write_results_db_connection.rollback()
-    #             logger.error(
-    #                 f"Error while running MONTHLY task: {task_name}. All Db"
-    #                 " transactions have been rollbacked. No datas write to"
-    #                 " destination."
-    #             )
+    for task_name in channel_params["daily_tasks_list"]:
+        result, _ = run_task(channel_params["name"], task_name, db_connection)
+
     with db_connection.cursor() as cursor:
         cursor.execute("COMMIT;")
         # Transfer from tmp dir to s3
@@ -110,5 +78,4 @@ def main(channel):
 
 
 if __name__ == "__main__":
-    os.environ["RUNNING_ENV"] = "development"
-    main(SOURCE_CHANNEL)
+    main()
