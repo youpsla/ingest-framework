@@ -9,6 +9,7 @@ from src.commons.client_helper import get_client
 from src.commons.model import Model
 from src.utils.custom_logger import logger
 from src.utils.sql_utils import SqlQuery
+from src.utils.various_utils import get_running_env
 
 
 class Task:
@@ -23,10 +24,10 @@ class Task:
     _source = None
     _destination = None
 
-    def __init__(self, channel, name, running_env, db_connection) -> None:
+    def __init__(self, channel, name, db_connection) -> None:
         self.channel = channel
         self.name = name
-        self.running_env = running_env
+        self.running_env = get_running_env()
         self.db_connection = db_connection
         self._params = None
         self._request_data_source = None

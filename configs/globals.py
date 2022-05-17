@@ -1,25 +1,15 @@
 import os
 import sys
 
-RUNNING_ON_LAMBDA = False
-RUNNING_ENV = "development"
-CHANNEL = "bing"
+from src.utils.various_utils import get_running_env, get_schema_name
 
-ROOT_DIR = ""
+#### User defined variables ####
+CHANNEL = "bing"
+###############################
 
 CONFIGS_DIRECTORY_PATH = "configs"
 
-
-def get_running_env():
-    running_env = os.environ.get("RUNNING_ENV")
-    if not running_env:
-        raise ValueError("RUNNING_ENV cannot be None.")
-    return running_env
-
-
-RUNNING_ENV = get_running_env()
-
-# if RUNNING_ENV == 'development':
+SCHEMA_NAME = get_schema_name(CHANNEL, get_running_env())
 
 
 if os.environ.get("AWS_EXECUTION_ENV") is None:

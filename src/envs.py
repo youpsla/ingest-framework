@@ -16,3 +16,7 @@ DB_SECRET_NAMES = {
 # SCHEMA_NAME = "aa_dev_linkedin"
 # SCHEMA_NAME = "linkedin"
 SCHEMA_NAME = "bing_dev"
+
+
+def get_schema_name():
+    pass
