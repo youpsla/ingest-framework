@@ -146,6 +146,11 @@ class ServiceRequest:
 
         if self.task.name == "daily_campaigns_update":
 
+            if not self.param:
+                raise ValueError(
+                    "Task 'daily_campaigns_update' need AccountId for querying source."
+                )
+
             result = self.service.GetCampaignsByAccountId(
                 **self.kwargs[0],
                 **self.param[0],
