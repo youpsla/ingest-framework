@@ -1,38 +1,32 @@
 # TODO: manage logger for having logger output in terminal when running locally + cleanup print statements
 
 
+import json
 import os
 import sys
 import time
+
+from configs.globals import *
 
 # Import redshift here for being able to rollback()/commit() transaction.
 from src.clients.redshift.redshift_client import RedshiftClient
 from src.commons.task import Task
 from src.utils.custom_logger import logger
 
-if os.environ.get("AWS_EXECUTION_ENV") is not None:
-    sys.path.append(os.path.join("/Users/Alain/Projects/ingest"))
-else:
-    sys.path.append(os.path.join("/var/task"))
-
 SOURCE_CHANNEL = "bing"
 
-DAILY_TASKS_LIST = [
-    # "daily_accounts_update",
-    # "daily_campaigns_update",
-    # "daily_adgroups_update",
-    # "daily_ads_update",
-    # "daily_medias_update",
-    "daily_media_associations_update",
-    # "daily_user_location_metrics_update",
-    # "daily_user_location_metrics_update_s3_to_reshift",
-    # "daily_demographic_metrics_update",
-    # "daily_demographic_metrics_update_s3_to_reshift",
-    # "daily_geographic_metrics_update",
-    # "daily_geographic_metrics_update_s3_to_reshift",
-]
 
-MONTHLY_TASKS_LIST = []
+def get_params_json_file_path():
+    app_home = os.environ["APPLICATION_HOME"]
+    return os.path.realpath(
+        os.path.join(app_home, "configs", SOURCE_CHANNEL, "channel.json")
+    )
+
+
+def get_channel_params():
+    with open(get_params_json_file_path(), "r") as f:
+        f = json.load(f)
+    return f
 
 
 def get_running_env():
@@ -68,17 +62,20 @@ def main(channel):
     start = time.time()
 
     running_env = get_running_env()
+    channel_params = get_channel_params()
 
     # Daily tasks run
-    logger.info(f"Daily tasks run: {DAILY_TASKS_LIST}")
-    workflow_result = []
+    logger.info(f"Daily tasks run: {channel_params['daily_tasks_list']}")
+    # workflow_result = []
 
     db_connection = RedshiftClient().db_connection
     with db_connection.cursor() as cursor:
         cursor.execute("BEGIN;")
-    for task_name in DAILY_TASKS_LIST:
-        result, _ = run_task(channel, task_name, running_env, db_connection)
-        workflow_result.append(result)
+    for task_name in channel_params["daily_tasks_list"]:
+        result, _ = run_task(
+            channel_params["name"], task_name, running_env, db_connection
+        )
+        # workflow_result.append(result)
         # if result != "success":
         #     destination.rollback()
         #     logger.error(
