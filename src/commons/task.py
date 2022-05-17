@@ -58,17 +58,17 @@ class Task:
             )
         return self._request_data_source
 
+    def get_params_json_file_path(self):
+        app_home = os.environ["APPLICATION_HOME"]
+        return os.path.realpath(
+            os.path.join(app_home, "configs", self.channel, "tasks.json")
+        )
+
     @property
     def params(self):
+        """Get task params from Json file. Store as property for reuse."""
         if self._params is None:
-            __location__ = os.path.realpath(
-                os.path.join(
-                    os.getcwd(), os.path.dirname(__file__), "../../", "tasks"
-                )
-            )
-            with open(
-                os.path.join(__location__, f"{self.channel}.json"), "r"
-            ) as f:
+            with open(self.get_params_json_file_path(), "r") as f:
                 f = json.load(f)
                 if len(f) == 0:
                     return None
