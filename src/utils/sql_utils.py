@@ -1,9 +1,9 @@
-import logging
+import os
 
 from psycopg2 import ProgrammingError, extras
 from psycopg2.extras import RealDictCursor
-from src.envs import SCHEMA_NAME
 from src.utils.custom_logger import logger
+from src.utils.various_utils import get_schema_name
 
 
 class SqlQuery:
@@ -32,20 +32,25 @@ class SqlQuery:
         self._values_list = None
 
     @property
+    def schema_name(self):
+        channel = os.environ["INGEST_CURRENT_CHANNEL"]
+        return get_schema_name(channel)
+
+    @property
     def raw_sql(self):
         try:
-            result = self._raw_sql.format(schema=SCHEMA_NAME)
+            result = self._raw_sql.format(schema=self.schema_name)
         except Exception:
             result = self._raw_sql
         return result
 
     @property
     def schema_table(self):
-        return "{}.{}".format(SCHEMA_NAME, self.model.model_name)
+        return "{}.{}".format(self.schema_name, self.model.model_name)
 
     @property
     def stage_table_name(self):
-        return "{}.{}".format(SCHEMA_NAME, "staging")
+        return "{}.{}".format(self.schema_name, "staging")
 
     @property
     def values_list(self):
