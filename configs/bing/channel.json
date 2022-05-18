@@ -1,17 +1,7 @@
 {
     "name": "bing",
     "daily_tasks_list" : [
-        "daily_campaigns_update",
-        "daily_adgroups_update",
-        "daily_ads_update",
-        "daily_medias_update",
-        "daily_media_associations_update",
-        "daily_user_location_metrics_update",
-        "daily_user_location_metrics_update_s3_to_reshift",
-        "daily_demographic_metrics_update",
-        "daily_demographic_metrics_update_s3_to_reshift",
-        "daily_geographic_metrics_update",
-        "daily_geographic_metrics_update_s3_to_reshift"
+        "daily_ads_update"
     ],
     "bck_daily_tasks_list" : [
         "daily_accounts_update",
