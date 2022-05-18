@@ -1,11 +1,12 @@
--- DROP SCHEMA bing cascade 
 
-CREATE SCHEMA bing;
+-- DROP SCHEMA bing_development cascade;
 
--- bing.accounts definition
+CREATE SCHEMA bing_development;
 
--- DROP TABLE bing.accounts;
-CREATE TABLE IF NOT EXISTS bing.accounts
+-- bing_development.accounts definition
+
+-- DROP TABLE bing_development.accounts;
+CREATE TABLE IF NOT EXISTS bing_development.accounts
 (
 	jab_id INT IDENTITY(1,1)
 	,jab_created_at TIMESTAMP WITHOUT TIME ZONE   ENCODE az64 default sysdate
@@ -17,12 +18,12 @@ CREATE TABLE IF NOT EXISTS bing.accounts
 )
 DISTSTYLE AUTO
 ;
--- ALTER TABLE bing.accounts owner to jabmo;
+-- ALTER TABLE bing_development.accounts owner to jabmo;
 
 
 
--- DROP TABLE bing.campaigns;
-CREATE TABLE IF NOT EXISTS bing.campaigns
+-- DROP TABLE bing_development.campaigns;
+CREATE TABLE IF NOT EXISTS bing_development.campaigns
 (
 	jab_id INT IDENTITY(1,1)
 	,jab_created_at TIMESTAMP WITHOUT TIME ZONE   ENCODE az64 default sysdate
@@ -34,10 +35,10 @@ CREATE TABLE IF NOT EXISTS bing.campaigns
 )
 DISTSTYLE AUTO
 ;
--- ALTER TABLE bing.campaigns owner to jabmo;
+-- ALTER TABLE bing_development.campaigns owner to jabmo;
 
 
-CREATE TABLE IF NOT EXISTS bing.adgroups
+CREATE TABLE IF NOT EXISTS bing_development.adgroups
 (
 	jab_id INT IDENTITY(1,1)
 	,jab_created_at TIMESTAMP WITHOUT TIME ZONE   ENCODE az64 default sysdate
@@ -48,10 +49,10 @@ CREATE TABLE IF NOT EXISTS bing.adgroups
 )
 DISTSTYLE AUTO
 ;
-ALTER TABLE bing.adgroups owner to jabmo;
+-- ALTER TABLE bing_development.adgroups owner to jabmo;
 
 
-CREATE TABLE IF NOT EXISTS bing.ads
+CREATE TABLE IF NOT EXISTS bing_development.ads
 (
 	jab_id INT IDENTITY(1,1)
 	,jab_created_at TIMESTAMP WITHOUT TIME ZONE   ENCODE az64 default sysdate
@@ -62,9 +63,9 @@ CREATE TABLE IF NOT EXISTS bing.ads
 )
 DISTSTYLE AUTO
 ;
--- ALTER TABLE bing.ads owner to jabmo;
+-- ALTER TABLE bing_development.ads owner to jabmo;
 
-CREATE TABLE IF NOT EXISTS bing.demographic_metrics
+CREATE TABLE IF NOT EXISTS bing_development.demographic_metrics
 (
 	jab_id INT IDENTITY(1,1)
 	,jab_created_at TIMESTAMP WITHOUT TIME ZONE   ENCODE az64 default sysdate
@@ -83,9 +84,9 @@ CREATE TABLE IF NOT EXISTS bing.demographic_metrics
 )
 DISTSTYLE AUTO
 ;
--- ALTER TABLE bing.demographic_metrics owner to jabmo;
+-- ALTER TABLE bing_development.demographic_metrics owner to jabmo;
 
-CREATE TABLE IF NOT EXISTS bing.user_location_metrics
+CREATE TABLE IF NOT EXISTS bing_development.user_location_metrics
 (
 	jab_id INT IDENTITY(1,1)
 	,jab_created_at TIMESTAMP WITHOUT TIME ZONE   ENCODE az64 default sysdate
@@ -107,9 +108,9 @@ CREATE TABLE IF NOT EXISTS bing.user_location_metrics
 )
 DISTSTYLE AUTO
 ;
--- ALTER TABLE bing.user_location_metrics owner to jabmo;
+-- ALTER TABLE bing_development.user_location_metrics owner to jabmo;
 
-CREATE TABLE IF NOT EXISTS bing.medias
+CREATE TABLE IF NOT EXISTS bing_development.medias
 (
 	jab_id INT IDENTITY(1,1)
 	,jab_created_at TIMESTAMP WITHOUT TIME ZONE   ENCODE az64 default sysdate
@@ -119,10 +120,23 @@ CREATE TABLE IF NOT EXISTS bing.medias
 )
 DISTSTYLE AUTO
 ;
--- ALTER TABLE bing.medias owner to jabmo;
+-- ALTER TABLE bing_development.medias owner to jabmo;
 
 
-CREATE TABLE IF NOT EXISTS bing.geographic_metrics
+CREATE TABLE IF NOT EXISTS bing_development.media_associations
+(
+	jab_id INT IDENTITY(1,1)
+	,jab_created_at TIMESTAMP WITHOUT TIME ZONE   ENCODE az64 default sysdate
+	,entity_id BIGINT   ENCODE az64
+	,media_enabled_entity VARCHAR(255)   ENCODE lzo
+	,media_id BIGINT   ENCODE az64
+)
+DISTSTYLE AUTO
+;
+-- ALTER TABLE bing_development.media_associations owner to jabmo;
+
+
+CREATE TABLE IF NOT EXISTS bing_development.geographic_metrics
 (
 	jab_id INT IDENTITY(1,1)
 	,jab_created_at TIMESTAMP WITHOUT TIME ZONE   ENCODE az64 default sysdate
@@ -144,19 +158,19 @@ CREATE TABLE IF NOT EXISTS bing.geographic_metrics
 )
 DISTSTYLE AUTO
 ;
--- ALTER TABLE bing.geographic_metrics owner to jabmo;
+-- ALTER TABLE bing_development.geographic_metrics owner to jabmo;
 
 
 
 
 
 --  Replace <schema_name> with the newly created
- GRANT USAGE ON SCHEMA bing TO GROUP dev_ro;
- GRANT SELECT ON ALL TABLES IN SCHEMA bing TO GROUP dev_ro;
- ALTER DEFAULT PRIVILEGES IN SCHEMA bing GRANT SELECT ON TABLES TO GROUP dev_ro;
+ GRANT USAGE ON SCHEMA bing_development TO GROUP dev_ro;
+ GRANT SELECT ON ALL TABLES IN SCHEMA bing_development TO GROUP dev_ro;
+ ALTER DEFAULT PRIVILEGES IN SCHEMA bing_development GRANT SELECT ON TABLES TO GROUP dev_ro;
 
- GRANT CREATE ON SCHEMA bing TO GROUP dev_rw;
- GRANT ALL ON ALL TABLES IN SCHEMA bing TO GROUP dev_rw;
- ALTER DEFAULT PRIVILEGES IN SCHEMA bing GRANT ALL ON TABLES TO GROUP dev_rw;
+ GRANT CREATE ON SCHEMA bing_development TO GROUP dev_rw;
+ GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA bing_development TO GROUP dev_rw;
+ ALTER DEFAULT PRIVILEGES IN SCHEMA bing_development GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO GROUP dev_rw;
 
  GRANT CREATE ON DATABASE snowplow TO GROUP dev_rw;
