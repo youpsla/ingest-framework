@@ -114,6 +114,14 @@
                 "source_path": [
                     "AdGroupId"
                 ]
+            },
+            "final_urls": {
+                "type": "raw",
+                "source_path": [
+                    "FinalUrls",
+                    "string",
+                    0
+                ]
             }
         },
         "medias": {
