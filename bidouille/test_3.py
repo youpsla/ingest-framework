@@ -4,6 +4,7 @@
 import json
 
 from src.clients.bing.auth_helper import *
+from src.utils.various_utils import nested_get
 from suds.client import Client
 from suds.sudsobject import asdict
 
@@ -12,9 +13,9 @@ from suds.sudsobject import asdict
 # You must provide credentials in auth_helper.py.
 
 
-# logging.basicConfig(level=logging.INFO)
-# logging.getLogger("suds.client").setLevel(logging.DEBUG)
-# logging.getLogger("suds.transport.http").setLevel(logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
+logging.getLogger("suds.client").setLevel(logging.DEBUG)
+logging.getLogger("suds.transport.http").setLevel(logging.DEBUG)
 
 
 def main(authorization_data):
@@ -47,11 +48,6 @@ def main(authorization_data):
     # )
 
     # 7559316666939
-    # dede = campaign_service.GetAdsByAdGroupId(
-    #     MediaEnabledEntities="ResponsiveAd ImageAdExtension",
-    #     MediaIds={"long": [7559219463432]},
-    # )
-
     adTypes = campaign_service.factory.create("ArrayOfAdType")
     adTypes.AdType.append("AppInstall")
     adTypes.AdType.append("DynamicSearch")
@@ -61,15 +57,30 @@ def main(authorization_data):
     adTypes.AdType.append("ResponsiveAd")
     adTypes.AdType.append("ResponsiveSearch")
     adTypes.AdType.append("Text")
-    dede = campaign_service.GetMediaAssociations(
-        AdGroupId=1332609311815986, AdTypes=adTypes
+    dede = campaign_service.GetAdsByAdGroupId(
+        AdTypes=adTypes,
+        AdGroupId="1330410450882640",
     )
+
+    # adTypes = campaign_service.factory.create("ArrayOfAdType")
+    # adTypes.AdType.append("AppInstall")
+    # adTypes.AdType.append("DynamicSearch")
+    # adTypes.AdType.append("ExpandedText")
+    # adTypes.AdType.append("Image")
+    # adTypes.AdType.append("Product")
+    # adTypes.AdType.append("ResponsiveAd")
+    # adTypes.AdType.append("ResponsiveSearch")
+    # adTypes.AdType.append("Text")
+    # dede = campaign_service.GetMediaAssociations(
+    #     AdGroupId=1332609311815986, AdTypes=adTypes
+    # )
 
     dada = recursive_asdict(dede)
     import pprint
 
     pprint.pprint(dada)
-    print(len(dada["MediaMetaData"]))
+    key = ["Ad", "FinalUrls", "string", 0]
+    print(nested_get(dada, key))
 
 
 # pass
