@@ -7,7 +7,7 @@ Resources:
     Properties:
       Description: STAGING - Bing API Ingest Microservice V2a
       Handler: bing.src.lambda_f.lambda_handler
-      CodeUri: s3://jabmo-linkedin-ingest-lambda/5962b5a8f51b533ede364298a07fb830
+      CodeUri: s3://jabmo-linkedin-ingest-lambda/3898a82de460b325c8a2db090e0e7f68
       Runtime: python3.8
       Layers:
       - arn:aws:lambda:eu-west-1:467882466042:layer:python-aws-psycopg2:1
@@ -19,7 +19,7 @@ Resources:
       Environment:
         Variables:
           SENTRY_DNS: https://47e2fc82fc674f428f2b3e931eddace7@o1035237.ingest.sentry.io/6094713
-          RUNNING_ENV: staging
+          RUNNING_ENV: development
   ScheduledRuleJabmoBingIngestDaily:
     Type: AWS::Events::Rule
     Properties:
