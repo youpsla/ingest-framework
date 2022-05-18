@@ -79,7 +79,7 @@ class S3Client(Client):
         objects = self.bucket.objects.filter(
             Prefix="application=ingest/channel={channel}/environment={environment}/state={state}/task={task}".format(
                 channel=self.task.channel,
-                environment="development",
+                environment=os.environ["RUNNING_ENV"],
                 state=UNPROCESSED_STATE,
                 task=self.task.params["s3_source_task"],
             )
@@ -118,7 +118,7 @@ class S3Client(Client):
 
         prefix = "application=ingest/channel={channel}/environment={environment}/state={state}/task={task}".format(
             channel=self.task.channel,
-            environment="development",
+            environment=os.environ["RUNNING_ENV"],
             state=UNPROCESSED_STATE,
             task=self.task.params["s3_source_task"],
         )
