@@ -10,6 +10,7 @@ from src.commons.client import Client
 from src.constants import PROCESSED_STATE, REDSHIT_S3_ARN, UNPROCESSED_STATE
 from src.utils.custom_logger import logger
 from src.utils.sql_utils import SqlQuery
+from src.utils.various_utils import get_schema_name
 
 
 class S3Client(Client):
@@ -103,7 +104,7 @@ class S3Client(Client):
 
         fields = ", ".join(self.task.model.fields_name_list)
         raw_sql = """copy {channel}.{dest_table} ({fields}) from 's3://{bucket_name}/{prefix}' iam_role '{arn}' csv IGNOREHEADER 1 FILLRECORD;""".format(
-            channel=self.task.channel,
+            channel=get_schema_name(self.task.channel),
             prefix=prefix,
             bucket_name=self.bucket_name,
             arn=REDSHIT_S3_ARN,
