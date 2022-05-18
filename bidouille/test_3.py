@@ -47,9 +47,22 @@ def main(authorization_data):
     # )
 
     # 7559316666939
+    # dede = campaign_service.GetAdsByAdGroupId(
+    #     MediaEnabledEntities="ResponsiveAd ImageAdExtension",
+    #     MediaIds={"long": [7559219463432]},
+    # )
+
+    adTypes = campaign_service.factory.create("ArrayOfAdType")
+    adTypes.AdType.append("AppInstall")
+    adTypes.AdType.append("DynamicSearch")
+    adTypes.AdType.append("ExpandedText")
+    adTypes.AdType.append("Image")
+    adTypes.AdType.append("Product")
+    adTypes.AdType.append("ResponsiveAd")
+    adTypes.AdType.append("ResponsiveSearch")
+    adTypes.AdType.append("Text")
     dede = campaign_service.GetMediaAssociations(
-        MediaEnabledEntities="ResponsiveAd ImageAdExtension",
-        MediaIds={"long": [7559219463432]},
+        AdGroupId=1332609311815986, AdTypes=adTypes
     )
 
     dada = recursive_asdict(dede)
