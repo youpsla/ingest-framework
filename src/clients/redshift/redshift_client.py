@@ -3,7 +3,8 @@ import os
 
 import psycopg2
 from src.clients.aws.aws_tools import Secret
-from src.envs import DB_SECRET_NAMES
+from src.constants import DB_SECRET_NAMES
+from src.utils.various_utils import get_running_env
 
 logger = logging.getLogger(__name__)
 
@@ -39,18 +40,8 @@ class RedshiftClient:
         self._write_results_db_connection = None
 
     @property
-    def secret_name_env_key(self):
-        return DB_SECRET_NAMES["redshift"][os.environ["RUNNING_ENV"]][self.mode]
-
-    @property
     def secret_name(self):
-        name = os.getenv(self.secret_name_env_key)
-        if not name:
-            raise Exception(
-                f"{self.secret_name_env_key} doesn't exists or is None. Please set"
-                f" {self.secret_name_env_key} with the Redshift secret name storing db"
-                " credentials."
-            )
+        name = DB_SECRET_NAMES["redshift"][get_running_env()][self.mode]
         return name
 
     @property
