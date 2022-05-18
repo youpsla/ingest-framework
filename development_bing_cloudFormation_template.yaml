@@ -19,7 +19,7 @@ Resources:
       Environment:
         Variables:
           SENTRY_DNS: https://47e2fc82fc674f428f2b3e931eddace7@o1035237.ingest.sentry.io/6094713
-          RUNNING_ENV: staging
+          RUNNING_ENV: development
 
   ScheduledRuleJabmoBingIngestDaily:
     Type: AWS::Events::Rule
