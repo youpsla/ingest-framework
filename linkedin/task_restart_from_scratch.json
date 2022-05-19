@@ -113,11 +113,8 @@
                             "type": "group",
                             "offset_type": "from_today",
                             "offset_unity": "days",
-<<<<<<< HEAD
                             "offset_value": "2000",
-=======
                             "offset_value": "1152",
->>>>>>> linkedin_new_schema
                             "offset_range_position": "start_day",
                             "url_params": {
                                 "dateRange.start.day": {
@@ -166,10 +163,7 @@
                     },
                     "statics": {
                         "timeGranularity": "DAILY",
-<<<<<<< HEAD
                         "start": "0",
-=======
->>>>>>> linkedin_new_schema
                         "pivot": "CREATIVE",
                         "fields": "likes,dateRange,impressions,costInUsd,clicks,shares,costInLocalCurrency,pivot,pivotValue",
                         "projection": "(*,elements*(likes,dateRange(*),impressions,costInUsd,clicks,shares,costInLocalCurrency,pivot,pivotValue~))"
@@ -369,14 +363,14 @@
         }
     },
     {
-        "pivot_member_geo_monthly_update": {
+        "pivot_member_country_monthly_update": {
             "actions": [
                 "insert"
             ],
             "exclude_existing_in_db": false,
             "source": "linkedin",
             "destination": "redshift",
-            "model": "pivot_member_geo",
+            "model": "pivot_member_country",
             "url": {
                 "base": "https://api.linkedin.com/v2/",
                 "category": "adAnalyticsV2",
@@ -521,11 +515,8 @@
                             "type": "group",
                             "offset_type": "from_today",
                             "offset_unity": "days",
-<<<<<<< HEAD
                             "offset_value": "2000",
-=======
                             "offset_value": "1152",
->>>>>>> linkedin_new_schema
                             "offset_range_position": "start_day",
                             "url_params": {
                                 "dateRange.start.day": {
@@ -631,11 +622,8 @@
                             "type": "group",
                             "offset_type": "from_today",
                             "offset_unity": "days",
-<<<<<<< HEAD
                             "offset_value": "2000",
-=======
                             "offset_value": "1152",
->>>>>>> linkedin_new_schema
                             "offset_range_position": "start_day",
                             "url_params": {
                                 "dateRange.start.day": {
@@ -740,11 +728,9 @@
         }
     },
     {
-<<<<<<< HEAD
         "pivot_job_title_daily_update": {
-=======
+
         "pivot_job_title_monthly_update": {
->>>>>>> linkedin_new_schema
             "actions": [
                 "insert"
             ],
@@ -787,11 +773,8 @@
                             "type": "group",
                             "offset_type": "from_today",
                             "offset_unity": "months",
-<<<<<<< HEAD
                             "offset_value": "2000",
-=======
                             "offset_value": "1152",
->>>>>>> linkedin_new_schema
                             "offset_range_position": "start_day",
                             "url_params": {
                                 "dateRange.start.day": {
