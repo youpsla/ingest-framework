@@ -53,7 +53,11 @@ class RedshiftClient:
             dbname = self.dbname
 
             connection = psycopg2.connect(
-                user=user, host=host, port=int(port), password=pwd, database=dbname
+                user=user,
+                host=host,
+                port=int(port),
+                password=pwd,
+                database=dbname,
             )
             self._db_connection = connection
 
@@ -70,7 +74,11 @@ class RedshiftClient:
             dbname = self.dbname
 
             connection = psycopg2.connect(
-                user=user, host=host, port=int(port), password=pwd, database=dbname
+                user=user,
+                host=host,
+                port=int(port),
+                password=pwd,
+                database=dbname,
             )
             self._write_results_db_connection = connection
 
