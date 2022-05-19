@@ -115,7 +115,7 @@
                     "AdGroupId"
                 ]
             },
-            "final_urls": {
+            "display_url": {
                 "type": "raw",
                 "source_path": [
                     "FinalUrls",
