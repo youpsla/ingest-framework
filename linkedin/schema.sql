@@ -292,14 +292,14 @@ DISTSTYLE AUTO
 ALTER TABLE new_linkedin.pivot_member_company owner to jabmo;
 
 
--- new_linkedin.pivot_member_geo definition
+-- new_linkedin.pivot_member_country definition
 
 -- Drop table
 
--- DROP TABLE new_linkedin.pivot_member_geo;
+-- DROP TABLE new_linkedin.pivot_member_country;
 
---DROP TABLE new_linkedin.pivot_member_geo;
-CREATE TABLE IF NOT EXISTS new_linkedin.pivot_member_geo
+--DROP TABLE new_linkedin.pivot_member_country;
+CREATE TABLE IF NOT EXISTS new_linkedin.pivot_member_country
 (
 	jab_id INT IDENTITY(1,1)
 	,jab_created_at TIMESTAMP WITHOUT TIME ZONE   ENCODE az64 default sysdate
@@ -318,7 +318,7 @@ CREATE TABLE IF NOT EXISTS new_linkedin.pivot_member_geo
 )
 DISTSTYLE AUTO
 ;
-ALTER TABLE new_linkedin.pivot_member_geo owner to jabmo;
+ALTER TABLE new_linkedin.pivot_member_country owner to jabmo;
 
 
 -- new_linkedin.social_metrics definition
@@ -352,11 +352,11 @@ ALTER TABLE new_linkedin.social_metrics owner to jabmo;
 
 
 
--- new_linkedin.v_pivot_member_geo_clicks source
+-- new_linkedin.v_pivot_member_country_clicks source
 
-CREATE OR REPLACE VIEW new_linkedin.v_pivot_member_geo_clicks
+CREATE OR REPLACE VIEW new_linkedin.v_pivot_member_country_clicks
 AS SELECT t.geo_id, t.impressions, t.clicks, t.cost_in_usd, t.facet, t.facet_id, t.country, t.time_granularity, t.start_date, t.end_date, t.jab_created_at, g.gen_num, md5((((((t.clicks::character varying::text || g.gen_num::character varying::text) || t.impressions::character varying::text) || t.geo_id::character varying::text) || t.facet_id::character varying::text) || t.start_date::character varying::text) || t.geo_id::character varying::text) AS id
-   FROM new_linkedin.pivot_member_geo t
+   FROM new_linkedin.pivot_member_country t
    JOIN ( SELECT 10000 * t1.num + 1000 * t2.num + 100 * t3.num + 10 * t4.num + t5.num AS gen_num
            FROM ((((((((( SELECT 1 AS num
         UNION 
@@ -459,9 +459,9 @@ UNION
 
 -- Permissions
 
-GRANT SELECT ON TABLE new_linkedin.v_pivot_member_geo_clicks TO public;
-GRANT UPDATE, RULE, DELETE, SELECT, REFERENCES, TRIGGER, INSERT ON TABLE new_linkedin.v_pivot_member_geo_clicks TO jabmo;
-GRANT SELECT ON TABLE new_linkedin.v_pivot_member_geo_clicks TO jabmoro;
+GRANT SELECT ON TABLE new_linkedin.v_pivot_member_country_clicks TO public;
+GRANT UPDATE, RULE, DELETE, SELECT, REFERENCES, TRIGGER, INSERT ON TABLE new_linkedin.v_pivot_member_country_clicks TO jabmo;
+GRANT SELECT ON TABLE new_linkedin.v_pivot_member_country_clicks TO jabmoro;
 
 
 
