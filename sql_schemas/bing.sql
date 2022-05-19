@@ -60,7 +60,7 @@ CREATE TABLE IF NOT EXISTS bing_development.ads
 	,type VARCHAR(255)   ENCODE lzo
 	,status VARCHAR(255)   ENCODE lzo
 	,adgroupid BIGINT   ENCODE az64
-	,final_urls VARCHAR(512)   ENCODE lzo
+	,display_url VARCHAR(512)   ENCODE lzo
 )
 DISTSTYLE AUTO
 ;
