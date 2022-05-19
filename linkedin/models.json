@@ -566,7 +566,7 @@
         }
     },
     {
-        "pivot_member_geo": {
+        "pivot_member_country": {
             "geo_id": {
                 "type": "function",
                 "source_path": [
@@ -682,7 +682,7 @@
             },
             "time_granularity": {
                 "type": "constant",
-                "value": "daily",
+                "value": "monthly",
                 "source_path": null
             },
             "city": {

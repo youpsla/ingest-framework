@@ -362,14 +362,14 @@
         }
     },
     {
-        "pivot_member_geo_monthly_update": {
+        "pivot_member_country_monthly_update": {
             "actions": [
                 "insert"
             ],
             "exclude_existing_in_db": false,
             "source": "linkedin",
             "destination": "redshift",
-            "model": "pivot_member_geo",
+            "model": "pivot_member_country",
             "url": {
                 "base": "https://api.linkedin.com/v2/",
                 "category": "adAnalyticsV2",
