@@ -31,12 +31,10 @@ DAILY_TASKS_LIST = [
     # "daily_social_metrics_update",
     # "creative_sponsored_video_daily_update",
     # "creative_sponsored_video__creative_name_daily_update",
+    "creative_sponsored_update_daily_update"
     # "account_pivot_campaign_daily_update",
     # "creative_url_daily_update",
     # "campaign_groups_daily_update",
-    # "pivot_member_organization_full_daily_update",
-    # "pivot_job_title_daily_full_update",
-    "pivot_member_country_full_daily_update",
 ]
 
 # Task ignored because:
@@ -44,9 +42,7 @@ DAILY_TASKS_LIST = [
 # Task("pivot_creative_daily_update", source, destination).run()
 
 MONTHLY_TASKS_LIST = [
-    "pivot_job_title_monthly_update",
-    "pivot_member_geo_monthly_update",
-    "pivot_member_organization_monthly_update",
+    "pivot_member_country_monthly_update",
 ]
 
 
@@ -55,7 +51,7 @@ def lambda_handler(event, context):
     main()
 
 
-def run_task(source, destination, task_name):
+def run_task(source, destination, task_name, db_connection):
     """Runs a task
 
     Returns:
@@ -63,7 +59,7 @@ def run_task(source, destination, task_name):
         Can be "success" or "error" depending on the task run result.
         A dict with params
     """
-    result = Task(task_name, source, destination).run()
+    result = Task(task_name, source, destination, db_connection).run()
     return result
 
 
@@ -72,6 +68,7 @@ def main():
     start = time.time()
 
     destination = RedshiftClient()
+    db_connection = destination.db_connection
     source = LinkedInClient(destination=destination)
 
     # Daily tasks run
