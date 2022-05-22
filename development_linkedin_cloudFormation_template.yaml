@@ -30,9 +30,6 @@ Resources:
       Targets:
         - Arn: !GetAtt Function.Arn
           Id: "Function"
-        - Input: "{ 'tasks_file_path': '/tasks/linkedin.json' }"
-          Arn: !GetAtt Function.Arn
-          Id: "Function"
   PermissionRuleJabmoLinkedInIngestDaily:
     Type: AWS::Lambda::Permission
     Properties:
