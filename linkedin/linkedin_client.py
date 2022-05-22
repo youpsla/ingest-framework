@@ -381,6 +381,9 @@ class LinkedInClient:
             zip_datas = list(zip_longest(sql_list, kwargs_list, args_list))
             # zip_datas = list(zip_longest(sql_list, kwargs_list, args_list))[0:2]
             result = []
+            print(f"Number of requests to run: {len(zip_datas)}")
+            total_request = len(zip_datas)
+            cpt = 0
             for zd in zip_datas:
                 endpoint = self.build_endpoint(
                     base=url_params["base"],
@@ -420,6 +423,10 @@ class LinkedInClient:
                                 r[k] = v
 
                 result += tmp_result
+                cpt += 1
+                print(
+                    f"Request {cpt} / {total_request} - { total_request - cpt} left."
+                )
 
         else:
             endpoint = self.build_endpoint(
