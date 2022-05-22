@@ -300,6 +300,9 @@
                                 "args",
                                 "rawsql"
                             ],
+                            "kwargs_fields": [],
+                            "db_fields": [],
+                            "args_fields": ["creative_id"],
                             "raw_sql": "select distinct(creative_id) from {schema}.social_metrics where creative_id not in (select creative_id from {schema}.creative_sponsored_update) and creative_type = 'SPONSORED_STATUS_UPDATE'",
                             "url_query_parameter_template": "/{}"
                         }
@@ -397,7 +400,9 @@
                                     "destination_key": "facet_id"
                                 }
                             ],
-                            "raw_sql": "select distinct(campaign_id) from {schema}.account_pivot_campaign where start_date between (select date_trunc('month', getdate() - interval '1 month')) and (select last_day(getdate() - interval '1 month'))"
+                            "raw_sql_2": "select distinct(campaign_id) from {schema}.account_pivot_campaign where start_date between (select date_trunc('month', getdate() - interval '1 month')) and (select last_day(getdate() - interval '1 month'))",
+                            "raw_sql": "select distinct(campaign_id) from {schema}.account_pivot_campaign"
+
                         }
                     },
                     "dynamics": {
