@@ -19,14 +19,14 @@ class Model:
 
     Attributes:
         model_name: The name of the model. Use "<schema>_<table>" format.
-        db_engine: Used to query Db (Instance of SqlQuery)
+        db_connection: Used to query Db (Instance of SqlQuery)
         _fields_list: List of attributes of type Field.
 
     """
 
-    def __init__(self, model_name, db_engine=None):
+    def __init__(self, model_name, db_connection=None):
         self.model_name = model_name
-        self.db_engine = db_engine
+        self.db_connection = db_connection
         self._fields_list = None
         self.set_fields()
 
@@ -136,7 +136,7 @@ class Model:
             A list of tuples. each tuple representing a record of the query result.
 
         """
-        q = SqlQuery(self.db_engine, "select", model=self, fields=fields)
+        q = SqlQuery(self.db_connection, "select", model=self, fields=fields)
         res = q.run()
         return res
 
@@ -150,25 +150,27 @@ class Model:
             A list of tuple with one tuple containing the max value.
 
         """
-        q = SqlQuery(self.db_engine, "select_max", max_field=field, model=self)
+        q = SqlQuery(
+            self.db_connection, "select_max", max_field=field, model=self
+        )
         res = q.run()
         return res
 
     @staticmethod
-    def get_from_raw_sql(db_engine, sql):
+    def get_from_raw_sql(db_connection, sql):
         """Allow to query the Db with raw sql.
 
         Mainly used for retrieving from teh db values used to build the request endpoint.
 
         Args:
-            db_engine:
+            db_connection:
             sql: A string repsenting the sql query.
 
         Returns:
             A list of tuple with one tuple containing the max value.
 
         """
-        q = SqlQuery(db_engine, "raw_sql", raw_sql=sql)
+        q = SqlQuery(db_connection, "raw_sql", raw_sql=sql)
         res = q.run()
         return res
 

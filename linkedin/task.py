@@ -55,7 +55,7 @@ class Task:
 
     @property
     def model(self):
-        return Model(self.params["model"], db_engine=self.db_connection)
+        return Model(self.params["model"], db_connection=self.db_connection)
 
     @property
     def actions(self):
@@ -194,7 +194,7 @@ class Task:
             for d in datas_from_source:
                 elem = d["datas"]
                 if elem is not None:
-                    m = Model(self.model.model_name, db_engine=self.db_connection)
+                    m = Model(self.model.model_name, db_connection=self.db_connection)
                     m.populate_values(elem)
                     datas_obj.append(m)
                     # del m
@@ -259,7 +259,7 @@ class Task:
 
     def insert(self, data):
         sql_query = SqlQuery(
-            self.destination,
+            self.db_connection,
             "insert",
             fields=[f.name for f in self.model.get_db_fields_list()],
             values=data,
@@ -269,7 +269,7 @@ class Task:
 
     def update(self, values_dicts_list, where_dicts_list=None):
         sql_query = SqlQuery(
-            self.destination,
+            self.db_connection,
             "update",
             fields=self.params["db_query"]["fields"],
             values=values_dicts_list,
