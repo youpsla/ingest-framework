@@ -302,9 +302,14 @@ class LinkedInClient:
 
         for v in params.values():
             if "rawsql" in v["type"]:
-                tmp = Model.get_from_raw_sql(self.destination, v["raw_sql"])
+                tmp = Model.get_from_raw_sql(
+                    self.destination.db_connection, v["raw_sql"]
+                )
             else:
-                model = Model(v["filter_model"], db_engine=self.destination)
+                model = Model(
+                    v["filter_model"],
+                    db_connection=self.destination.db_connection,
+                )
                 tmp = model.get_all(fields=v["all_fields"])
 
             kwargs_list = self.get_kwargs_list(v["kwargs_fields"], tmp)

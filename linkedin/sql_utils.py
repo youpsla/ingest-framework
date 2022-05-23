@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 class SqlQuery:
     def __init__(
         self,
-        destination,
+        db_connection,
         qtype,
         fields=None,
         values=None,
@@ -23,7 +23,7 @@ class SqlQuery:
         self.qtype = qtype
         self.fields = fields
         self.values = values
-        self.destination = destination
+        self.db_connection = db_connection
         self.model = model
         self.max_field = max_field
         self._raw_sql = raw_sql
@@ -40,15 +40,16 @@ class SqlQuery:
 
     def run(self):
 
-        write_results_db_connection = self.destination.write_results_db_connection
-        write_cur = write_results_db_connection.cursor()
+        write_cur = self.db_connection.cursor()
 
-        db_connection = self.destination.db_connection
+        db_connection = self.db_connection
         # cursor = db_connection.cursor()
 
         try:
             if self.qtype == "select":
-                with db_connection.cursor(cursor_factory=RealDictCursor) as cursor:
+                with db_connection.cursor(
+                    cursor_factory=RealDictCursor
+                ) as cursor:
                     self.sql = self.get_sql_select()
                     cursor.execute(self.sql)
                     return cursor.fetchall()
@@ -66,7 +67,9 @@ class SqlQuery:
                     db_connection.commit()
                 return cursor.fetchall()
             elif self.qtype == "raw_sql":
-                with db_connection.cursor(cursor_factory=RealDictCursor) as cursor:
+                with db_connection.cursor(
+                    cursor_factory=RealDictCursor
+                ) as cursor:
                     cursor.execute(self.raw_sql)
                     db_connection.commit()
                     return cursor.fetchall()
@@ -104,7 +107,9 @@ class SqlQuery:
     def get_sql_update(self):
         sql = """UPDATE {} SET {} WHERE {}"""
 
-        where = " ".join([f" {k}='{v}'" for d in self.where for k, v in d.items()])
+        where = " ".join(
+            [f" {k}='{v}'" for d in self.where for k, v in d.items()]
+        )
 
         # set_data = ' , '.join(['='.join((str(a[0]),str(a[1]))) for a in zip(fields,values)]) # noqa: E501
         set_data = " , ".join(

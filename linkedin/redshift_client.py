@@ -20,7 +20,7 @@ class RedshiftClient:
 
     """
 
-    def __init__(self, auth_type="prod", mode="readwrite", dbname="snowplow"):
+    def __init__(self, auth_type="dev", mode="readwrite", dbname="snowplow"):
         self.auth_type = auth_type
         self.mode = mode
         self.dbname = dbname
