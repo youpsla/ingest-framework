@@ -6,8 +6,8 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Description: LinkedIn API Ingest Microservice V2a
-      Handler: Ingest.linkedin.lambda_f.lambda_handler
-      CodeUri: s3://linkedin-ingest-dev-staging/Ingest.zip
+      Handler: linkedin.lambda_f.lambda_handler
+      CodeUri: .
       Runtime: python3.8
       Layers:
         - arn:aws:lambda:eu-west-1:467882466042:layer:python-aws-psycopg2:1
@@ -17,7 +17,7 @@ Resources:
       MemorySize: 256
       Environment:
         Variables:
-          WEB_INGEST_DEV_RW_SECRET_NAME: jabmo/db/redshift/web-ingest-dev/rw
+          WEB_INGEST_DEV_RW_SECRET_NAME: jabmo/db/redshift/web-ingest/dev/rw
           SENTRY_DNS: https://47e2fc82fc674f428f2b3e931eddace7@o1035237.ingest.sentry.io/6094713
 
   ScheduledRuleJabmoLinkedInIngestDaily:
