@@ -453,7 +453,7 @@
                         }
                     },
                     "statics": {
-                        "timeGranularity": "ALL",
+                        "timeGranularity": "MONTHLY",
                         "start": "0",
                         "pivot": "MEMBER_COUNTY",
                         "fields": "pivotValue,dateRange,impressions,costInUsd,clicks,shares,pivot",
