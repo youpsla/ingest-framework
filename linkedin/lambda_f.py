@@ -26,14 +26,17 @@ logger.setLevel(logging.INFO)
 RUN_MODE = "dev"
 
 DAILY_TASKS_LIST = [
-    "daily_accounts_update",
-    "daily_campaigns_update",
-    "daily_social_metrics_update",
-    "creative_sponsored_video_daily_update",
-    "creative_sponsored_video__creative_name_daily_update",
-    "account_pivot_campaign_daily_update",
-    "creative_url_daily_update",
-    "campaign_groups_daily_update",
+    # "daily_accounts_update",
+    # "daily_campaigns_update",
+    # "daily_social_metrics_update",
+    # "creative_sponsored_video_daily_update",
+    # "creative_sponsored_video__creative_name_daily_update",
+    # "account_pivot_campaign_daily_update",
+    # "creative_url_daily_update",
+    # "campaign_groups_daily_update",
+    # "pivot_member_organization_full_daily_update",
+    # "pivot_job_title_daily_full_update",
+    "pivot_member_country_full_daily_update",
 ]
 
 # Task ignored because:
@@ -75,30 +78,30 @@ def main():
     logger.info(f"Daily tasks run: {DAILY_TASKS_LIST}")
     for task_name in DAILY_TASKS_LIST:
         result = run_task(source, destination, task_name)
-        if result != "success":
-            destination.write_results_db_connection.rollback()
-            logger.error(
-                f"Error while running DAILY task{task_name}. All Db transactions have"
-                " been rollbacked. No datas write to destination."
-            )
-            sys.exit()
+        # if result != "success":
+        #     destination.write_results_db_connection.rollback()
+        #     logger.error(
+        #         f"Error while running DAILY task{task_name}. All Db transactions have"
+        #         " been rollbacked. No datas write to destination."
+        #     )
+        #     sys.exit()
 
     # Monthly tasks run
-    today = datetime.datetime.now()
-    run_monthly = True if today.day == 1 else False
-    # run_monthly = True
-    if run_monthly is True:
-        logger.info(f"Monthly tasks run: {MONTHLY_TASKS_LIST}")
-        for task_name in MONTHLY_TASKS_LIST:
-            result = run_task(source, destination, task_name)
-            if result != "success":
-                destination.write_results_db_connection.rollback()
-                logger.error(
-                    f"Error while running MONTHLY task: {task_name}. All Db"
-                    " transactions have been rollbacked. No datas write to"
-                    " destination."
-                )
-                sys.exit()
+    # today = datetime.datetime.now()
+    # run_monthly = True if today.day == 1 else False
+    # # run_monthly = True
+    # if run_monthly is True:
+    #     logger.info(f"Monthly tasks run: {MONTHLY_TASKS_LIST}")
+    #     for task_name in MONTHLY_TASKS_LIST:
+    #         result = run_task(source, destination, task_name)
+    #         if result != "success":
+    #             destination.write_results_db_connection.rollback()
+    #             logger.error(
+    #                 f"Error while running MONTHLY task: {task_name}. All Db"
+    #                 " transactions have been rollbacked. No datas write to"
+    #                 " destination."
+    #             )
+    #             sys.exit()
 
     destination.write_results_db_connection.commit()
     destination.write_results_db_connection.close()

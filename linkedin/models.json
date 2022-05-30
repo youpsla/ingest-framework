@@ -727,6 +727,167 @@
         }
     },
     {
+        "pivot_member_country_full": {
+            "geo_id": {
+                "type": "function",
+                "source_path": [
+                    "pivotValue"
+                ],
+                "transform_function": {
+                    "type": "lstrip",
+                    "string_to_strip": "urn:li:geo:"
+                }
+            },
+            "impressions": {
+                "type": "raw",
+                "source_path": [
+                    "impressions"
+                ]
+            },
+            "clicks": {
+                "type": "raw",
+                "source_path": [
+                    "clicks"
+                ]
+            },
+            "cost_in_usd": {
+                "type": "raw",
+                "source_path": [
+                    "costInUsd"
+                ]
+            },
+            "facet": {
+                "type": "constant",
+                "value": "campaign",
+                "source_path": null
+            },
+            "facet_id": {
+                "type": "raw",
+                "source_path": [
+                    "facet_id"
+                ]
+            },
+            "start_day": {
+                "source_path": [
+                    "dateRange",
+                    "start",
+                    "day"
+                ],
+                "type": "raw",
+                "exclude": true
+            },
+            "start_month": {
+                "source_path": [
+                    "dateRange",
+                    "start",
+                    "month"
+                ],
+                "type": "raw",
+                "exclude": true
+            },
+            "start_year": {
+                "source_path": [
+                    "dateRange",
+                    "start",
+                    "year"
+                ],
+                "type": "raw",
+                "exclude": true
+            },
+            "start_date": {
+                "source_path": null,
+                "type": "composite",
+                "composite_fields": {
+                    "start_day": "day",
+                    "start_month": "month",
+                    "start_year": "year"
+                },
+                "composite_pattern": "{year}-{month}-{day}"
+            },
+            "end_day": {
+                "source_path": [
+                    "dateRange",
+                    "end",
+                    "day"
+                ],
+                "type": "raw",
+                "exclude": true
+            },
+            "end_month": {
+                "source_path": [
+                    "dateRange",
+                    "end",
+                    "month"
+                ],
+                "type": "raw",
+                "exclude": true
+            },
+            "end_year": {
+                "source_path": [
+                    "dateRange",
+                    "end",
+                    "year"
+                ],
+                "type": "raw",
+                "exclude": true
+            },
+            "end_date": {
+                "source_path": null,
+                "type": "composite",
+                "composite_fields": {
+                    "end_day": "day",
+                    "end_month": "month",
+                    "end_year": "year"
+                },
+                "composite_pattern": "{year}-{month}-{day}"
+            },
+            "time_granularity": {
+                "type": "constant",
+                "value": "monthly",
+                "source_path": null
+            },
+            "city": {
+                "source_path": [
+                    "pivotValue~",
+                    "defaultLocalizedName",
+                    "value"
+                ],
+                "type": "function",
+                "transform_function": {
+                    "type": "split",
+                    "split_position": 0,
+                    "split_caracter": ","
+                }
+            },
+            "region": {
+                "source_path": [
+                    "pivotValue~",
+                    "defaultLocalizedName",
+                    "value"
+                ],
+                "type": "function",
+                "transform_function": {
+                    "type": "split",
+                    "split_position": 1,
+                    "split_caracter": ","
+                }
+            },
+            "country": {
+                "source_path": [
+                    "pivotValue~",
+                    "defaultLocalizedName",
+                    "value"
+                ],
+                "type": "function",
+                "transform_function": {
+                    "type": "split",
+                    "split_position": 2,
+                    "split_caracter": ","
+                }
+            }
+        }
+    },
+    {
         "account_pivot_campaign": {
             "advertiser_id": {
                 "type": "function",
@@ -1174,6 +1335,140 @@
         }
     },
     {
+        "pivot_job_title_full": {
+            "id": {
+                "type": "function",
+                "default": null,
+                "source_path": [
+                    "pivotValue"
+                ],
+                "transform_function": {
+                    "type": "lstrip",
+                    "string_to_strip": "urn:li:title:"
+                }
+            },
+            "impressions": {
+                "type": "raw",
+                "source_path": [
+                    "impressions"
+                ]
+            },
+            "clicks": {
+                "type": "raw",
+                "source_path": [
+                    "clicks"
+                ]
+            },
+            "cost_in_usd": {
+                "type": "raw",
+                "source_path": [
+                    "costInUsd"
+                ]
+            },
+            "facet": {
+                "type": "constant",
+                "value": "campaign",
+                "source_path": null
+            },
+            "facet_id": {
+                "type": "raw",
+                "default": null,
+                "source_path": [
+                    "facet_id"
+                ]
+            },
+            "start_day": {
+                "source_path": [
+                    "dateRange",
+                    "start",
+                    "day"
+                ],
+                "type": "raw",
+                "exclude": true
+            },
+            "start_month": {
+                "source_path": [
+                    "dateRange",
+                    "start",
+                    "month"
+                ],
+                "type": "raw",
+                "exclude": true
+            },
+            "start_year": {
+                "source_path": [
+                    "dateRange",
+                    "start",
+                    "year"
+                ],
+                "type": "raw",
+                "exclude": true
+            },
+            "start_date": {
+                "source_path": null,
+                "type": "composite",
+                "composite_fields": {
+                    "start_day": "day",
+                    "start_month": "month",
+                    "start_year": "year"
+                },
+                "composite_pattern": "{year}-{month}-{day}"
+            },
+            "end_day": {
+                "source_path": [
+                    "dateRange",
+                    "end",
+                    "day"
+                ],
+                "type": "raw",
+                "exclude": true
+            },
+            "end_month": {
+                "source_path": [
+                    "dateRange",
+                    "end",
+                    "month"
+                ],
+                "type": "raw",
+                "exclude": true
+            },
+            "end_year": {
+                "source_path": [
+                    "dateRange",
+                    "end",
+                    "year"
+                ],
+                "type": "raw",
+                "exclude": true
+            },
+            "end_date": {
+                "source_path": null,
+                "type": "composite",
+                "composite_fields": {
+                    "end_day": "day",
+                    "end_month": "month",
+                    "end_year": "year"
+                },
+                "composite_pattern": "{year}-{month}-{day}"
+            },
+            "time_granularity": {
+                "type": "constant",
+                "value": "monthly",
+                "source_path": null
+            },
+            "job_title": {
+                "type": "raw",
+                "default": null,
+                "source_path": [
+                    "pivotValue~",
+                    "name",
+                    "localized",
+                    "en_US"
+                ]
+            }
+        }
+    },
+    {
         "creative_url": {
             "creative_id": {
                 "type": "raw",
@@ -1287,6 +1582,135 @@
     },
     {
         "pivot_member_company": {
+            "organization_id": {
+                "type": "function",
+                "source_path": [
+                    "pivotValue"
+                ],
+                "transform_function": {
+                    "type": "lstrip",
+                    "string_to_strip": "urn:li:organization:"
+                }
+            },
+            "impressions": {
+                "type": "raw",
+                "source_path": [
+                    "impressions"
+                ]
+            },
+            "clicks": {
+                "type": "raw",
+                "source_path": [
+                    "clicks"
+                ]
+            },
+            "cost_in_usd": {
+                "type": "raw",
+                "source_path": [
+                    "costInUsd"
+                ]
+            },
+            "start_day": {
+                "source_path": [
+                    "dateRange",
+                    "start",
+                    "day"
+                ],
+                "type": "raw",
+                "exclude": true
+            },
+            "start_month": {
+                "source_path": [
+                    "dateRange",
+                    "start",
+                    "month"
+                ],
+                "type": "raw",
+                "exclude": true
+            },
+            "start_year": {
+                "source_path": [
+                    "dateRange",
+                    "start",
+                    "year"
+                ],
+                "type": "raw",
+                "exclude": true
+            },
+            "start_date": {
+                "source_path": null,
+                "type": "composite",
+                "composite_fields": {
+                    "start_day": "day",
+                    "start_month": "month",
+                    "start_year": "year"
+                },
+                "composite_pattern": "{year}-{month}-{day}"
+            },
+            "end_day": {
+                "source_path": [
+                    "dateRange",
+                    "end",
+                    "day"
+                ],
+                "type": "raw",
+                "exclude": true
+            },
+            "end_month": {
+                "source_path": [
+                    "dateRange",
+                    "end",
+                    "month"
+                ],
+                "type": "raw",
+                "exclude": true
+            },
+            "end_year": {
+                "source_path": [
+                    "dateRange",
+                    "end",
+                    "year"
+                ],
+                "type": "raw",
+                "exclude": true
+            },
+            "end_date": {
+                "source_path": null,
+                "type": "composite",
+                "composite_fields": {
+                    "end_day": "day",
+                    "end_month": "month",
+                    "end_year": "year"
+                },
+                "composite_pattern": "{year}-{month}-{day}"
+            },
+            "facet": {
+                "type": "constant",
+                "value": "campaign",
+                "source_path": null
+            },
+            "facet_id": {
+                "type": "raw",
+                "source_path": [
+                    "facet_id"
+                ]
+            },
+            "organization_name": {
+                "type": "raw",
+                "source_path": [
+                    "pivotValue~",
+                    "localizedName"
+                ]
+            },
+            "time_granularity": {
+                "type": "constant",
+                "value": "monthly",
+                "source_path": null
+            }
+        }
+    },
+    {
+        "pivot_member_company_full": {
             "organization_id": {
                 "type": "function",
                 "source_path": [
