@@ -321,6 +321,96 @@ DISTSTYLE AUTO
 ALTER TABLE new_linkedin.pivot_member_country owner to jabmo;
 
 
+-- new_linkedin.pivot_job_title_full definition
+
+-- Drop table
+
+-- DROP TABLE new_linkedin.pivot_job_title_full;
+
+--DROP TABLE new_linkedin.pivot_job_title_full;
+CREATE TABLE IF NOT EXISTS new_linkedin.pivot_job_title_full
+(
+	jab_id INT IDENTITY(1,1)
+	,jab_created_at TIMESTAMP WITHOUT TIME ZONE   ENCODE az64 default sysdate
+	,id INTEGER NOT NULL  ENCODE az64
+	,impressions INTEGER NOT NULL  ENCODE az64
+	,clicks INTEGER NOT NULL  ENCODE az64
+	,cost_in_usd VARCHAR(50) NOT NULL  ENCODE lzo
+	,facet VARCHAR(50) NOT NULL  ENCODE lzo
+	,facet_id INTEGER NOT NULL  ENCODE az64
+	,start_date TIMESTAMP WITHOUT TIME ZONE   ENCODE az64
+	,end_date TIMESTAMP WITHOUT TIME ZONE   ENCODE az64
+	,time_granularity VARCHAR(255)   ENCODE lzo
+	,job_title VARCHAR(255)   ENCODE lzo
+)
+DISTSTYLE AUTO
+ SORTKEY (
+	facet_id
+	)
+;
+ALTER TABLE new_linkedin.pivot_job_title_full owner to jabmo;
+
+
+-- new_linkedin.pivot_member_company_full definition
+
+-- Drop table
+
+-- DROP TABLE new_linkedin.pivot_member_company_full;
+
+--DROP TABLE new_linkedin.pivot_member_company_full;
+CREATE TABLE IF NOT EXISTS new_linkedin.pivot_member_company_full
+(
+	jab_id INT IDENTITY(1,1)
+	,jab_created_at TIMESTAMP WITHOUT TIME ZONE   ENCODE az64 default sysdate
+	,organization_id INTEGER NOT NULL  ENCODE az64
+	,impressions INTEGER NOT NULL  ENCODE az64
+	,clicks INTEGER NOT NULL  ENCODE az64
+	,cost_in_usd VARCHAR(50) NOT NULL  ENCODE lzo
+	,start_date TIMESTAMP WITHOUT TIME ZONE NOT NULL  ENCODE az64
+	,end_date TIMESTAMP WITHOUT TIME ZONE NOT NULL  ENCODE az64
+	,facet VARCHAR(50) NOT NULL  ENCODE lzo
+	,facet_id INTEGER NOT NULL  ENCODE az64
+	,organization_name VARCHAR(255)   ENCODE lzo
+	,time_granularity VARCHAR(255)   ENCODE lzo
+)
+DISTSTYLE AUTO
+;
+ALTER TABLE new_linkedin.pivot_member_company owner to jabmo;
+
+
+-- new_linkedin.pivot_member_country_full definition
+
+-- Drop table
+
+-- DROP TABLE new_linkedin.pivot_member_country_full;
+
+--DROP TABLE new_linkedin.pivot_member_country_full;
+CREATE TABLE IF NOT EXISTS new_linkedin.pivot_member_country_full
+(
+	jab_id INT IDENTITY(1,1)
+	,jab_created_at TIMESTAMP WITHOUT TIME ZONE   ENCODE az64 default sysdate
+	,geo_id INTEGER NOT NULL  ENCODE az64
+	,impressions INTEGER NOT NULL  ENCODE az64
+	,clicks INTEGER NOT NULL  ENCODE az64
+	,cost_in_usd VARCHAR(50) NOT NULL  ENCODE lzo
+	,facet VARCHAR(50) NOT NULL  ENCODE lzo
+	,facet_id INTEGER NOT NULL  ENCODE az64
+	,country VARCHAR(255)   ENCODE lzo
+	,time_granularity VARCHAR(255)   ENCODE lzo
+	,start_date TIMESTAMP WITHOUT TIME ZONE   ENCODE az64
+	,end_date TIMESTAMP WITHOUT TIME ZONE   ENCODE az64
+	,"region" VARCHAR(255)   ENCODE lzo
+	,city VARCHAR(255)   ENCODE lzo
+)
+DISTSTYLE AUTO
+;
+ALTER TABLE new_linkedin.pivot_member_country_full owner to jabmo;
+
+
+
+
+
+
 -- new_linkedin.social_metrics definition
 
 -- Drop table
