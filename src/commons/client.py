@@ -100,14 +100,13 @@ class Client:
         for d in sql_datas:
             tmp_result = []
             for f in db_fields:
-                tmp_result.append({f[1]: d[f[0]]})
+                # tmp_result.append({f[1]: d[f[0]]})
+                tmp_result.append({f["destination_key"]: d[f["origin_key"]]})
             result.append(tmp_result)
 
         return result
 
-    def get_filter_values_from_db(
-        self, destination=None, params=None, channel=None, db_connection=None
-    ):
+    def get_filter_values_from_db(self, params=None, channel=None, db_connection=None):
         if not params:
             return [], [], []
 
@@ -118,7 +117,7 @@ class Client:
                 model = Model(
                     v["filter_model"],
                     db_connection=db_connection,
-                    channel=channel,
+                    channel=self.task.channel,
                 )
                 tmp = model.get_all(fields=v["all_fields"])
 
@@ -160,7 +159,6 @@ class Client:
         if params:
             kwargs_list, args_list, sql_list = (
                 self.get_filter_values_from_db(
-                    destination=task.request_data_source,
                     params=params.get("db", None),
                     channel=task.channel,
                     db_connection=self.task.db_connection,
@@ -171,6 +169,6 @@ class Client:
 
             from itertools import zip_longest
 
-            zip_data = list(zip_longest(sql_list, kwargs_list, args_list))
+            zip_data = list(zip_longest(sql_list, kwargs_list, args_list, fillvalue=[]))
             return zip_data
         return None

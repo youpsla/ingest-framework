@@ -163,7 +163,7 @@ class Model:
         return res
 
     def get_fields_value_as_string(self, fields):
-        return "".join([getattr(self, f).db_value for f in fields])
+        return "".join([str(getattr(self, f).db_value) for f in fields])
 
     def get_max_for_field(self, field):
         """Get max value for a specific field.
@@ -175,9 +175,7 @@ class Model:
             A list of tuple with one tuple containing the max value.
 
         """
-        q = SqlQuery(
-            self.db_connection, "select_max", max_field=field, model=self
-        )
+        q = SqlQuery(self.db_connection, "select_max", max_field=field, model=self)
         res = q.run()
         return res
 

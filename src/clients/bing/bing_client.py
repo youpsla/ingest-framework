@@ -1,4 +1,3 @@
-import os
 import time
 from datetime import datetime
 
@@ -8,9 +7,7 @@ import src.clients.s3 as s3
 from bingads.v13.reporting.reporting_download_parameters import (
     ReportingDownloadParameters,
 )
-from bingads.v13.reporting.reporting_service_manager import (
-    ReportingServiceManager,
-)
+from bingads.v13.reporting.reporting_service_manager import ReportingServiceManager
 from src.clients.bing.auth_helper import (
     DEVELOPER_TOKEN,
     AuthorizationData,
@@ -99,9 +96,7 @@ class BingAdsClient(Client):
 
         tmp = []
         for r in result:
-            tmp.append(
-                {"datas": r, "authorization_data": self.authorization_data}
-            )
+            tmp.append({"datas": r, "authorization_data": self.authorization_data})
 
         return tmp
 
@@ -139,9 +134,7 @@ class ServiceRequest:
         if self.task.name == "daily_accounts_update":
             result = self.service.GetAccountsInfo()
             result = recursive_asdict(result)
-            result = nested_get(
-                result, self.task.params["url"]["response_data_key"]
-            )
+            result = nested_get(result, self.task.params["url"]["response_data_key"])
             return result
 
         if self.task.name == "daily_campaigns_update":
@@ -157,9 +150,7 @@ class ServiceRequest:
             )
 
             result = recursive_asdict(result)
-            result = nested_get(
-                result, self.task.params["url"]["response_data_key"]
-            )
+            result = nested_get(result, self.task.params["url"]["response_data_key"])
             return result
 
         if self.task.name == "daily_adgroups_update":
@@ -169,9 +160,7 @@ class ServiceRequest:
                 **self.param[0],
             )
             result = recursive_asdict(result)
-            result = nested_get(
-                result, self.task.params["url"]["response_data_key"]
-            )
+            result = nested_get(result, self.task.params["url"]["response_data_key"])
             return result
 
         if self.task.name == "daily_ads_update":
@@ -187,13 +176,9 @@ class ServiceRequest:
             adTypes.AdType.append("Text")
 
             # TODO: Generic way of managing params here
-            result = self.service.GetAdsByAdGroupId(
-                **self.param[0], AdTypes=adTypes
-            )
+            result = self.service.GetAdsByAdGroupId(**self.param[0], AdTypes=adTypes)
             result = recursive_asdict(result)
-            result = nested_get(
-                result, self.task.params["url"]["response_data_key"]
-            )
+            result = nested_get(result, self.task.params["url"]["response_data_key"])
             return result
 
         if self.task.name == "daily_medias_update":
@@ -203,9 +188,7 @@ class ServiceRequest:
             )
 
             result = recursive_asdict(result)
-            result = nested_get(
-                result, self.task.params["url"]["response_data_key"]
-            )
+            result = nested_get(result, self.task.params["url"]["response_data_key"])
             return result
 
         if self.task.name == "daily_media_associations_update":
@@ -222,9 +205,7 @@ class ServiceRequest:
             )
 
             result = recursive_asdict(result)
-            result = nested_get(
-                result, self.task.params["url"]["response_data_key"]
-            )
+            result = nested_get(result, self.task.params["url"]["response_data_key"])
             return result
 
         raise ValueError("Unknown task name")
@@ -311,8 +292,8 @@ class ReportManager:
         """Submit the download request and then use the ReportingDownloadOperation result to
         track status until the report is complete e.g. either using
         ReportingDownloadOperation.track() or ReportingDownloadOperation.get_status()."""
-        reporting_download_operation = (
-            self.reporting_service_manager.submit_download(self.report_request)
+        reporting_download_operation = self.reporting_service_manager.submit_download(
+            self.report_request
         )
 
         # You may optionally cancel the track() operation after a specified time interval.
@@ -324,8 +305,7 @@ class ReportManager:
         # or use custom polling logic with get_status() as shown below.
         for i in range(10):
             time.sleep(
-                self.reporting_service_manager.poll_interval_in_milliseconds
-                / 1000.0
+                self.reporting_service_manager.poll_interval_in_milliseconds / 1000.0
             )
 
             download_status = reporting_download_operation.get_status()

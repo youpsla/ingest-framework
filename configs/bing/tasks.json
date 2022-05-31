@@ -15,7 +15,9 @@
                     "AccountInfo"
                 ]
             },
-            "destination_unique_keys": ["id"],
+            "destination_unique_keys": [
+                "id"
+            ],
             "exclude_existing_in_db": true,
             "exclude_key": "id",
             "update_key": "id"
@@ -32,7 +34,9 @@
             "request_data_source": "redshift",
             "model": "campaigns",
             "exclude_existing_in_db": true,
-            "destination_unique_keys": ["id"],
+            "destination_unique_keys": [
+                "id"
+            ],
             "exclude_key": "id",
             "update_key": "id",
             "url": {
@@ -46,10 +50,10 @@
                         "_": {
                             "type": "db",
                             "db_fields": [
-                                [
-                                    "id",
-                                    "AccountId"
-                                ]
+                                {
+                                    "origin_key": "id",
+                                    "destination_key": "AccountId"
+                                }
                             ],
                             "filter_model": "accounts",
                             "all_fields": [
@@ -77,7 +81,9 @@
             "request_data_source": "redshift",
             "model": "adgroups",
             "exclude_existing_in_db": true,
-            "destination_unique_keys": ["id"],
+            "destination_unique_keys": [
+                "id"
+            ],
             "exclude_key": "id",
             "update_key": "id",
             "url": {
@@ -91,10 +97,10 @@
                         "_": {
                             "type": "db",
                             "db_fields": [
-                                [
-                                    "id",
-                                    "CampaignId"
-                                ]
+                                {
+                                    "origin_key": "id",
+                                    "destination_key": "CampaignId"
+                                }
                             ],
                             "filter_model": "campaigns",
                             "all_fields": [
@@ -117,7 +123,9 @@
             "request_data_source": "redshift",
             "model": "ads",
             "exclude_existing_in_db": true,
-            "destination_unique_keys": ["id"],
+            "destination_unique_keys": [
+                "id"
+            ],
             "exclude_key": "id",
             "update_key": "id",
             "url": {
@@ -131,10 +139,10 @@
                         "_": {
                             "type": "db",
                             "db_fields": [
-                                [
-                                    "id",
-                                    "AdGroupId"
-                                ]
+                                {
+                                    "origin_key": "id",
+                                    "destination_key": "AdGroupId"
+                                }
                             ],
                             "filter_model": "adgroups",
                             "all_fields": [
@@ -166,7 +174,9 @@
             "source": "bing",
             "destination": "redshift",
             "model": "medias",
-            "destination_unique_keys": ["id"],
+            "destination_unique_keys": [
+                "id"
+            ],
             "exclude_existing_in_db": true,
             "exclude_key": "id",
             "update_key": "id",
@@ -181,7 +191,9 @@
                         "MediaEnabledEntities": [
                             "ResponsiveAd ImageAdExtension"
                         ],
-                        "PageInfo" : [null]
+                        "PageInfo": [
+                            null
+                        ]
                     }
                 }
             }
@@ -196,22 +208,27 @@
             "destination": "redshift",
             "model": "media_associations",
             "exclude_existing_in_db": true,
-            "destination_unique_keys": ["entity_id", "media_id"],
+            "destination_unique_keys": [
+                "entity_id",
+                "media_id"
+            ],
             "url": {
                 "type": "service",
                 "service_name": "CampaignManagementService",
                 "response_data_key": [
-                    "MediaAssociations", "ArrayOfMediaAssociation", "MediaAssociation"
+                    "MediaAssociations",
+                    "ArrayOfMediaAssociation",
+                    "MediaAssociation"
                 ],
                 "params": {
                     "db": {
                         "_": {
                             "type": "db",
                             "db_fields": [
-                                [
-                                    "id",
-                                    "MediaIds"
-                                ]
+                                {
+                                    "origin_key": "id",
+                                    "destination_key": "MediasIds"
+                                }
                             ],
                             "filter_model": "medias",
                             "all_fields": [
@@ -240,10 +257,10 @@
                         "_": {
                             "type": "db",
                             "db_fields": [
-                                [
-                                    "id",
-                                    "AccountIds"
-                                ]
+                                {
+                                    "origin_key": "id",
+                                    "destination_key": "AccountIds"
+                                }
                             ],
                             "filter_model": "accounts",
                             "all_fields": [
@@ -335,10 +352,10 @@
                         "_": {
                             "type": "db",
                             "db_fields": [
-                                [
-                                    "id",
-                                    "AccountIds"
-                                ]
+                                {
+                                    "origin_key": "id",
+                                    "destination_key": "AccountIds"
+                                }
                             ],
                             "filter_model": "accounts",
                             "all_fields": [
@@ -430,10 +447,10 @@
                         "_": {
                             "type": "db",
                             "db_fields": [
-                                [
-                                    "id",
-                                    "AccountIds"
-                                ]
+                                {
+                                    "origin_key": "id",
+                                    "destination_key": "AccountIds"
+                                }
                             ],
                             "filter_model": "accounts",
                             "all_fields": [

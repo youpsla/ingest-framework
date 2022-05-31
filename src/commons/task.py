@@ -43,17 +43,13 @@ class Task:
     def destination(self):
         if not self._destination:
             destination_name = self.params["destination"]
-            self._destination = get_client(
-                self.running_env, destination_name, self
-            )
+            self._destination = get_client(self.running_env, destination_name, self)
         return self._destination
 
     @property
     def request_data_source(self):
         if not self._request_data_source:
-            request_data_source_name = self.params.get(
-                "request_data_source", None
-            )
+            request_data_source_name = self.params.get("request_data_source", None)
             self._request_data_source = get_client(
                 self.running_env, request_data_source_name, self
             )
@@ -109,9 +105,7 @@ class Task:
             )
 
         if not result:
-            logger.info(
-                f"{self.name}: No data from source." " Running next task."
-            )
+            logger.info(f"{self.name}: No data from source." " Running next task.")
 
         return result
 
@@ -142,17 +136,7 @@ class Task:
 
         # Insert datas in destination
         if "insert" in self.actions:
-            datas_obj = []
-            for d in source_data:
-                elem = d["datas"]
-                if elem is not None:
-                    m = Model(
-                        self.model.model_name,
-                        db_connection=self.db_connection,
-                        channel=self.channel,
-                    )
-                    m.populate_values(elem)
-                    datas_obj.append(m)
+            data_objs = self.get_data_objs(source_data)
             datas_values = []
             # Search for new records and insert them.
             if self.params["exclude_existing_in_db"]:
@@ -162,9 +146,7 @@ class Task:
                 existing_ids = [
                     "".join(
                         str(r[e])
-                        for e in [
-                            d for d in self.params["destination_unique_keys"]
-                        ]
+                        for e in [d for d in self.params["destination_unique_keys"]]
                     )
                     for r in self.model.get_all()
                 ]
@@ -175,17 +157,17 @@ class Task:
                 # existing_ids = [
                 #     str(r[e]) for r in self.model.get_all() for e in self.params['exclude_keys']
                 # ]
-                datas_obj = [
+                data_objs = [
                     r
-                    for r in datas_obj
+                    for r in data_objs
                     if r.get_fields_value_as_string(
                         self.params["destination_unique_keys"]
                     )
                     not in existing_ids
                 ]
-                datas_values = [r.get_db_values_tuple() for r in datas_obj]
+                datas_values = [r.get_db_values_tuple() for r in data_objs]
             else:
-                datas_values = [r.get_db_values_tuple() for r in datas_obj]
+                datas_values = [r.get_db_values_tuple() for r in data_objs]
 
             logger.info(
                 f"{self.name} - {self.model.model_name}:"
@@ -194,28 +176,8 @@ class Task:
             self.insert(datas_values)
 
         if "update" in self.actions:
-            datas_obj = []
-            for d in source_data:
-                if d["datas"] is not None:
-                    m = Model(
-                        self.model.model_name,
-                        db_connection=self.db_connection,
-                        channel=self.channel,
-                    )
-                    # m.set_field(
-                    #     self.params["db_query"]["fields"][0],
-                    #     m.params[self.params["db_query"]["fields"][0]],
-                    # )
-                    # m.set_field(
-                    #     d["where_field"],
-                    #     m.params[d["where_field"]],
-                    # )
-                    m.set_fields()
-                    m.populate_values(d["datas"])
-                    # setattr(getattr(m, d["where_field"]), "value", d["where_value"])
-                    datas_obj.append(m)
-
-            data_values = [r.get_db_values_tuple() for r in datas_obj]
+            data_objs = self.get_data_objs(source_data)
+            data_values = [r.get_db_values_tuple() for r in data_objs]
 
             # where_dicts_list = []
             # for v in self.params["db_query"]["keys"]:
@@ -228,20 +190,52 @@ class Task:
             ]
 
             self.update(values_dicts_list, self.params["update_key"])
-        return True, self.destination
-        # except Exception as e:
-        #     logger.error(
-        #         f"ERROR occured while running task {self.name}:\n{e}\n\n Cancel all"
-        #         " tasks runned so far.\nRollback Db transaction.\n## ENDING LAMBDA"
-        #     )
-        #     self.destination.rollback()
-        #     raise Exception(
-        #         "Current running task has failed. All write operation(s) have been"
-        #         " rollbacked."
-        #     )
-        # TODO: Update linkedin client to implemùent rollback method
 
-        return "error"
+        if "partial_update" in self.actions:
+            for d in source_data:
+                if d["datas"] is not None:
+                    m = Model(
+                        self.model.model_name, self.db_connection, channel=self.channel
+                    )
+                    # m.set_field(
+                    #     self.params["db_query"]["fields"][0],
+                    #     m.params[self.params["db_query"]["fields"][0]],
+                    # )
+                    # m.set_field(
+                    #     d["where_field"],
+                    #     m.params[d["where_field"]],
+                    # )
+                    m.populate_values(d["datas"])
+                    # setattr(getattr(m, d["where_field"]), "value", d["where_value"])
+
+                    where_dicts_list = []
+                    for v in self.params["db_query"]["keys"]:
+                        where_dicts_list.append({v: d["datas"][v]})
+
+                    values_dicts_list = []
+                    for v in self.params["db_query"]["fields"]:
+                        values_dicts_list.append({v[0]: d["datas"][v[1]]})
+
+                    self.partial_update(
+                        values_dicts_list,
+                        where_dicts_list=where_dicts_list,
+                    )
+
+        return True, self.destination
+
+    def get_data_objs(self, source_data):
+        data_objs = []
+        for d in source_data:
+            elem = d["datas"]
+            if elem is not None:
+                m = Model(
+                    self.model.model_name,
+                    db_connection=self.db_connection,
+                    channel=self.channel,
+                )
+                m.populate_values(elem)
+                data_objs.append(m)
+        return data_objs
 
     def insert(self, data):
         sql_query = SqlQuery(
@@ -250,6 +244,17 @@ class Task:
             fields=[f.name for f in self.model.get_db_fields_list()],
             values=data,
             model=self.model,
+        )
+        sql_query.run()
+
+    def partial_update(self, values_dicts_list, where_dicts_list=None):
+        sql_query = SqlQuery(
+            self.db_connection,
+            "partial_update",
+            fields=self.params["db_query"]["fields"],
+            values=values_dicts_list,
+            model=self.model,
+            where=where_dicts_list,
         )
         sql_query.run()
 
