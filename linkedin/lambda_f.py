@@ -1,6 +1,7 @@
 # TODO: manage logger for having logger output in terminal when running locally + cleanup print statements
 
 
+import datetime
 import json
 import os
 import time
@@ -61,6 +62,13 @@ def main():
 
     for task_name in channel_params["daily_tasks_list"]:
         result, _ = run_task(channel_params["name"], task_name, db_connection)
+
+    today = datetime.datetime.now()
+    run_monthly = True if today.day == 1 else False
+    run_monthly = True
+    if run_monthly:
+        for task_name in channel_params["monthly_tasks_list"]:
+            result, _ = run_task(channel_params["name"], task_name, db_connection)
 
     with db_connection.cursor() as cursor:
         cursor.execute("COMMIT;")
