@@ -113,10 +113,7 @@ class SqlQuery:
                     pass
 
             except Exception as e:
-                logger.error(
-                    f"Issue while executing the following sql query:\n{self.sql}.\nThe"
-                    f" following error occur: {e}"
-                )
+                logger.error(f"The following error occur: {e}")
                 raise RuntimeError
             return result
 
