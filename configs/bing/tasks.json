@@ -227,7 +227,7 @@
                             "db_fields": [
                                 {
                                     "origin_key": "id",
-                                    "destination_key": "MediasIds"
+                                    "destination_key": "MediaIds"
                                 }
                             ],
                             "filter_model": "medias",
