@@ -2,14 +2,18 @@
     {
         "daily_campaigns_update": {
             "actions": [
-                "insert"
+                "insert",
+                "update"
             ],
             "exclude_existing_in_db": true,
             "exclude_key": "id",
-            "destination_unique_keys": ["id"],
+            "destination_unique_keys": [
+                "id"
+            ],
             "source": "linkedin",
             "destination": "redshift",
             "request_data_source": "redshift",
+            "update_key": "id",
             "model": "campaigns",
             "url": {
                 "response_datas_key": "elements",
@@ -52,14 +56,17 @@
         },
         "daily_accounts_update": {
             "actions": [
-                "insert"
+                "insert", "update"
             ],
             "exclude_existing_in_db": true,
             "exclude_key": "id",
             "source": "linkedin",
             "destination": "redshift",
-            "destination_unique_keys": ["id"],
+            "destination_unique_keys": [
+                "id"
+            ],
             "request_data_source": "redshift",
+            "update_key": "id",
             "model": "accounts",
             "url": {
                 "response_datas_key": "elements",
@@ -83,7 +90,9 @@
             "exclude_existing_in_db": false,
             "source": "linkedin",
             "destination": "redshift",
-            "destination_unique_keys": ["creative_id"],
+            "destination_unique_keys": [
+                "creative_id"
+            ],
             "request_data_source": "redshift",
             "model": "social_metrics",
             "url": {
@@ -179,13 +188,16 @@
     {
         "creative_sponsored_video_daily_update": {
             "actions": [
-                "insert"
+                "insert", "update"
             ],
             "exclude_existing_in_db": false,
             "source": "linkedin",
             "destination": "redshift",
-            "destination_unique_keys": ["id"],
+            "destination_unique_keys": [
+                "id"
+            ],
             "request_data_source": "redshift",
+            "update_key": "id",
             "model": "creative_sponsored_video",
             "url": {
                 "base": "https://api.linkedin.com/v2/",
@@ -237,7 +249,9 @@
             "exclude_existing_in_db": false,
             "source": "linkedin",
             "destination": "redshift",
-            "destination_unique_keys": ["id"],
+            "destination_unique_keys": [
+                "id"
+            ],
             "request_data_source": "redshift",
             "model": "creative_sponsored_video",
             "update_key": "ugc_ref",
@@ -285,7 +299,9 @@
             "exclude_existing_in_db": false,
             "source": "linkedin",
             "destination": "redshift",
-            "destination_unique_keys": ["id"],
+            "destination_unique_keys": [
+                "id"
+            ],
             "request_data_source": "redshift",
             "model": "creative_sponsored_update",
             "url": {
@@ -302,7 +318,9 @@
                             ],
                             "kwargs_fields": [],
                             "db_fields": [],
-                            "args_fields": ["creative_id"],
+                            "args_fields": [
+                                "creative_id"
+                            ],
                             "raw_sql": "select distinct(creative_id) from {schema}.social_metrics where creative_id not in (select creative_id from {schema}.creative_sponsored_update) and creative_type = 'SPONSORED_STATUS_UPDATE'",
                             "url_query_parameter_template": "/{}"
                         }
@@ -328,7 +346,9 @@
             "exclude_existing_in_db": false,
             "source": "linkedin",
             "destination": "redshift",
-            "destination_unique_keys": ["id"],
+            "destination_unique_keys": [
+                "id"
+            ],
             "request_data_source": "redshift",
             "model": "creative_text_ads",
             "url": {
@@ -397,7 +417,6 @@
                             ],
                             "raw_sql_2": "select distinct(campaign_id) from {schema}.account_pivot_campaign where start_date between (select date_trunc('month', getdate() - interval '1 month')) and (select last_day(getdate() - interval '1 month'))",
                             "raw_sql": "select distinct(campaign_id) from {schema}.account_pivot_campaign"
-
                         }
                     },
                     "dynamics": {
@@ -1045,14 +1064,17 @@
     {
         "campaign_groups_daily_update": {
             "actions": [
-                "insert"
+                "insert", "update"
             ],
             "exclude_existing_in_db": true,
             "exclude_key": "id",
             "source": "linkedin",
             "destination": "redshift",
             "request_data_source": "redshift",
-            "destination_unique_keys": ["id"],
+            "update_key": "id",
+            "destination_unique_keys": [
+                "id"
+            ],
             "model": "campaign_groups",
             "url": {
                 "response_datas_key": "elements",
