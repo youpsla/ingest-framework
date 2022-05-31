@@ -177,16 +177,9 @@ class Task:
 
         if "update" in self.actions:
             data_objs = self.get_data_objs(source_data)
-            data_values = [r.get_db_values_tuple() for r in data_objs]
 
-            # where_dicts_list = []
-            # for v in self.params["db_query"]["keys"]:
-            #     where_dicts_list.append({v: d["datas"][v]})
-
-            model_fields_list = self.model.fields_list
             values_dicts_list = [
-                {model_fields_list[values.index(v)].name: v for v in values}
-                for values in data_values
+                {f.name: f.db_value for f in obj.fields_list} for obj in data_objs
             ]
 
             self.update(values_dicts_list, self.params["update_key"])
