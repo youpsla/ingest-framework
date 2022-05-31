@@ -1,57 +1,36 @@
-# TODO: Put all insert and update Db requests in a transaction for commiting at the end of completion of the group of tasks.# noqa E:501
-# TODO: Create a list of task in lambda_f.py. This allow better error and logging messages (Add running task name).# noqa E:501
 # TODO: manage logger for having logger output in terminal when running locally + cleanup print statements
 
-import datetime
-import logging
+
+import json
 import os
-import sys
 import time
 
-sys.path.append(os.path.join(os.path.dirname(__file__)))
+# Temporary solution. This import allow init of some envs variables
+# TODO: Envs management needs better system.
+from configs.globals import CHANNEL
 
-from linkedin_client import LinkedInClient
-from redshift_client import RedshiftClient
-from task import Task
-
-logger = logging.getLogger(__name__)
-
-ch = logging.StreamHandler()
-ch.setLevel(logging.INFO)
-logger.addHandler(ch)
+# Import redshift here for being able to rollback()/commit() transaction.
+from src.clients.redshift.redshift_client import RedshiftClient
+from src.commons.task import Task
+from src.utils.custom_logger import logger
 
 
-logger.setLevel(logging.INFO)
+def get_params_json_file_path():
+    app_home = os.environ["APPLICATION_HOME"]
+    return os.path.realpath(os.path.join(app_home, "configs", CHANNEL, "channel.json"))
 
-RUN_MODE = "dev"
 
-DAILY_TASKS_LIST = [
-    # "daily_accounts_update",
-    # "daily_campaigns_update",
-    # "daily_social_metrics_update",
-    # "creative_sponsored_video_daily_update",
-    # "creative_sponsored_video__creative_name_daily_update",
-    "creative_sponsored_update_daily_update"
-    # "account_pivot_campaign_daily_update",
-    # "creative_url_daily_update",
-    # "campaign_groups_daily_update",
-]
-
-# Task ignored because:
-# select max(start_date) from linkedin.pivot_creative; > 2021-05-24 00:00:00.000
-# Task("pivot_creative_daily_update", source, destination).run()
-
-MONTHLY_TASKS_LIST = [
-    "pivot_member_country_monthly_update",
-]
+def get_channel_params():
+    with open(get_params_json_file_path(), "r") as f:
+        f = json.load(f)
+    return f
 
 
 def lambda_handler(event, context):
-    print("Enter Linkedin Ingest Lambda.")
     main()
 
 
-def run_task(source, destination, task_name, db_connection):
+def run_task(channel, task_name, db_connection):
     """Runs a task
 
     Returns:
@@ -59,49 +38,33 @@ def run_task(source, destination, task_name, db_connection):
         Can be "success" or "error" depending on the task run result.
         A dict with params
     """
-    result = Task(task_name, source, destination, db_connection).run()
-    return result
+    result, destination = Task(
+        channel=channel,
+        name=task_name,
+        db_connection=db_connection,
+    ).run()
+    return result, destination
 
 
 def main():
     logger.info("### Starting Ingest lambda ###")
     start = time.time()
 
-    destination = RedshiftClient()
-    db_connection = destination.db_connection
-    source = LinkedInClient(destination=destination)
+    channel_params = get_channel_params()
 
     # Daily tasks run
-    logger.info(f"Daily tasks run: {DAILY_TASKS_LIST}")
-    for task_name in DAILY_TASKS_LIST:
-        result = run_task(source, destination, task_name)
-        # if result != "success":
-        #     destination.write_results_db_connection.rollback()
-        #     logger.error(
-        #         f"Error while running DAILY task{task_name}. All Db transactions have"
-        #         " been rollbacked. No datas write to destination."
-        #     )
-        #     sys.exit()
+    logger.info(f"Daily tasks run: {channel_params['daily_tasks_list']}")
 
-    # Monthly tasks run
-    # today = datetime.datetime.now()
-    # run_monthly = True if today.day == 1 else False
-    # # run_monthly = True
-    # if run_monthly is True:
-    #     logger.info(f"Monthly tasks run: {MONTHLY_TASKS_LIST}")
-    #     for task_name in MONTHLY_TASKS_LIST:
-    #         result = run_task(source, destination, task_name)
-    #         if result != "success":
-    #             destination.write_results_db_connection.rollback()
-    #             logger.error(
-    #                 f"Error while running MONTHLY task: {task_name}. All Db"
-    #                 " transactions have been rollbacked. No datas write to"
-    #                 " destination."
-    #             )
-    #             sys.exit()
+    db_connection = RedshiftClient().db_connection
+    with db_connection.cursor() as cursor:
+        cursor.execute("BEGIN;")
 
-    destination.write_results_db_connection.commit()
-    destination.write_results_db_connection.close()
+    for task_name in channel_params["daily_tasks_list"]:
+        result, _ = run_task(channel_params["name"], task_name, db_connection)
+
+    with db_connection.cursor() as cursor:
+        cursor.execute("COMMIT;")
+        # Transfer from tmp dir to s3
     logger.info("All tasks have runned successfully. Daily Worflow ended with success.")
 
     end = time.time()

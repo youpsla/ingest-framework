@@ -102,6 +102,9 @@ class SqlQuery:
                     # 3) Do the update
                     self.sql = self.get_sql_update()
                     cursor.execute(self.sql)
+                elif self.qtype == "partial_update":
+                    self.sql = self.get_sql_partial_update()
+                    cursor.execute(self.sql)
 
                 result = []
                 try:
@@ -132,7 +135,7 @@ class SqlQuery:
     def get_sql_insert(self, schema_table):
         sql = """INSERT INTO {} ({}) VALUES %s"""
         sql = sql.format(
-            schema_table, ", ".join([f.name for f in self.model.fields_list])
+            schema_table, ", ".join([f.name for f in self.model.get_db_fields_list()])
         )
         return sql
 
@@ -203,4 +206,20 @@ class SqlQuery:
                 and_where=update_get_and_where(self),
             )
         )
+        return sql
+
+    def get_sql_partial_update(self):
+        sql = """UPDATE {} SET {} WHERE {}"""
+
+        where = " ".join([f" {k}='{v}'" for d in self.where for k, v in d.items()])
+
+        # set_data = ' , '.join(['='.join((str(a[0]),str(a[1]))) for a in zip(fields,values)]) # noqa: E501
+        set_data = " , ".join(
+            [
+                "=".join((str(k), "'{}'".format(v.replace("'", "''"))))
+                for d in self.values
+                for k, v in d.items()
+            ]
+        )
+        sql = sql.format(self.schema_table, set_data, where)
         return sql

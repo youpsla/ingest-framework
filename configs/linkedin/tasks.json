@@ -6,8 +6,10 @@
             ],
             "exclude_existing_in_db": true,
             "exclude_key": "id",
+            "destination_unique_keys": ["id"],
             "source": "linkedin",
             "destination": "redshift",
+            "request_data_source": "redshift",
             "model": "campaigns",
             "url": {
                 "response_datas_key": "elements",
@@ -56,6 +58,8 @@
             "exclude_key": "id",
             "source": "linkedin",
             "destination": "redshift",
+            "destination_unique_keys": ["id"],
+            "request_data_source": "redshift",
             "model": "accounts",
             "url": {
                 "response_datas_key": "elements",
@@ -68,10 +72,6 @@
                 "header": {
                     "X-Restli-Protocol-Version": "2.0.0"
                 }
-            },
-            "destination_unique_key": {
-                "type": "raw",
-                "value": "id"
             }
         }
     },
@@ -83,6 +83,8 @@
             "exclude_existing_in_db": false,
             "source": "linkedin",
             "destination": "redshift",
+            "destination_unique_keys": ["creative_id"],
+            "request_data_source": "redshift",
             "model": "social_metrics",
             "url": {
                 "response_datas_key": "elements",
@@ -113,7 +115,7 @@
                             "type": "group",
                             "offset_type": "from_today",
                             "offset_unity": "days",
-                            "offset_value": "1152",
+                            "offset_value": "1",
                             "offset_range_position": "start_day",
                             "url_params": {
                                 "dateRange.start.day": {
@@ -162,6 +164,7 @@
                     },
                     "statics": {
                         "timeGranularity": "DAILY",
+                        "start": "0",
                         "pivot": "CREATIVE",
                         "fields": "likes,dateRange,impressions,costInUsd,clicks,shares,costInLocalCurrency,pivot,pivotValue",
                         "projection": "(*,elements*(likes,dateRange(*),impressions,costInUsd,clicks,shares,costInLocalCurrency,pivot,pivotValue~))"
@@ -170,10 +173,6 @@
             },
             "request": {
                 "header": null
-            },
-            "destination_unique_key": {
-                "type": "raw",
-                "value": "creative_id"
             }
         }
     },
@@ -185,6 +184,8 @@
             "exclude_existing_in_db": false,
             "source": "linkedin",
             "destination": "redshift",
+            "destination_unique_keys": ["id"],
+            "request_data_source": "redshift",
             "model": "creative_sponsored_video",
             "url": {
                 "base": "https://api.linkedin.com/v2/",
@@ -213,17 +214,13 @@
                 "header": {
                     "X-Restli-Protocol-Version": "2.0.0"
                 }
-            },
-            "destination_unique_key": {
-                "type": "raw",
-                "value": "id"
             }
         }
     },
     {
         "creative_sponsored_video__creative_name_daily_update": {
             "actions": [
-                "update"
+                "partial_update"
             ],
             "db_query": {
                 "type": "update",
@@ -240,7 +237,10 @@
             "exclude_existing_in_db": false,
             "source": "linkedin",
             "destination": "redshift",
+            "destination_unique_keys": ["id"],
+            "request_data_source": "redshift",
             "model": "creative_sponsored_video",
+            "update_key": "ugc_ref",
             "url": {
                 "base": "https://api.linkedin.com/v2/",
                 "category": "adDirectSponsoredContents",
@@ -254,10 +254,13 @@
                             ],
                             "kwargs_fields": [],
                             "db_fields": [
-                                [
-                                    "ugc_ref",
-                                    "ugc_ref"
-                                ]
+                                {
+                                    "origin_key": "ugc_ref",
+                                    "destination_key": "ugc_ref"
+                                }
+                            ],
+                            "keys": [
+                                "ugc_ref"
                             ],
                             "all_fields": [
                                 "ugc_ref"
@@ -271,10 +274,6 @@
             },
             "request": {
                 "header": null
-            },
-            "destination_unique_key": {
-                "type": "raw",
-                "value": "id"
             }
         }
     },
@@ -286,6 +285,8 @@
             "exclude_existing_in_db": false,
             "source": "linkedin",
             "destination": "redshift",
+            "destination_unique_keys": ["id"],
+            "request_data_source": "redshift",
             "model": "creative_sponsored_update",
             "url": {
                 "base": "https://api.linkedin.com/v2/",
@@ -299,6 +300,9 @@
                                 "args",
                                 "rawsql"
                             ],
+                            "kwargs_fields": [],
+                            "db_fields": [],
+                            "args_fields": ["creative_id"],
                             "raw_sql": "select distinct(creative_id) from {schema}.social_metrics where creative_id not in (select creative_id from {schema}.creative_sponsored_update) and creative_type = 'SPONSORED_STATUS_UPDATE'",
                             "url_query_parameter_template": "/{}"
                         }
@@ -313,10 +317,6 @@
                 "header": {
                     "X-Restli-Protocol-Version": "2.0.0"
                 }
-            },
-            "destination_unique_key": {
-                "type": "raw",
-                "value": "id"
             }
         }
     },
@@ -328,6 +328,8 @@
             "exclude_existing_in_db": false,
             "source": "linkedin",
             "destination": "redshift",
+            "destination_unique_keys": ["id"],
+            "request_data_source": "redshift",
             "model": "creative_text_ads",
             "url": {
                 "base": "https://api.linkedin.com/v2/",
@@ -353,10 +355,6 @@
                 "header": {
                     "X-Restli-Protocol-Version": "2.0.0"
                 }
-            },
-            "destination_unique_key": {
-                "type": "raw",
-                "value": "id"
             }
         }
     },
@@ -368,6 +366,7 @@
             "exclude_existing_in_db": false,
             "source": "linkedin",
             "destination": "redshift",
+            "request_data_source": "redshift",
             "model": "pivot_member_country",
             "url": {
                 "base": "https://api.linkedin.com/v2/",
@@ -391,12 +390,14 @@
                                 ]
                             ],
                             "db_fields": [
-                                [
-                                    "campaign_id",
-                                    "facet_id"
-                                ]
+                                {
+                                    "origin_key": "campaign_id",
+                                    "destination_key": "facet_id"
+                                }
                             ],
+                            "raw_sql_2": "select distinct(campaign_id) from {schema}.account_pivot_campaign where start_date between (select date_trunc('month', getdate() - interval '1 month')) and (select last_day(getdate() - interval '1 month'))",
                             "raw_sql": "select distinct(campaign_id) from {schema}.account_pivot_campaign"
+
                         }
                     },
                     "dynamics": {
@@ -404,7 +405,7 @@
                             "type": "group",
                             "offset_type": "from_today",
                             "offset_unity": "months",
-                            "offset_value": "100",
+                            "offset_value": "1",
                             "offset_range_position": "start_day",
                             "url_params": {
                                 "dateRange.start.day": {
@@ -462,10 +463,113 @@
             },
             "request": {
                 "header": null
+            }
+        }
+    },
+    {
+        "pivot_member_country_full_daily_update": {
+            "actions": [
+                "erase",
+                "insert"
+            ],
+            "exclude_existing_in_db": false,
+            "source": "linkedin",
+            "destination": "redshift",
+            "request_data_source": "redshift",
+            "model": "pivot_member_country_full",
+            "url": {
+                "base": "https://api.linkedin.com/v2/",
+                "category": "adAnalyticsV2",
+                "q": "analytics",
+                "response_datas_key": "elements",
+                "params": {
+                    "db": {
+                        "campaigns[0]": {
+                            "type": [
+                                "db",
+                                "args",
+                                "rawsql"
+                            ],
+                            "args_fields": [],
+                            "kwargs_fields": [
+                                [
+                                    "id",
+                                    "urn:li:sponsoredCampaign:{}",
+                                    "campaigns"
+                                ]
+                            ],
+                            "db_fields": [
+                                {
+                                    "origin_key": "id",
+                                    "destination_key": "facet_id"
+                                }
+                            ],
+                            "raw_sql": "select distinct(id) from {schema}.campaigns"
+                        }
+                    },
+                    "dynamics": {
+                        "start_date": {
+                            "type": "group",
+                            "offset_type": "from_today",
+                            "offset_unity": "months",
+                            "offset_value": "10000",
+                            "offset_range_position": "start_day",
+                            "url_params": {
+                                "dateRange.start.day": {
+                                    "type": "filter_by",
+                                    "value_type": "date",
+                                    "url_query_parameter_value": "{day}",
+                                    "offset": ""
+                                },
+                                "dateRange.start.month": {
+                                    "type": "filter_by",
+                                    "value_type": "date",
+                                    "url_query_parameter_value": "{month}"
+                                },
+                                "dateRange.start.year": {
+                                    "type": "filter_by",
+                                    "value_type": "date",
+                                    "url_query_parameter_value": "{year}"
+                                }
+                            }
+                        },
+                        "end_date": {
+                            "type": "group",
+                            "offset_type": "from_today",
+                            "offset_unity": "months",
+                            "offset_value": "1",
+                            "offset_range_position": "end_day",
+                            "url_params": {
+                                "dateRange.end.day": {
+                                    "type": "filter_by",
+                                    "value_type": "date",
+                                    "url_query_parameter_value": "{day}",
+                                    "offset": ""
+                                },
+                                "dateRange.end.month": {
+                                    "type": "filter_by",
+                                    "value_type": "date",
+                                    "url_query_parameter_value": "{month}"
+                                },
+                                "dateRange.end.year": {
+                                    "type": "filter_by",
+                                    "value_type": "date",
+                                    "url_query_parameter_value": "{year}"
+                                }
+                            }
+                        }
+                    },
+                    "statics": {
+                        "timeGranularity": "ALL",
+                        "start": "0",
+                        "pivot": "MEMBER_COUNTY",
+                        "fields": "pivotValue,dateRange,impressions,costInUsd,clicks,shares,pivot",
+                        "projection": "(*,elements*(pivotValue~,dateRange(*),impressions,costInUsd,clicks,shares,pivot))"
+                    }
+                }
             },
-            "destination_unique_key": {
-                "type": "raw",
-                "value": "creative_id"
+            "request": {
+                "header": null
             }
         }
     },
@@ -478,6 +582,7 @@
             "source": "linkedin",
             "response_datas_key": "elements",
             "destination": "redshift",
+            "request_data_source": "redshift",
             "model": "account_pivot_campaign",
             "url": {
                 "response_datas_key": "elements",
@@ -497,10 +602,10 @@
                                 ]
                             ],
                             "db_fields": [
-                                [
-                                    "id",
-                                    "advertiser_id"
-                                ]
+                                {
+                                    "origin_key": "id",
+                                    "destination_key": "advertiser_id"
+                                }
                             ],
                             "filter_model": "accounts",
                             "all_fields": [
@@ -513,7 +618,7 @@
                             "type": "group",
                             "offset_type": "from_today",
                             "offset_unity": "days",
-                            "offset_value": "1152",
+                            "offset_value": "1",
                             "offset_range_position": "start_day",
                             "url_params": {
                                 "dateRange.start.day": {
@@ -583,6 +688,7 @@
             "source": "linkedin",
             "response_datas_key": "elements",
             "destination": "redshift",
+            "request_data_source": "redshift",
             "model": "pivot_creative",
             "url": {
                 "response_datas_key": "elements",
@@ -602,10 +708,10 @@
                                 ]
                             ],
                             "db_fields": [
-                                [
-                                    "id",
-                                    "facet_id"
-                                ]
+                                {
+                                    "origin_key": "id",
+                                    "destination_key": "facet_id"
+                                }
                             ],
                             "filter_model": "campaigns",
                             "all_fields": [
@@ -619,7 +725,7 @@
                             "type": "group",
                             "offset_type": "from_today",
                             "offset_unity": "days",
-                            "offset_value": "1152",
+                            "offset_value": "1",
                             "offset_range_position": "start_day",
                             "url_params": {
                                 "dateRange.start.day": {
@@ -687,6 +793,7 @@
             "exclude_existing_in_db": false,
             "source": "linkedin",
             "destination": "redshift",
+            "request_data_source": "redshift",
             "model": "creative_url",
             "url": {
                 "base": "https://api.linkedin.com/v2/",
@@ -701,10 +808,10 @@
                             ],
                             "kwargs_fields": [],
                             "db_fields": [
-                                [
-                                    "creative_id",
-                                    "creative_id"
-                                ]
+                                {
+                                    "origin_key": "creative_id",
+                                    "destination_key": "creative_id"
+                                }
                             ],
                             "all_fields": [
                                 "creative_id"
@@ -732,6 +839,7 @@
             "source": "linkedin",
             "response_datas_key": "elements",
             "destination": "redshift",
+            "request_data_source": "redshift",
             "model": "pivot_job_title",
             "url": {
                 "response_datas_key": "elements",
@@ -751,15 +859,16 @@
                                 ]
                             ],
                             "db_fields": [
-                                [
-                                    "campaign_id",
-                                    "facet_id"
-                                ]
+                                {
+                                    "origin_key": "campaign_id",
+                                    "destination_key": "facet_id"
+                                }
                             ],
                             "all_fields": [
                                 "campaign_id"
                             ],
-                            "raw_sql": "select distinct(campaign_id) from {schema}.account_pivot_campaign where start_date between (select date_trunc('month', getdate() - interval '1 month')) and (select last_day(getdate() - interval '1 month'))"
+                            "raw_sql_2": "select distinct(campaign_id) from {schema}.account_pivot_campaign where start_date between (select date_trunc('month', getdate() - interval '1 month')) and (select last_day(getdate() - interval '1 month'))",
+                            "raw_sql": "select distinct(campaign_id) from {schema}.account_pivot_campaign"
                         }
                     },
                     "dynamics": {
@@ -767,7 +876,7 @@
                             "type": "group",
                             "offset_type": "from_today",
                             "offset_unity": "months",
-                            "offset_value": "1152",
+                            "offset_value": "1",
                             "offset_range_position": "start_day",
                             "url_params": {
                                 "dateRange.start.day": {
@@ -828,6 +937,112 @@
         }
     },
     {
+        "pivot_job_title_daily_full_update": {
+            "actions": [
+                "erase",
+                "insert"
+            ],
+            "exclude_existing_in_db": false,
+            "source": "linkedin",
+            "response_datas_key": "elements",
+            "destination": "redshift",
+            "request_data_source": "redshift",
+            "model": "pivot_job_title_full",
+            "url": {
+                "response_datas_key": "elements",
+                "base": "https://api.linkedin.com/v2/",
+                "category": "adAnalyticsV2",
+                "q": "analytics",
+                "params": {
+                    "db": {
+                        "_": {
+                            "type": "db rawsql",
+                            "args_fields": [],
+                            "kwargs_fields": [
+                                [
+                                    "id",
+                                    "urn:li:sponsoredCampaign:{}",
+                                    "campaigns[0]"
+                                ]
+                            ],
+                            "db_fields": [
+                                {
+                                    "origin_key": "id",
+                                    "destination_key": "facet_id"
+                                }
+                            ],
+                            "all_fields": [
+                                "campaign_id"
+                            ],
+                            "raw_sql": "select distinct(id) from {schema}.campaigns"
+                        }
+                    },
+                    "dynamics": {
+                        "start_date": {
+                            "type": "group",
+                            "offset_type": "from_today",
+                            "offset_unity": "months",
+                            "offset_value": "10000",
+                            "offset_range_position": "start_day",
+                            "url_params": {
+                                "dateRange.start.day": {
+                                    "type": "filter_by",
+                                    "value_type": "date",
+                                    "url_query_parameter_value": "{day}",
+                                    "offset": ""
+                                },
+                                "dateRange.start.month": {
+                                    "type": "filter_by",
+                                    "value_type": "date",
+                                    "url_query_parameter_value": "{month}"
+                                },
+                                "dateRange.start.year": {
+                                    "type": "filter_by",
+                                    "value_type": "date",
+                                    "url_query_parameter_value": "{year}"
+                                }
+                            }
+                        },
+                        "end_date": {
+                            "type": "group",
+                            "offset_type": "from_today",
+                            "offset_unity": "months",
+                            "offset_value": "1",
+                            "offset_range_position": "end_day",
+                            "url_params": {
+                                "dateRange.end.day": {
+                                    "type": "filter_by",
+                                    "value_type": "date",
+                                    "url_query_parameter_value": "{day}",
+                                    "offset": ""
+                                },
+                                "dateRange.end.month": {
+                                    "type": "filter_by",
+                                    "value_type": "date",
+                                    "url_query_parameter_value": "{month}"
+                                },
+                                "dateRange.end.year": {
+                                    "type": "filter_by",
+                                    "value_type": "date",
+                                    "url_query_parameter_value": "{year}"
+                                }
+                            }
+                        }
+                    },
+                    "statics": {
+                        "timeGranularity": "ALL",
+                        "pivot": "MEMBER_JOB_TITLE",
+                        "fields": "externalWebsiteConversions,dateRange,impressions,costInUsd,clicks,shares,costInLocalCurrency,pivot,pivotValue",
+                        "projection": "(*,elements*(externalWebsiteConversions,dateRange(*),impressions,costInUsd,clicks,shares,costInLocalCurrency,pivot,pivotValue~))"
+                    }
+                }
+            },
+            "request": {
+                "header": null
+            }
+        }
+    },
+    {
         "campaign_groups_daily_update": {
             "actions": [
                 "insert"
@@ -836,6 +1051,8 @@
             "exclude_key": "id",
             "source": "linkedin",
             "destination": "redshift",
+            "request_data_source": "redshift",
+            "destination_unique_keys": ["id"],
             "model": "campaign_groups",
             "url": {
                 "response_datas_key": "elements",
@@ -845,10 +1062,6 @@
             },
             "request": {
                 "header": null
-            },
-            "destination_unique_key": {
-                "type": "raw",
-                "value": "id"
             }
         }
     },
@@ -861,6 +1074,7 @@
             "source": "linkedin",
             "response_datas_key": "elements",
             "destination": "redshift",
+            "request_data_source": "redshift",
             "model": "pivot_member_company",
             "url": {
                 "response_datas_key": "elements",
@@ -880,15 +1094,16 @@
                                 ]
                             ],
                             "db_fields": [
-                                [
-                                    "campaign_id",
-                                    "facet_id"
-                                ]
+                                {
+                                    "origin_key": "campaign_id",
+                                    "destination_key": "facet_id"
+                                }
                             ],
                             "all_fields": [
                                 "campaign_id"
                             ],
-                            "raw_sql": "select distinct(campaign_id) from {schema}.account_pivot_campaign where start_date between (select date_trunc('month', getdate() - interval '1 month')) and (select last_day(getdate() - interval '1 month'))"
+                            "raw_sql_2": "select distinct(campaign_id) from {schema}.account_pivot_campaign where start_date between (select date_trunc('month', getdate() - interval '1 month')) and (select last_day(getdate() - interval '1 month'))",
+                            "raw_sql": "select distinct(campaign_id) from {schema}.account_pivot_campaign"
                         }
                     },
                     "dynamics": {
@@ -945,6 +1160,112 @@
                     },
                     "statics": {
                         "timeGranularity": "MONTHLY",
+                        "pivot": "MEMBER_COMPANY",
+                        "fields": "externalWebsiteConversions,dateRange,impressions,costInUsd,clicks,shares,costInLocalCurrency,pivot,pivotValue",
+                        "projection": "(*,elements*(externalWebsiteConversions,dateRange(*),impressions,costInUsd,clicks,shares,costInLocalCurrency,pivot,pivotValue~(localizedName)))"
+                    }
+                }
+            },
+            "request": {
+                "header": null
+            }
+        }
+    },
+    {
+        "pivot_member_organization_full_daily_update": {
+            "actions": [
+                "erase",
+                "insert"
+            ],
+            "exclude_existing_in_db": false,
+            "source": "linkedin",
+            "response_datas_key": "elements",
+            "destination": "redshift",
+            "request_data_source": "redshift",
+            "model": "pivot_member_company_full",
+            "url": {
+                "response_datas_key": "elements",
+                "base": "https://api.linkedin.com/v2/",
+                "category": "adAnalyticsV2",
+                "q": "analytics",
+                "params": {
+                    "db": {
+                        "_": {
+                            "type": "db rawsql",
+                            "args_fields": [],
+                            "kwargs_fields": [
+                                [
+                                    "id",
+                                    "urn:li:sponsoredCampaign:{}",
+                                    "campaigns[0]"
+                                ]
+                            ],
+                            "db_fields": [
+                                {
+                                    "origin_key": "id",
+                                    "destination_key": "facet_id"
+                                }
+                            ],
+                            "all_fields": [
+                                "campaign_id"
+                            ],
+                            "raw_sql": "select distinct(id) from {schema}.campaigns"
+                        }
+                    },
+                    "dynamics": {
+                        "start_date": {
+                            "type": "group",
+                            "offset_type": "from_today",
+                            "offset_unity": "days",
+                            "offset_value": "10000",
+                            "offset_range_position": "start_day",
+                            "url_params": {
+                                "dateRange.start.day": {
+                                    "type": "filter_by",
+                                    "value_type": "date",
+                                    "url_query_parameter_value": "{day}",
+                                    "offset": ""
+                                },
+                                "dateRange.start.month": {
+                                    "type": "filter_by",
+                                    "value_type": "date",
+                                    "url_query_parameter_value": "{month}"
+                                },
+                                "dateRange.start.year": {
+                                    "type": "filter_by",
+                                    "value_type": "date",
+                                    "url_query_parameter_value": "{year}"
+                                }
+                            }
+                        },
+                        "end_date": {
+                            "type": "group",
+                            "offset_type": "from_today",
+                            "offset_unity": "days",
+                            "offset_value": "1",
+                            "offset_range_position": "end_day",
+                            "url_params": {
+                                "dateRange.end.day": {
+                                    "type": "filter_by",
+                                    "value_type": "date",
+                                    "url_query_parameter_value": "{day}",
+                                    "offset": ""
+                                },
+                                "dateRange.end.month": {
+                                    "type": "filter_by",
+                                    "value_type": "date",
+                                    "url_query_parameter_value": "{month}"
+                                },
+                                "dateRange.end.year": {
+                                    "type": "filter_by",
+                                    "value_type": "date",
+                                    "url_query_parameter_value": "{year}"
+                                }
+                            }
+                        }
+                    },
+                    "statics": {
+                        "timeGranularity": "ALL",
                         "pivot": "MEMBER_COMPANY",
                         "fields": "externalWebsiteConversions,dateRange,impressions,costInUsd,clicks,shares,costInLocalCurrency,pivot,pivotValue",
                         "projection": "(*,elements*(externalWebsiteConversions,dateRange(*),impressions,costInUsd,clicks,shares,costInLocalCurrency,pivot,pivotValue~(localizedName)))"

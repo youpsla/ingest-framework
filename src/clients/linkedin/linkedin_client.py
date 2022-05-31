@@ -6,10 +6,10 @@ import dateutil.relativedelta
 import requests
 from requests.exceptions import ConnectionError, ConnectTimeout, RetryError
 from requests.structures import CaseInsensitiveDict
-
-from aws_tools import Secret
-from models import Model
-from utils.http_utils import get_http_adapter
+from src.clients.aws.aws_tools import Secret
+from src.commons.client import Client
+from src.commons.model import Model
+from src.utils.http_utils import get_http_adapter
 
 
 class LinkedInAccessToken:
@@ -105,7 +105,7 @@ class LinkedInRefreshToken(Secret):
         return False
 
 
-class LinkedInClient:
+class LinkedInClient(Client):
     """# noqa: E501
     This object is responsbile of:
     - Building API http requests
@@ -123,234 +123,11 @@ class LinkedInClient:
 
     """
 
-    def __init__(self, destination=None):
+    def __init__(self, task=None, env=None):
+        super().__init__(env)
         self.access_token = LinkedInAccessToken().value
-        self.destination = destination
+        self.task = task
         self.http_adapter = get_http_adapter()
-
-    def get_dynamics_param(self, name, params, value):
-        """# noqa: E501
-        Build a dict for an endpoint kwarg. Envetually, transform the data collected from destination (Db).
-        At teh moment, only kwargs of type "date" are manage. Return None in other cases.
-
-        Args:
-            name: str
-            The name /key of kwarg
-
-            params: dict
-                kwarg description as found in task.json
-
-            value: str or int
-                The value retrieve from source
-
-        Returns:
-            a dict {name:value}
-            None is this kwargs is not of type "date".
-
-        """
-        if params["value_type"] == "date":
-            return {
-                name: params["url_query_parameter_value"].format(
-                    day=value.day,
-                    month=value.month,
-                    year=value.year,
-                ),
-            }
-
-        return None
-
-    def get_dynamics_group_params(self, params):
-        """# noqa: E501
-        Manage group fo params. Group fo params. It is used to set start and end date for http API queries. AS the offset_parameter is common to day, month, year I group them in a group.
-
-        Use offset_unity, offset_value found in params to calculate the date for, http request.
-        Args:
-            params: dict
-
-        Returns:
-            a dict {name:value}
-            None is this kwargs is not of type "date".
-        """
-        url_params = params["url_params"]
-        today = datetime.today()
-        result = []
-        if params["offset_unity"] == "days":
-            tmp = {params["offset_unity"]: int(params["offset_value"])}
-            start_date = today - timedelta(**tmp)
-            for k, v in url_params.items():
-                result.append(self.get_dynamics_param(k, v, start_date))
-
-        if params["offset_unity"] == "months":
-
-            today = date.today()
-            last_day_of_prev_month = (
-                today
-                - dateutil.relativedelta.relativedelta(
-                    months=int(params["offset_value"]) - 1
-                )
-            ).replace(day=1) - timedelta(days=1)
-
-            start_day_of_prev_month = last_day_of_prev_month.replace(day=1)
-
-            for k, v in url_params.items():
-                result.append(
-                    self.get_dynamics_param(
-                        k,
-                        v,
-                        start_day_of_prev_month
-                        if params["offset_range_position"] == "start_day"
-                        else last_day_of_prev_month,
-                    )
-                )
-
-        return result
-
-    def get_kwargs_list(self, kwargs_fields=[], sql_datas=[], urlencode=False):
-        """# noqa: E501
-        Manage group fo params. Group fo params. It is used to set start and end date for http API queries. AS the offset_parameter is common to day, month, year I group them in a group.
-
-        Use offset_unity, offset_value found in params to calculate the date for, http request.
-        Args:
-            params: dict
-
-        Returns:
-            a dict {name:value}
-            None is this kwargs is not of type "date".
-        """
-        result = []
-        for d in sql_datas:
-            tmp_result = []
-            for f in kwargs_fields:
-                r = {f[2]: f[1].format(d[f[0]])}
-                tmp_result.append(r)
-            result.append(tmp_result)
-
-        return result
-
-    def get_args_list(self, args_fields=[], sql_datas=[]):
-
-        """# noqa: E501
-        Build the list of args for the endpoint http requets
-
-        Args:
-            args_fields: list
-                List of args fields
-            sql_datas: list
-                List of datas retrieved from db
-
-
-        Returns:
-            a list which elements are string ef values to insert in url.
-            The returned list can be empty.
-        """
-
-        result = []
-        if not args_fields:
-            return args_fields
-        for d in sql_datas:
-            tmp_result = []
-            for f in args_fields:
-                tmp_result.append(d[f])
-            result.append(tmp_result)
-
-        return result
-
-    def get_sql_list(self, db_fields=[], sql_datas=[]):
-        """# noqa: E501
-        In some table, we musy insert datas from other tables, datas not available in the API response.
-        For example, the "pivot_job_title_monthly_update" needs a "facet_id" field. This data is used for querying the source API BUT need to be writtten with anohter column name in another table.
-        We collect the "campaign_id" for filtering API and we must write this information in the "facet_id" column.
-
-        Args:
-            db_fields: list
-                List of dict. The form of each dict is: {"origin_key": name_of_the_origin_column, "target_key": name_of_the_destination_column}
-            sql_datas: list
-                List of dict. The form of each dict is:: {"name_of_origin_column": value}
-
-
-        Returns:
-            a list of dicts. The form of each dict is:: {"name_of_target_column": value}
-            The returned list can be empty.
-        """
-        result = []
-        if not db_fields:
-            return db_fields
-        for d in sql_datas:
-            tmp_result = []
-            for f in db_fields:
-                tmp_result.append({f["destination_key"]: d[f["origin_key"]]})
-            result.append(tmp_result)
-
-        return result
-
-    def get_filter_values_from_db(self, params=None):
-        """# noqa: E501
-        Build 3 list of dicts:
-        - kwargs_list: A list of dicts containing key and value for building endpoint kwargs
-        - args_list: A list of strings containing key and value for building endpoint args
-        - sql_list: A list of dicts containing key and value for writing in Db values retirieved from Db.
-
-        Args:
-            params: list
-                List of params as defined in task.json
-
-        Returns:
-            3 lists as explained above
-        """
-        if not params:
-            return [], [], []
-
-        for v in params.values():
-            if "rawsql" in v["type"]:
-                tmp = Model.get_from_raw_sql(
-                    self.destination.db_connection, v["raw_sql"]
-                )
-            else:
-                model = Model(
-                    v["filter_model"],
-                    db_connection=self.destination.db_connection,
-                )
-                tmp = model.get_all(fields=v["all_fields"])
-
-            kwargs_list = self.get_kwargs_list(v["kwargs_fields"], tmp)
-            args_list = self.get_args_list(v["args_fields"], tmp)
-            sql_list = self.get_sql_list(v["db_fields"], tmp)
-
-        return kwargs_list, args_list, sql_list
-
-    def get_dynamics_params(self, params):
-        """# noqa: E501
-        Build dynamics params from json
-
-        Args:
-            params: list
-                List of params as defined in task.json
-
-        Returns:
-            A list of dicts. Each dict has the form: {"kwargs_name": value}
-        """
-        dynamics_params = params.get("dynamics", {})
-        result = []
-        for n, p in dynamics_params.items():
-            if p["type"] == "group":
-                result += self.get_dynamics_group_params(p)
-            else:
-                result += self.get_dynamics_param(n, p)
-
-        return result
-
-    def get_statics_params(self, params):
-        """# noqa: E501
-        Build statics params from json
-
-        Args:
-            params: list
-                List of params as defined in task.json
-
-        Returns:
-            A list of dicts. Each dict has the form: {"kwargs_name": value}
-        """
-        return [{k: v} for k, v in params.get("statics", {}).items()]
 
     def get(self, task_params, header=None):
         """# noqa: E501
@@ -370,26 +147,33 @@ class LinkedInClient:
         params = url_params.get("params", None)
 
         if params:
-            kwargs_list, args_list, sql_list = (
-                self.get_filter_values_from_db(params.get("db", None))
-                if params
-                else ([], [], [])
-            )
+            db_params = self.get_db_params(self.task)
+
+            # kwargs_list, args_list, sql_list = (
+            #     self.get_filter_values_from_db(
+            #         params=params.get("db", None),
+            #         channel=self.task.channel,
+            #         db_connection=self.task.db_connection,
+            #     )
+            #     if params
+            #     else ([], [], [])
+            # )
 
             dynamics_params = self.get_dynamics_params(params)
             statics_params = self.get_statics_params(params)
 
             kwargs = dynamics_params + statics_params
 
-            from itertools import zip_longest
+            # from itertools import zip_longest
 
-            zip_datas = list(zip_longest(sql_list, kwargs_list, args_list))
+            # zip_datas = list(zip_longest(sql_list, kwargs_list, args_list))
             # zip_datas = list(zip_longest(sql_list, kwargs_list, args_list))[0:2]
             result = []
-            print(f"Number of requests to run: {len(zip_datas)}")
-            total_request = len(zip_datas)
+            total_request = len(db_params)
+            print(f"Number of requests to run: {total_request}")
+
             cpt = 0
-            for zd in zip_datas:
+            for zd in db_params:
                 endpoint = self.build_endpoint(
                     base=url_params["base"],
                     category=url_params["category"],
@@ -429,9 +213,7 @@ class LinkedInClient:
 
                 result += tmp_result
                 cpt += 1
-                print(
-                    f"Request {cpt} / {total_request} - { total_request - cpt} left."
-                )
+                print(f"Request {cpt} / {total_request} - { total_request - cpt} left.")
 
         else:
             endpoint = self.build_endpoint(
