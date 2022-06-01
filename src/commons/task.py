@@ -140,9 +140,7 @@ class Task:
             datas_values = []
             # Search for new records and insert them.
             if self.params["exclude_existing_in_db"]:
-                # existing_ids = [
-                #     str(r[self.params["exclude_key"]]) for r in self.model.get_all()
-                # ]
+
                 existing_ids = [
                     "".join(
                         str(r[e])
@@ -150,13 +148,6 @@ class Task:
                     )
                     for r in self.model.get_all()
                 ]
-
-                # api_ids = [
-                #     "".join([str(r[e]) for e in self.params['exclude_keys']) for r in api_data
-                # ]
-                # existing_ids = [
-                #     str(r[e]) for r in self.model.get_all() for e in self.params['exclude_keys']
-                # ]
                 data_objs = [
                     r
                     for r in data_objs
