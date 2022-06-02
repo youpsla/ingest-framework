@@ -197,9 +197,11 @@ class LinkedInClient(Client):
                         print(
                             "LINKEDIN API error. Max elements of 15 000 per request"
                             f" reached. Elments for enpoint {endpoint} will not be"
-                            " inserted in Db."
+                            " inserted in Db.\n"
                         )
-                        continue
+                        raise ValueError(
+                            "Linbkedin APi limit reached. More than 15000 elements in answer. STOPPING !!"
+                        )
                     for da in data:
                         tmp_result.append(da)
                 else:
