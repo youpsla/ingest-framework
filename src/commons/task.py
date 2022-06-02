@@ -173,7 +173,11 @@ class Task:
                 {f.name: f.db_value for f in obj.fields_list} for obj in data_objs
             ]
 
-            self.update(values_dicts_list, self.params["update_key"])
+            # TODO: Manage the case when no quries are done to source because of prefiltering from DB. This is the case for sponsored_video_update
+            if values_dicts_list:
+                self.update(values_dicts_list, self.params["update_key"])
+            else:
+                pass
 
         if "partial_update" in self.actions:
             for d in source_data:
