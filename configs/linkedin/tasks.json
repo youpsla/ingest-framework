@@ -197,7 +197,7 @@
                 "id"
             ],
             "request_data_source": "redshift",
-            "update_key": "id",
+            "update_key": "creative_id",
             "model": "creative_sponsored_video",
             "url": {
                 "base": "https://api.linkedin.com/v2/",
@@ -530,8 +530,8 @@
                         "start_date": {
                             "type": "group",
                             "offset_type": "from_today",
-                            "offset_unity": "months",
-                            "offset_value": "10000",
+                            "offset_unity": "days",
+                            "offset_value": "3000",
                             "offset_range_position": "start_day",
                             "url_params": {
                                 "dateRange.start.day": {
@@ -555,7 +555,7 @@
                         "end_date": {
                             "type": "group",
                             "offset_type": "from_today",
-                            "offset_unity": "months",
+                            "offset_unity": "days",
                             "offset_value": "1",
                             "offset_range_position": "end_day",
                             "url_params": {
@@ -637,7 +637,7 @@
                             "type": "group",
                             "offset_type": "from_today",
                             "offset_unity": "days",
-                            "offset_value": "1",
+                            "offset_value": "2000",
                             "offset_range_position": "start_day",
                             "url_params": {
                                 "dateRange.start.day": {
@@ -662,7 +662,7 @@
                             "type": "group",
                             "offset_type": "from_today",
                             "offset_unity": "days",
-                            "offset_value": "1",
+                            "offset_value": "1001",
                             "offset_range_position": "end_day",
                             "url_params": {
                                 "dateRange.end.day": {
@@ -1000,8 +1000,8 @@
                         "start_date": {
                             "type": "group",
                             "offset_type": "from_today",
-                            "offset_unity": "months",
-                            "offset_value": "10000",
+                            "offset_unity": "days",
+                            "offset_value": "3000",
                             "offset_range_position": "start_day",
                             "url_params": {
                                 "dateRange.start.day": {
@@ -1025,7 +1025,7 @@
                         "end_date": {
                             "type": "group",
                             "offset_type": "from_today",
-                            "offset_unity": "months",
+                            "offset_unity": "days",
                             "offset_value": "1",
                             "offset_range_position": "end_day",
                             "url_params": {
@@ -1239,7 +1239,7 @@
                             "type": "group",
                             "offset_type": "from_today",
                             "offset_unity": "days",
-                            "offset_value": "10000",
+                            "offset_value": "3000",
                             "offset_range_position": "start_day",
                             "url_params": {
                                 "dateRange.start.day": {
