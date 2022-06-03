@@ -17,12 +17,15 @@ from sentry_sdk.integrations.aws_lambda import AwsLambdaIntegration
 from src.clients.redshift.redshift_client import RedshiftClient
 from src.commons.task import Task
 from src.utils.custom_logger import logger
+from src.utils.various_utils import get_running_env
 
-sentry_sdk.init(
-    dsn=os.environ["SENTRY_DNS"],
-    integrations=[AwsLambdaIntegration(timeout_warning=True)],
-    traces_sample_rate=1.0,
-)
+
+def activate_sentry():
+    sentry_sdk.init(
+        dsn=os.environ["SENTRY_DNS"],
+        integrations=[AwsLambdaIntegration(timeout_warning=True)],
+        traces_sample_rate=1.0,
+    )
 
 
 def get_params_json_file_path():
@@ -37,6 +40,8 @@ def get_channel_params():
 
 
 def lambda_handler(event, context):
+    if get_running_env() in ["production", "staging"]:
+        activate_sentry()
     main()
 
 
@@ -73,7 +78,8 @@ def main():
         result, _ = run_task(channel_params["name"], task_name, db_connection)
 
     today = datetime.datetime.now()
-    run_monthly = True if today.day == 1 else False
+    # run_monthly = True if today.day == 1 else False
+    run_monthly = True
     if run_monthly:
         monthly_tasks_list = channel_params.get("monthly_tasks_list", None)
         if monthly_tasks_list:
