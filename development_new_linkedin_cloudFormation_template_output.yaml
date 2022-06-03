@@ -1,0 +1,47 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: LinkedIn API Ingest Microservice V2a
+Resources:
+  Function:
+    Type: AWS::Serverless::Function
+    Properties:
+      Description: LinkedIn API Ingest Microservice V2a - Production
+      Handler: linkedin.lambda_f.lambda_handler
+      CodeUri: s3://jabmo-linkedin-ingest-lambda/9217831f4053b5b84a3e0bc5159a9cc0
+      Runtime: python3.8
+      Layers:
+      - arn:aws:lambda:eu-west-1:467882466042:layer:python-aws-psycopg2:1
+      - arn:aws:lambda:eu-west-1:467882466042:layer:python-requests:1
+      - arn:aws:lambda:eu-west-1:467882466042:layer:python-bingads:1
+      - arn:aws:lambda:eu-west-1:943013980633:layer:SentryPythonServerlessSDK:24
+      Role: arn:aws:iam::467882466042:role/Linkedin-lambda-dev-staging-rw
+      Timeout: 900
+      MemorySize: 1024
+      Environment:
+        Variables:
+          WEB_INGEST_PROD_RW_SECRET_NAME: jabmo/db/redshift/web-ingest/dev/rw
+          SENTRY_DNS: https://47e2fc82fc674f428f2b3e931eddace7@o1035237.ingest.sentry.io/6094713
+          RUNNING_ENV: development
+  ScheduledRuleJabmoLinkedInIngestDaily:
+    Type: AWS::Events::Rule
+    Properties:
+      Description: jabmo-linkedin-ingest-prod-daily-trigger
+      ScheduleExpression: cron(00 07 * * ? *)
+      State: ENABLED
+      Targets:
+      - Arn:
+          Fn::GetAtt:
+          - Function
+          - Arn
+        Id: Function
+  PermissionRuleJabmoLinkedInIngestDaily:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName:
+        Ref: Function
+      Action: lambda:InvokeFunction
+      Principal: events.amazonaws.com
+      SourceArn:
+        Fn::GetAtt:
+        - ScheduledRuleJabmoLinkedInIngestDaily
+        - Arn
