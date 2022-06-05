@@ -18,7 +18,7 @@ DB_SECRET_NAMES = {
             "readonly": "jabmo/db/redshift/web-ingest/dev/ro",
             "readwrite": "jabmo/db/redshift/web-ingest/dev/rw",
         },
-        "prod": {
+        "production": {
             "readonly": "jabmo/db/redshift/web-ingest/prod",
             "readwrite": "jabmo/db/redshift/web-ingest/prod/rw",
         },
