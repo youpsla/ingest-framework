@@ -1,6 +1,15 @@
 {
     "name": "linkedin",
     "daily_tasks_list" : [
+        "daily_accounts_update",
+        "daily_campaigns_update",
+        "daily_social_metrics_update",
+        "creative_sponsored_video_daily_update",
+        "creative_sponsored_video__creative_name_daily_update",
+        "account_pivot_campaign_daily_update",
+        "creative_url_daily_update",
+        "campaign_groups_daily_update",
+        "creative_sponsored_update_daily_update",
     ],
     "bck_daily_tasks_list" : [
         "daily_accounts_update",
@@ -11,6 +20,7 @@
         "account_pivot_campaign_daily_update",
         "creative_url_daily_update",
         "campaign_groups_daily_update",
+        "creative_sponsored_update_daily_update",
         "pivot_member_organization_full_daily_update",
         "pivot_job_title_daily_full_update",
         "pivot_member_country_full_daily_update"
@@ -26,3 +36,5 @@
         "pivot_member_organization_monthly_update"
     ]
 }
+
+
