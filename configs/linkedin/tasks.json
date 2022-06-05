@@ -835,7 +835,8 @@
                             "all_fields": [
                                 "creative_id"
                             ],
-                            "raw_sql": "select distinct(creative_id) from {schema}.social_metrics where creative_id not in (select creative_id from {schema}.creative_url) and creative_type = 'SPONSORED_STATUS_UPDATE' and start_date < getdate() - INTERVAL '1 DAY'"
+                            "raw_sql": "select distinct(creative_id) from {schema}.social_metrics where advertiser_id =  507206911 and creative_id not in (select creative_id from {schema}.creative_url) and creative_type = 'SPONSORED_STATUS_UPDATE'",
+                            "raw_sq_2l": "select distinct(creative_id) from {schema}.social_metrics where creative_id not in (select creative_id from {schema}.creative_url) and creative_type = 'SPONSORED_STATUS_UPDATE' and start_date < getdate() - INTERVAL '1 DAY'"
                         }
                     },
                     "dynamics": {},
