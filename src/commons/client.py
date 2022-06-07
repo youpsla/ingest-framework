@@ -124,6 +124,13 @@ class Client:
 
             kwargs_list, args_list, sql_list = [], [], []
 
+            # from collections import OrderedDict
+
+            # tmp = []
+            # data = OrderedDict()
+            # data["id"] = 507206911
+            # tmp.append(data)
+
             if v.get("kwargs_fields", None):
                 kwargs_list = self.get_kwargs_list(v["kwargs_fields"], tmp)
 
