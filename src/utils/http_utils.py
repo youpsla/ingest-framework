@@ -21,7 +21,9 @@ retry_strategy = Retry(
 
 def get_http_adapter():
     http = requests.Session()
-    adapter = TimeoutHTTPAdapter(max_retries=retry_strategy)
+    adapter = TimeoutHTTPAdapter(
+        max_retries=retry_strategy, pool_connections=80, pool_maxsize=80
+    )
     http.mount("https://", adapter)
     http.mount("http://", adapter)
 

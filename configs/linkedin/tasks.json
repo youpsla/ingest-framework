@@ -126,7 +126,7 @@
                         "start_date": {
                             "type": "group",
                             "offset_type": "from_today",
-                            "offset_value": "1680",
+                            "offset_value": "3000",
                             "offset_range_position": "start_day",
                             "url_params": {
                                 "dateRange.start.day": {
@@ -151,7 +151,7 @@
                             "type": "group",
                             "offset_type": "from_today",
                             "offset_unity": "days",
-                            "offset_value": "1650",
+                            "offset_value": "1",
                             "offset_range_position": "end_day",
                             "url_params": {
                                 "dateRange.end.day": {
@@ -622,124 +622,11 @@
                                     "accounts"
                                 ]
                             ],
-                            "db_fields": [
-                                {
-                                    "origin_key": "id",
-                                    "destination_key": "advertiser_id"
-                                }
-                            ],
+                            "db_fields": [],
                             "filter_model": "accounts",
                             "all_fields": [
                                 "id"
                             ]
-                        }
-                    },
-                    "date_range": {
-                        "split_allowed": true,
-                        "offset_unity": "days",
-                        "start_date": {
-                            "type": "group",
-                            "offset_type": "from_today",
-                            "offset_value": "1680",
-                            "offset_range_position": "start_day",
-                            "url_params": {
-                                "dateRange.start.day": {
-                                    "type": "filter_by",
-                                    "value_type": "date",
-                                    "url_query_parameter_value": "{day}",
-                                    "offset": ""
-                                },
-                                "dateRange.start.month": {
-                                    "type": "filter_by",
-                                    "value_type": "date",
-                                    "url_query_parameter_value": "{month}"
-                                },
-                                "dateRange.start.year": {
-                                    "type": "filter_by",
-                                    "value_type": "date",
-                                    "url_query_parameter_value": "{year}"
-                                }
-                            }
-                        },
-                        "end_date": {
-                            "type": "group",
-                            "offset_type": "from_today",
-                            "offset_unity": "days",
-                            "offset_value": "1650",
-                            "offset_range_position": "end_day",
-                            "url_params": {
-                                "dateRange.end.day": {
-                                    "type": "filter_by",
-                                    "value_type": "date",
-                                    "url_query_parameter_value": "{day}",
-                                    "offset": ""
-                                },
-                                "dateRange.end.month": {
-                                    "type": "filter_by",
-                                    "value_type": "date",
-                                    "url_query_parameter_value": "{month}"
-                                },
-                                "dateRange.end.year": {
-                                    "type": "filter_by",
-                                    "value_type": "date",
-                                    "url_query_parameter_value": "{year}"
-                                }
-                            }
-                        }
-                    },
-                    "statics": {
-                        "timeGranularity": "DAILY",
-                        "start": "0",
-                        "pivot": "CAMPAIGN",
-                        "fields": "pivotValue,dateRange,impressions,costInUsd,clicks,shares,pivot",
-                        "projection": "(*,elements*(pivotValue~(account, id, name, status, campaignGroup, type),dateRange(*),impressions,costInUsd,clicks,shares,pivot))"
-                    }
-                }
-            },
-            "request": {
-                "header": null
-            }
-        }
-    },
-    {
-        "pivot_creative_daily_update": {
-            "actions": [
-                "insert"
-            ],
-            "exclude_existing_in_db": false,
-            "source": "linkedin",
-            "response_datas_key": "elements",
-            "destination": "redshift",
-            "request_data_source": "redshift",
-            "model": "pivot_creative",
-            "url": {
-                "response_datas_key": "elements",
-                "base": "https://api.linkedin.com/v2/",
-                "category": "adAnalyticsV2",
-                "q": "analytics",
-                "params": {
-                    "db": {
-                        "_": {
-                            "type": "db",
-                            "args_fields": [],
-                            "kwargs_fields": [
-                                [
-                                    "id",
-                                    "urn:li:sponsoredCampaign:{}",
-                                    "campaigns[0]"
-                                ]
-                            ],
-                            "db_fields": [
-                                {
-                                    "origin_key": "id",
-                                    "destination_key": "facet_id"
-                                }
-                            ],
-                            "filter_model": "campaigns",
-                            "all_fields": [
-                                "id"
-                            ],
-                            "raw_sql": "SELECT distinct(id) from {schema}.campaigns order by entry_date desc"
                         }
                     },
                     "date_range": {
@@ -797,9 +684,10 @@
                     },
                     "statics": {
                         "timeGranularity": "DAILY",
-                        "pivot": "CREATIVE",
-                        "fields": "externalWebsiteConversions,dateRange,impressions,costInUsd,clicks,shares,costInLocalCurrency,pivot,pivotValue",
-                        "projection": "(*,elements*(externalWebsiteConversions,dateRange(*),impressions,costInUsd,clicks,shares,costInLocalCurrency,pivot,pivotValue~))"
+                        "start": "0",
+                        "pivot": "CAMPAIGN",
+                        "fields": "pivotValue,dateRange,impressions,costInUsd,clicks,shares,pivot",
+                        "projection": "(*,elements*(pivotValue~(account, id, name, status, campaignGroup, type),dateRange(*),impressions,costInUsd,clicks,shares,pivot))"
                     }
                 }
             },
@@ -839,7 +727,7 @@
                             "all_fields": [
                                 "creative_id"
                             ],
-                            "raw_sql": "select distinct(creative_id) from {schema}.social_metrics where advertiser_id =  507206911 and creative_id not in (select creative_id from {schema}.creative_url) and creative_type = 'SPONSORED_STATUS_UPDATE'"
+                            "raw_sql": "select distinct(creative_id) from {schema}.social_metrics where creative_id not in (select creative_id from {schema}.creative_url) and creative_type = 'SPONSORED_STATUS_UPDATE'"
                         }
                     },
                     "dynamics": {},
@@ -1085,7 +973,8 @@
                 "response_datas_key": "elements",
                 "base": "https://api.linkedin.com/v2/",
                 "category": "adCampaignGroupsV2",
-                "q": "search"
+                "q": "search",
+                "params": null
             },
             "request": {
                 "header": null
