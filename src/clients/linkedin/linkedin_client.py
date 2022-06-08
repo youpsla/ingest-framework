@@ -147,27 +147,13 @@ class LinkedInClient(Client):
         params = url_params.get("params", None)
 
         if params:
-            db_params = self.get_db_params(self.task)
-
-            # kwargs_list, args_list, sql_list = (
-            #     self.get_filter_values_from_db(
-            #         params=params.get("db", None),
-            #         channel=self.task.channel,
-            #         db_connection=self.task.db_connection,
-            #     )
-            #     if params
-            #     else ([], [], [])
-            # )
+            db_params = self.get_request_params(self.task)
 
             dynamics_params = self.get_dynamics_params(params)
             statics_params = self.get_statics_params(params)
 
             kwargs = dynamics_params + statics_params
 
-            # from itertools import zip_longest
-
-            # zip_datas = list(zip_longest(sql_list, kwargs_list, args_list))
-            # zip_datas = list(zip_longest(sql_list, kwargs_list, args_list))[0:2]
             result = []
             total_request = len(db_params)
             print(f"Number of requests to run: {total_request}")

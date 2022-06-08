@@ -56,7 +56,8 @@
         },
         "daily_accounts_update": {
             "actions": [
-                "insert", "update"
+                "insert",
+                "update"
             ],
             "exclude_existing_in_db": true,
             "exclude_key": "id",
@@ -119,12 +120,13 @@
                             ]
                         }
                     },
-                    "dynamics": {
+                    "date_range": {
+                        "split_allowed": true,
+                        "offset_unity": "days",
                         "start_date": {
                             "type": "group",
                             "offset_type": "from_today",
-                            "offset_unity": "days",
-                            "offset_value": "10000",
+                            "offset_value": "1680",
                             "offset_range_position": "start_day",
                             "url_params": {
                                 "dateRange.start.day": {
@@ -149,7 +151,7 @@
                             "type": "group",
                             "offset_type": "from_today",
                             "offset_unity": "days",
-                            "offset_value": "1",
+                            "offset_value": "1650",
                             "offset_range_position": "end_day",
                             "url_params": {
                                 "dateRange.end.day": {
@@ -173,7 +175,6 @@
                     },
                     "statics": {
                         "timeGranularity": "DAILY",
-                        "start": "0",
                         "pivot": "CREATIVE",
                         "fields": "likes,dateRange,impressions,costInUsd,clicks,shares,costInLocalCurrency,pivot,pivotValue",
                         "projection": "(*,elements*(likes,dateRange(*),impressions,costInUsd,clicks,shares,costInLocalCurrency,pivot,pivotValue~))"
@@ -188,7 +189,8 @@
     {
         "creative_sponsored_video_daily_update": {
             "actions": [
-                "insert", "update"
+                "insert",
+                "update"
             ],
             "exclude_existing_in_db": false,
             "source": "linkedin",
@@ -632,12 +634,13 @@
                             ]
                         }
                     },
-                    "dynamics": {
+                    "date_range": {
+                        "split_allowed": true,
+                        "offset_unity": "days",
                         "start_date": {
                             "type": "group",
                             "offset_type": "from_today",
-                            "offset_unity": "days",
-                            "offset_value": "1",
+                            "offset_value": "1680",
                             "offset_range_position": "start_day",
                             "url_params": {
                                 "dateRange.start.day": {
@@ -662,7 +665,7 @@
                             "type": "group",
                             "offset_type": "from_today",
                             "offset_unity": "days",
-                            "offset_value": "1",
+                            "offset_value": "1650",
                             "offset_range_position": "end_day",
                             "url_params": {
                                 "dateRange.end.day": {
@@ -739,12 +742,13 @@
                             "raw_sql": "SELECT distinct(id) from {schema}.campaigns order by entry_date desc"
                         }
                     },
-                    "dynamics": {
+                    "date_range": {
+                        "split_allowed": true,
+                        "offset_unity": "days",
                         "start_date": {
                             "type": "group",
                             "offset_type": "from_today",
-                            "offset_unity": "days",
-                            "offset_value": "1",
+                            "offset_value": "3000",
                             "offset_range_position": "start_day",
                             "url_params": {
                                 "dateRange.start.day": {
@@ -1064,7 +1068,8 @@
     {
         "campaign_groups_daily_update": {
             "actions": [
-                "insert", "update"
+                "insert",
+                "update"
             ],
             "exclude_existing_in_db": true,
             "exclude_key": "id",
