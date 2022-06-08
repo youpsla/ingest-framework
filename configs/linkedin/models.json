@@ -429,6 +429,7 @@
                     "share~",
                     "content",
                     "contentEntities",
+                    0,
                     "title"
                 ]
             },
@@ -452,6 +453,7 @@
                     "share~",
                     "content",
                     "contentEntities",
+                    0,
                     "entityLocation"
                 ]
             },
@@ -464,6 +466,7 @@
                     "share~",
                     "content",
                     "contentEntities",
+                    0,
                     "description"
                 ]
             },

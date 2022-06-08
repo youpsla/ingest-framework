@@ -14,21 +14,34 @@ from suds.sudsobject import asdict
 #         return None
 
 
+# def nested_get(dic, keys):
+#     try:
+#         for key in keys:
+#             if not isinstance(key, int):
+#                 if isinstance(dic, list):
+#                     try:
+#                         dic = dic[0][key]
+#                     except:
+#                         dic = dic[0]
+#                 else:
+#                     dic = dic[key]
+#             else:
+#                 dic = dic[key]
+#         return dic
+#     except Exception:
+#         return None
+
+
 def nested_get(dic, keys):
+
     try:
-        for key in keys:
-            if not isinstance(key, int):
-                if isinstance(dic, list):
-                    try:
-                        dic = dic[0][key]
-                    except:
-                        dic = dic[0]
-                else:
-                    dic = dic[key]
-            else:
+        if keys:
+            for key in keys:
                 dic = dic[key]
-        return dic
-    except Exception:
+            return dic
+        else:
+            return None
+    except KeyError:
         return None
 
 

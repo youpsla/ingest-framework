@@ -56,7 +56,7 @@ class BingAdsClient(Client):
         params = params.get("url", None)
         query_params = params.get("params", None)
 
-        db_params = self.get_db_params(self.task)
+        db_params = self.get_request_params(self.task)
         kwargs = self.get_kwargs(query_params)
 
         result = []
