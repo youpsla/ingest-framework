@@ -78,8 +78,8 @@ def main():
         result, _ = run_task(channel_params["name"], task_name, db_connection)
 
     today = datetime.datetime.now()
-    # run_monthly = True if today.day == 1 else False
-    run_monthly = True
+    run_monthly = True if today.day == 1 else False
+    # run_monthly = True
     if run_monthly:
         monthly_tasks_list = channel_params.get("monthly_tasks_list", None)
         if monthly_tasks_list:
