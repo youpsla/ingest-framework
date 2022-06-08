@@ -75,11 +75,7 @@ class SqlQuery:
                     cursor.execute(self.sql)
                 elif self.qtype == "insert":
                     self.sql = self.get_sql_insert(self.schema_table)
-                    extras.execute_values(
-                        cursor,
-                        self.sql,
-                        self.values,
-                    )
+                    extras.execute_values(cursor, self.sql, self.values, page_size=500)
                 elif self.qtype == "select_max":
                     self.sql = self.get_sql_select_max()
                     cursor.execute(self.sql, self.values)

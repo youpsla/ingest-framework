@@ -148,85 +148,93 @@ class LinkedInClient(Client):
 
         if params:
             db_params = self.get_request_params(self.task)
-
+            total_requests_number = len(db_params)
             dynamics_params = self.get_dynamics_params(params)
             statics_params = self.get_statics_params(params)
-
             kwargs = dynamics_params + statics_params
+            endpoint_list = [
+                (
+                    self.build_endpoint(
+                        base=url_params["base"],
+                        category=url_params["category"],
+                        q=url_params["q"],
+                        kwargs=zd[1] + kwargs,
+                        args=zd[2],
+                    ),
+                    zd[0],
+                )
+                for zd in db_params
+            ]
+        else:
+            total_requests_number = 1
+            endpoint_list = [
+                (
+                    self.build_endpoint(
+                        base=url_params["base"],
+                        category=url_params["category"],
+                        q=url_params["q"],
+                    ),
+                    [],
+                )
+            ]
+        print(f"Number of requests to run: {total_requests_number}")
 
-            result = []
-            total_request = len(db_params)
-            print(f"Number of requests to run: {total_request}")
+        import concurrent.futures
 
-            cpt = 0
-            for zd in db_params:
-                endpoint = self.build_endpoint(
-                    base=url_params["base"],
-                    category=url_params["category"],
-                    q=url_params["q"],
-                    kwargs=zd[1] + kwargs,
-                    args=zd[2],
+        ### Method 1. not sure to rpeserver order for adding avalues later
+        # with concurrent.futures.ThreadPoolExecutor(max_workers=40) as executor:
+        #     futures = [
+        #         executor.submit(self.do_get_query, endpoint, headers)
+        #         for endpoint in endpoint_list
+        #     ]
+        # futures_result = [f.result() for f in futures]
+
+        threads = []
+        futures_results = []
+        response_key = url_params.get("response_datas_key", None)
+        with concurrent.futures.ThreadPoolExecutor(max_workers=80) as executor:
+            for endpoint in endpoint_list:
+                threads.append(
+                    (
+                        executor.submit(self.do_get_query, endpoint[0], headers),
+                        endpoint[1],
+                    )
                 )
 
-                data = self.do_get_query(endpoint=endpoint, headers=headers)
-                # If no data continue to next iteration
-                if not data:
-                    continue
+        for task in threads:
+            tmp_task_result = task[0].result()
+            if response_key:
+                response_elements = tmp_task_result[response_key]
+            else:
+                response_elements = [tmp_task_result]
+            if len(response_elements) >= 15000:
+                print(
+                    "LINKEDIN API error. Max elements of 15 000 per request"
+                    f" reached. Elments for enpoint {endpoint} will not be"
+                    " inserted in Db.\n"
+                )
+                raise ValueError(
+                    "Linbkedin APi limit reached. More than 15000 elements in answer. STOPPING !!"
+                )
+            if task[1]:
+                for r in response_elements:
+                    for f in task[1]:
+                        for k, v in f.items():
+                            r[k] = v
 
-                response_key = url_params.get("response_datas_key", None)
+            futures_results.append(response_elements)
 
-                tmp_result = []
-                if response_key:
-                    data = data[response_key]
-                    print(len(data))
-                    if len(data) >= 15000:
-                        print(
-                            "LINKEDIN API error. Max elements of 15 000 per request"
-                            f" reached. Elments for enpoint {endpoint} will not be"
-                            " inserted in Db.\n"
-                        )
-                        raise ValueError(
-                            "Linbkedin APi limit reached. More than 15000 elements in answer. STOPPING !!"
-                        )
-                    for da in data:
-                        tmp_result.append(da)
-                else:
-                    tmp_result.append(data)
-
-                if zd[0]:
-                    for r in tmp_result:
-                        for f in zd[0]:
-                            for k, v in f.items():
-                                r[k] = v
-
-                result += tmp_result
-                cpt += 1
-                print(f"Request {cpt} / {total_request} - { total_request - cpt} left.")
-
-        else:
-            endpoint = self.build_endpoint(
-                base=url_params["base"],
-                category=url_params["category"],
-                q=url_params["q"],
+        cpt = 0
+        result = []
+        for r in futures_results:
+            result.extend(r)
+            cpt += 1
+            print(
+                f"Request {cpt} / {total_requests_number} - { total_requests_number - cpt} left."
             )
 
-            data = self.do_get_query(endpoint=endpoint, headers=headers)
-            # If no data continue to next iteration
-            if not data:
-                return None
-
-            response_key = url_params.get("response_datas_key", None)
-            tmp_result = []
-            if response_key:
-                data = data[response_key]
-                for d in data:
-                    tmp_result.append(d)
-            else:
-                tmp_result.append(data)
-
-            result = tmp_result
-
-        return [{"datas": d} for d in result]
+        to_return = [{"datas": d} for d in result]
+        return to_return
 
     def build_headers(self, header=None):
         """# noqa: E501
@@ -295,24 +303,24 @@ class LinkedInClient(Client):
         Returns:
             A json str repeenting the API response
         """
-        try:
-            response = self.http_adapter.get(url=endpoint, headers=headers)
-        except ConnectionError as e:
-            print("Error while connecting to db")
-            print(e)
-            return None
-        except ConnectTimeout as e:
-            print("Timeout connecting to db")
-            print(e)
-            return None
-        except RetryError as e:
-            print("Timeout connecting to db")
-            print(e)
-            return None
-        except Exception as e:
-            print("Unhandled exception occurs")
-            print(e)
-            return None
+        # try:
+        response = self.http_adapter.get(url=endpoint, headers=headers)
+        # except ConnectionError as e:
+        #     print("Error while connecting to db")
+        #     print(e)
+        #     return None
+        # except ConnectTimeout as e:
+        #     print("Timeout connecting to db")
+        #     print(e)
+        #     return None
+        # except RetryError as e:
+        #     print("Timeout connecting to db")
+        #     print(e)
+        #     return None
+        # except Exception as e:
+        #     print("Unhandled exception occurs")
+        #     print(e)
+        #     return None
 
         if response.status_code != 200:
             print("Error while processing request")

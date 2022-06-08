@@ -1523,7 +1523,9 @@
                     "share~",
                     "content",
                     "contentEntities",
+                    0,
                     "thumbnails",
+                    0,
                     "resolvedUrl"
                 ]
             }

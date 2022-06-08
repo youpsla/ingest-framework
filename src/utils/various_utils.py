@@ -2,35 +2,6 @@ import os
 
 from suds.sudsobject import asdict
 
-# def nested_get(dic, keys):
-#     try:
-#         for key in keys:
-#             if isinstance(dic, list):
-#                 dic = dic[0][key]
-#             else:
-#                 dic = dic[key]
-#         return dic
-#     except Exception:
-#         return None
-
-
-# def nested_get(dic, keys):
-#     try:
-#         for key in keys:
-#             if not isinstance(key, int):
-#                 if isinstance(dic, list):
-#                     try:
-#                         dic = dic[0][key]
-#                     except:
-#                         dic = dic[0]
-#                 else:
-#                     dic = dic[key]
-#             else:
-#                 dic = dic[key]
-#         return dic
-#     except Exception:
-#         return None
-
 
 def nested_get(dic, keys):
 
