@@ -1,14 +1,13 @@
 import json
-from datetime import date, datetime, timedelta
+import time
+from datetime import datetime
 from urllib.parse import urlencode
 
-import dateutil.relativedelta
 import requests
 from requests.exceptions import ConnectionError, ConnectTimeout, RetryError
 from requests.structures import CaseInsensitiveDict
 from src.clients.aws.aws_tools import Secret
 from src.commons.client import Client
-from src.commons.model import Model
 from src.utils.http_utils import get_http_adapter
 
 
@@ -129,6 +128,16 @@ class LinkedInClient(Client):
         self.task = task
         self.http_adapter = get_http_adapter()
 
+    def get_chunks(self, lst):
+        chunk_size = 500
+        if len(lst) > chunk_size:
+            results_lists = [
+                lst[offs : offs + chunk_size] for offs in range(0, len(lst), chunk_size)
+            ]
+            return results_lists
+        else:
+            return [lst]
+
     def get(self, task_params, header=None):
         """# noqa: E501
         Build the endpoint, query the API.
@@ -189,49 +198,49 @@ class LinkedInClient(Client):
         #     ]
         # futures_result = [f.result() for f in futures]
 
-        threads = []
         futures_results = []
         response_key = url_params.get("response_datas_key", None)
-        with concurrent.futures.ThreadPoolExecutor(max_workers=80) as executor:
-            for endpoint in endpoint_list:
-                threads.append(
-                    (
-                        executor.submit(self.do_get_query, endpoint[0], headers),
-                        endpoint[1],
+        endpoint_list_list = self.get_chunks(endpoint_list)
+        for lst in endpoint_list_list:
+            threads = []
+            print(f"Chunck with {len(lst)} queries")
+            with concurrent.futures.ThreadPoolExecutor(max_workers=40) as executor:
+                for endpoint in lst:
+                    print(endpoint)
+                    threads.append(
+                        (
+                            executor.submit(self.do_get_query, endpoint[0], headers),
+                            endpoint[1],
+                        )
                     )
-                )
 
-        for task in threads:
-            tmp_task_result = task[0].result()
-            if response_key:
-                response_elements = tmp_task_result[response_key]
-            else:
-                response_elements = [tmp_task_result]
-            if len(response_elements) >= 15000:
-                print(
-                    "LINKEDIN API error. Max elements of 15 000 per request"
-                    f" reached. Elments for enpoint {endpoint} will not be"
-                    " inserted in Db.\n"
-                )
-                raise ValueError(
-                    "Linbkedin APi limit reached. More than 15000 elements in answer. STOPPING !!"
-                )
-            if task[1]:
-                for r in response_elements:
-                    for f in task[1]:
-                        for k, v in f.items():
-                            r[k] = v
+                for task in threads:
+                    tmp_task_result = task[0].result()
+                    if tmp_task_result is not None:
+                        if response_key:
+                            response_elements = tmp_task_result[response_key]
+                        else:
+                            response_elements = [tmp_task_result]
+                        if len(response_elements) >= 15000:
+                            print(
+                                "LINKEDIN API error. Max elements of 15 000 per request"
+                                f" reached. Elments for enpoint {endpoint} will not be"
+                                " inserted in Db.\n"
+                            )
+                            raise ValueError(
+                                "Linbkedin APi limit reached. More than 15000 elements in answer. STOPPING !!"
+                            )
+                        if task[1]:
+                            for r in response_elements:
+                                for f in task[1]:
+                                    for k, v in f.items():
+                                        r[k] = v
 
-            futures_results.append(response_elements)
+                        futures_results.append(response_elements)
 
-        cpt = 0
         result = []
         for r in futures_results:
             result.extend(r)
-            cpt += 1
-            print(
-                f"Request {cpt} / {total_requests_number} - { total_requests_number - cpt} left."
-            )
 
         to_return = [{"datas": d} for d in result]
         return to_return
@@ -303,24 +312,29 @@ class LinkedInClient(Client):
         Returns:
             A json str repeenting the API response
         """
-        # try:
-        response = self.http_adapter.get(url=endpoint, headers=headers)
-        # except ConnectionError as e:
-        #     print("Error while connecting to db")
-        #     print(e)
-        #     return None
-        # except ConnectTimeout as e:
-        #     print("Timeout connecting to db")
-        #     print(e)
-        #     return None
-        # except RetryError as e:
-        #     print("Timeout connecting to db")
-        #     print(e)
-        #     return None
-        # except Exception as e:
-        #     print("Unhandled exception occurs")
-        #     print(e)
-        #     return None
+        try:
+            response = self.http_adapter.get(url=endpoint, headers=headers)
+        except ConnectionError as e:
+            print("Error while connecting to db")
+            print(e)
+            return None
+        except ConnectTimeout as e:
+            print("Timeout connecting to db")
+            print(e)
+            return None
+        except RetryError as e:
+            print("Timeout connecting to db")
+            print(e)
+            import time
+
+            print("429 limit reached. Wait 5 minutes.")
+            time.sleep(300)
+            print("Restarting after 300 seconds of pause")
+            return None
+        except Exception as e:
+            print("Unhandled exception occurs")
+            print(e)
+            return None
 
         if response.status_code != 200:
             print("Error while processing request")
