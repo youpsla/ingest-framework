@@ -421,12 +421,13 @@
                             "raw_sql": "select distinct(campaign_id) from {schema}.account_pivot_campaign"
                         }
                     },
-                    "dynamics": {
+                    "date_range": {
+                        "split_allowed": true,
+                        "offset_unity": "months",
                         "start_date": {
                             "type": "group",
                             "offset_type": "from_today",
-                            "offset_unity": "months",
-                            "offset_value": "1",
+                            "offset_value": "36",
                             "offset_range_position": "start_day",
                             "url_params": {
                                 "dateRange.start.day": {
@@ -450,8 +451,8 @@
                         "end_date": {
                             "type": "group",
                             "offset_type": "from_today",
-                            "offset_unity": "months",
-                            "offset_value": "1",
+                            "offset_unity": "days",
+                            "offset_value": "26",
                             "offset_range_position": "end_day",
                             "url_params": {
                                 "dateRange.end.day": {
@@ -782,12 +783,13 @@
                             "raw_sql": "select distinct(campaign_id) from {schema}.account_pivot_campaign"
                         }
                     },
-                    "dynamics": {
+                    "date_range": {
+                        "split_allowed": true,
+                        "offset_unity": "months",
                         "start_date": {
                             "type": "group",
                             "offset_type": "from_today",
-                            "offset_unity": "months",
-                            "offset_value": "1",
+                            "offset_value": "25",
                             "offset_range_position": "start_day",
                             "url_params": {
                                 "dateRange.start.day": {
@@ -811,7 +813,7 @@
                         "end_date": {
                             "type": "group",
                             "offset_type": "from_today",
-                            "offset_unity": "months",
+                            "offset_unity": "days",
                             "offset_value": "1",
                             "offset_range_position": "end_day",
                             "url_params": {
@@ -1022,12 +1024,13 @@
                             "raw_sql": "select distinct(campaign_id) from {schema}.account_pivot_campaign"
                         }
                     },
-                    "dynamics": {
+                    "date_range": {
+                        "split_allowed": true,
+                        "offset_unity": "months",
                         "start_date": {
                             "type": "group",
                             "offset_type": "from_today",
-                            "offset_unity": "months",
-                            "offset_value": "1",
+                            "offset_value": "24",
                             "offset_range_position": "start_day",
                             "url_params": {
                                 "dateRange.start.day": {
@@ -1051,8 +1054,8 @@
                         "end_date": {
                             "type": "group",
                             "offset_type": "from_today",
-                            "offset_unity": "months",
-                            "offset_value": "1",
+                            "offset_unity": "days",
+                            "offset_value": "24",
                             "offset_range_position": "end_day",
                             "url_params": {
                                 "dateRange.end.day": {
