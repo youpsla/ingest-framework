@@ -4,6 +4,7 @@ from datetime import date, datetime, timedelta
 from itertools import zip_longest
 
 import dateutil
+from dateutil.relativedelta import relativedelta
 from src.commons.model import Model
 from src.constants import ENVS_LIST
 
@@ -179,7 +180,8 @@ class Client:
     def get_day_relative_to_today_from_params(self, day_params, offset_unity):
         today = datetime.date(datetime.now())
         tmp = {offset_unity: int(day_params["offset_value"])}
-        day = today - timedelta(**tmp)
+        day = today - relativedelta(**tmp)
+        # day = today - timedelta(**tmp)
         return day
 
     def get_day_ranges_list(self, date_range_params):
@@ -222,13 +224,77 @@ class Client:
 
         return result
 
+    def get_month_ranges_list(self, date_range_params):
+        offset_unity = date_range_params["offset_unity"]
+        start_date = self.get_day_relative_to_today_from_params(
+            date_range_params["start_date"], offset_unity
+        )
+
+        end_date = self.get_day_relative_to_today_from_params(
+            date_range_params["end_date"], offset_unity
+        )
+        year = start_date.year
+        month = start_date.month
+        result = []
+        while (year, month) <= (end_date.year, end_date.month):
+            tmp_result = []
+            sd = date(year, month, 1)
+            last_day_of_month_number = calendar.monthrange(year, month)[1]
+            ed = date(year, month, last_day_of_month_number)
+
+            tmp_result.append(
+                self.get_date_params(date_range_params["start_date"]["url_params"], sd)
+            )
+
+            tmp_result.append(
+                self.get_date_params(date_range_params["end_date"]["url_params"], ed)
+            )
+
+            result.append(tmp_result)
+
+            if month == 12:
+                month = 1
+                year += 1
+            else:
+                month += 1
+
+        # if start_date != end_date and date_range_params["split_allowed"] is True:
+        #     delta = end_date - start_date
+        #     days = [start_date + timedelta(days=i) for i in range(delta.days + 1)]
+        #     for d in days:
+        #         tmp_result = []
+        #         tmp_result.append(
+        #             self.get_date_params(
+        #                 date_range_params["start_date"]["url_params"], d
+        #             )
+        #         )
+        #         tmp_result.append(
+        #             self.get_date_params(date_range_params["end_date"]["url_params"], d)
+        #         )
+        #         result.append(tmp_result)
+        # else:
+        #     tmp_result = []
+        #     tmp_result.append(
+        #         self.get_date_params(
+        #             date_range_params["start_date"]["url_params"], start_date
+        #         )
+        #     )
+        #     tmp_result.append(
+        #         self.get_date_params(
+        #             date_range_params["end_date"]["url_params"], end_date
+        #         )
+        #     )
+        #     result.append(tmp_result)
+
+        return result
+
     def get_date_ranges_list(self, params):
 
         result = []
         if params["offset_unity"] == "days":
             result = self.get_day_ranges_list(params)
         if params["offset_unity"] == "months":
-            pass
+            result = self.get_month_ranges_list(params)
 
         return result
 
