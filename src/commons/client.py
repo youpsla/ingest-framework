@@ -185,12 +185,32 @@ class Client:
         return day
 
     def get_day_ranges_list(self, date_range_params):
-        offset_unity = date_range_params["offset_unity"]
-        start_date = self.get_day_relative_to_today_from_params(
-            date_range_params["start_date"], offset_unity
-        )
+
+        # Use max(field) to retrieve start_date.
+        # If source table is empty, then the "offset_value" is used.
+        if date_range_params.get("start_date", {}).get("use_max_from_field", None):
+            tmp_date = Model(
+                date_range_params["start_date"]["use_max_from_field"]["model"],
+                db_connection=self.task.db_connection,
+                channel=self.task.channel,
+            ).get_max_for_date_field_plus_one_day(
+                date_range_params["start_date"]["use_max_from_field"]["field"]
+            )[
+                0
+            ][
+                "max_date"
+            ]
+            if tmp_date:
+                start_date = tmp_date.date()
+
+        if date_range_params["start_date"]["offset_value"] is not None:
+            offset_unity = date_range_params["offset_unity"]
+            start_date = self.get_day_relative_to_today_from_params(
+                date_range_params["start_date"], offset_unity
+            )
+
         end_date = self.get_day_relative_to_today_from_params(
-            date_range_params["end_date"], offset_unity
+            date_range_params["end_date"], date_range_params["end_date"]["offset_unity"]
         )
 
         result = []
