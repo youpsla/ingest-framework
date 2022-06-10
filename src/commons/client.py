@@ -57,7 +57,6 @@ class Client:
         if params["offset_unity"] == "days":
             tmp = {params["offset_unity"]: int(params["offset_value"])}
             start_date = today - timedelta(**tmp)
-            # end_date = today - timedelta(**tmp)
             for k, v in url_params.items():
                 result.append(self.get_dynamics_param(k, v, start_date))
 
@@ -116,7 +115,6 @@ class Client:
         for d in sql_datas:
             tmp_result = []
             for f in db_fields:
-                # tmp_result.append({f[1]: d[f[0]]})
                 tmp_result.append({f["destination_key"]: d[f["origin_key"]]})
             result.append(tmp_result)
 
@@ -138,13 +136,6 @@ class Client:
                 tmp = model.get_all(fields=v["all_fields"])
 
             kwargs_list, args_list, sql_list = [], [], []
-
-            # from collections import OrderedDict
-
-            # tmp = []
-            # data = OrderedDict()
-            # data["id"] = 507206911
-            # tmp.append(data)
 
             if v.get("kwargs_fields", None):
                 kwargs_list = self.get_kwargs_list(v["kwargs_fields"], tmp)
@@ -277,35 +268,6 @@ class Client:
                 year += 1
             else:
                 month += 1
-
-        # if start_date != end_date and date_range_params["split_allowed"] is True:
-        #     delta = end_date - start_date
-        #     days = [start_date + timedelta(days=i) for i in range(delta.days + 1)]
-        #     for d in days:
-        #         tmp_result = []
-        #         tmp_result.append(
-        #             self.get_date_params(
-        #                 date_range_params["start_date"]["url_params"], d
-        #             )
-        #         )
-        #         tmp_result.append(
-        #             self.get_date_params(date_range_params["end_date"]["url_params"], d)
-        #         )
-        #         result.append(tmp_result)
-        # else:
-        #     tmp_result = []
-        #     tmp_result.append(
-        #         self.get_date_params(
-        #             date_range_params["start_date"]["url_params"], start_date
-        #         )
-        #     )
-        #     tmp_result.append(
-        #         self.get_date_params(
-        #             date_range_params["end_date"]["url_params"], end_date
-        #         )
-        #     )
-        #     result.append(tmp_result)
-
         return result
 
     def get_date_ranges_list(self, params):
