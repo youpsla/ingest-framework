@@ -641,7 +641,7 @@
                             "raw_sql": "select distinct(id) from {schema}.campaigns"
                         }
                     },
-                    "dynamics": {
+                    "date_range": {
                         "start_date": {
                             "type": "group",
                             "offset_type": "from_today",
@@ -1006,7 +1006,7 @@
                             "raw_sql": "select distinct(id) from {schema}.campaigns"
                         }
                     },
-                    "dynamics": {
+                    "date_range": {
                         "start_date": {
                             "type": "group",
                             "offset_type": "from_today",
@@ -1247,7 +1247,7 @@
                             "raw_sql": "select distinct(id) from {schema}.campaigns"
                         }
                     },
-                    "dynamics": {
+                    "date_range": {
                         "start_date": {
                             "type": "group",
                             "offset_type": "from_today",
