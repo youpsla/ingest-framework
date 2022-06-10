@@ -319,17 +319,19 @@ class LinkedInClient(Client):
             print(e)
             return None
         except ConnectTimeout as e:
-            print("Timeout connecting to db")
+            print("Request timeout")
             print(e)
             return None
         except RetryError as e:
-            print("Timeout connecting to db")
+            print("Too many retries. 429.")
             print(e)
             import time
 
             print("429 limit reached. Wait 5 minutes.")
             time.sleep(300)
             print("Restarting after 300 seconds of pause")
+            response = self.do_get_query(endpoint=endpoint, headers=headers)
+
             return None
         except Exception as e:
             print("Unhandled exception occurs")
