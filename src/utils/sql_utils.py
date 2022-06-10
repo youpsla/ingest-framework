@@ -79,6 +79,10 @@ class SqlQuery:
                 elif self.qtype == "select_max":
                     self.sql = self.get_sql_select_max()
                     cursor.execute(self.sql, self.values)
+                elif self.qtype == "select_max_for_date_plus_one_day":
+                    self.sql = self.get_sql_select_max_for_date_plus_one_day()
+                    cursor.execute(self.sql, self.values)
+
                 elif self.qtype == "raw_sql":
                     cursor.execute(self.raw_sql)
                     return cursor.fetchall()
@@ -123,6 +127,10 @@ class SqlQuery:
 
     def get_sql_select_max(self):
         sql = f"SELECT MAX({self.max_field}) FROM {self.schema_table}"
+        return sql
+
+    def get_sql_select_max_for_date_plus_one_day(self):
+        sql = f"SELECT MAX({self.max_field}) + INTERVAL '1 day' as max_date FROM {self.schema_table}"
         return sql
 
     def get_sql_insert(self, schema_table):

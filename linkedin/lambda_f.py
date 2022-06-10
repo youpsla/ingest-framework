@@ -88,7 +88,7 @@ def main():
 
     with db_connection.cursor() as cursor:
         cursor.execute("COMMIT;")
-        # Transfer from tmp dir to s3
+    # Transfer from tmp dir to s3
     logger.info("All tasks have runned successfully. Daily Worflow ended with success.")
 
     end = time.time()
