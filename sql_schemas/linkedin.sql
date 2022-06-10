@@ -1,14 +1,14 @@
--- DROP SCHEMA linkedin_development.
+-- DROP SCHEMA linkedin_staging.
 
--- CREATE SCHEMA linkedin_development
--- linkedin_development.account_pivot_campaign definition
+CREATE SCHEMA linkedin_staging
+-- linkedin_staging.account_pivot_campaign definition
 
 -- Drop table
 
--- DROP TABLE linkedin_development.account_pivot_campaign;
+-- DROP TABLE linkedin_staging.account_pivot_campaign;
 
---DROP TABLE linkedin_development.account_pivot_campaign;
-CREATE TABLE IF NOT EXISTS linkedin_development.account_pivot_campaign
+--DROP TABLE linkedin_staging.account_pivot_campaign;
+CREATE TABLE IF NOT EXISTS linkedin_staging.account_pivot_campaign
 (
 	jab_id INT IDENTITY(1,1)
 	,jab_created_at TIMESTAMP WITHOUT TIME ZONE   ENCODE az64 default sysdate
@@ -28,17 +28,17 @@ CREATE TABLE IF NOT EXISTS linkedin_development.account_pivot_campaign
 )
 DISTSTYLE AUTO
 ;
--- ALTER TABLE linkedin_development.account_pivot_campaign owner to jabmo;
+-- ALTER TABLE linkedin_staging.account_pivot_campaign owner to jabmo;
 
 
--- linkedin_development.accounts definition
+-- linkedin_staging.accounts definition
 
 -- Drop table
 
--- DROP TABLE linkedin_development.accounts;
+-- DROP TABLE linkedin_staging.accounts;
 
---DROP TABLE linkedin_development.accounts;
-CREATE TABLE IF NOT EXISTS linkedin_development.accounts
+--DROP TABLE linkedin_staging.accounts;
+CREATE TABLE IF NOT EXISTS linkedin_staging.accounts
 (
 	jab_id INT IDENTITY(1,1)
 	,jab_created_at TIMESTAMP WITHOUT TIME ZONE   ENCODE az64 default sysdate
@@ -53,17 +53,17 @@ CREATE TABLE IF NOT EXISTS linkedin_development.accounts
 )
 DISTSTYLE AUTO
 ;
--- ALTER TABLE linkedin_development.accounts owner to jabmo;
+-- ALTER TABLE linkedin_staging.accounts owner to jabmo;
 
 
--- linkedin_development.campaign_groups definition
+-- linkedin_staging.campaign_groups definition
 
 -- Drop table
 
--- DROP TABLE linkedin_development.campaign_groups;
+-- DROP TABLE linkedin_staging.campaign_groups;
 
---DROP TABLE linkedin_development.campaign_groups;
-CREATE TABLE IF NOT EXISTS linkedin_development.campaign_groups
+--DROP TABLE linkedin_staging.campaign_groups;
+CREATE TABLE IF NOT EXISTS linkedin_staging.campaign_groups
 (
 	jab_id INT IDENTITY(1,1)
 	,jab_created_at TIMESTAMP WITHOUT TIME ZONE   ENCODE az64 default sysdate
@@ -76,17 +76,17 @@ CREATE TABLE IF NOT EXISTS linkedin_development.campaign_groups
 )
 DISTSTYLE AUTO
 ;
--- ALTER TABLE linkedin_development.campaign_groups owner to jabmo;
+-- ALTER TABLE linkedin_staging.campaign_groups owner to jabmo;
 
 
--- linkedin_development.campaigns definition
+-- linkedin_staging.campaigns definition
 
 -- Drop table
 
--- DROP TABLE linkedin_development.campaigns;
+-- DROP TABLE linkedin_staging.campaigns;
 
---DROP TABLE linkedin_development.campaigns;
-CREATE TABLE IF NOT EXISTS linkedin_development.campaigns
+--DROP TABLE linkedin_staging.campaigns;
+CREATE TABLE IF NOT EXISTS linkedin_staging.campaigns
 (
 	jab_id INT IDENTITY(1,1)
 	,jab_created_at TIMESTAMP WITHOUT TIME ZONE   ENCODE az64 default sysdate
@@ -107,17 +107,17 @@ CREATE TABLE IF NOT EXISTS linkedin_development.campaigns
 )
 DISTSTYLE AUTO
 ;
--- ALTER TABLE linkedin_development.campaigns owner to jabmo;
+-- ALTER TABLE linkedin_staging.campaigns owner to jabmo;
 
 
--- linkedin_development.creative_sponsored_update definition
+-- linkedin_staging.creative_sponsored_update definition
 
 -- Drop table
 
--- DROP TABLE linkedin_development.creative_sponsored_update;
+-- DROP TABLE linkedin_staging.creative_sponsored_update;
 
---DROP TABLE linkedin_development.creative_sponsored_update;
-CREATE TABLE IF NOT EXISTS linkedin_development.creative_sponsored_update
+--DROP TABLE linkedin_staging.creative_sponsored_update;
+CREATE TABLE IF NOT EXISTS linkedin_staging.creative_sponsored_update
 (
 	jab_id INT IDENTITY(1,1)
 	,jab_created_at TIMESTAMP WITHOUT TIME ZONE   ENCODE az64 default sysdate
@@ -130,17 +130,17 @@ CREATE TABLE IF NOT EXISTS linkedin_development.creative_sponsored_update
 )
 DISTSTYLE AUTO
 ;
--- ALTER TABLE linkedin_development.creative_sponsored_update owner to jabmo;
+-- ALTER TABLE linkedin_staging.creative_sponsored_update owner to jabmo;
 
 
--- linkedin_development.creative_sponsored_video definition
+-- linkedin_staging.creative_sponsored_video definition
 
 -- Drop table
 
--- DROP TABLE linkedin_development.creative_sponsored_video;
+-- DROP TABLE linkedin_staging.creative_sponsored_video;
 
---DROP TABLE linkedin_development.creative_sponsored_video;
-CREATE TABLE IF NOT EXISTS linkedin_development.creative_sponsored_video
+--DROP TABLE linkedin_staging.creative_sponsored_video;
+CREATE TABLE IF NOT EXISTS linkedin_staging.creative_sponsored_video
 (
 	jab_id INT IDENTITY(1,1)
 	,jab_created_at TIMESTAMP WITHOUT TIME ZONE   ENCODE az64 default sysdate
@@ -156,17 +156,17 @@ CREATE TABLE IF NOT EXISTS linkedin_development.creative_sponsored_video
 )
 DISTSTYLE AUTO
 ;
--- ALTER TABLE linkedin_development.creative_sponsored_video owner to jabmo;
+-- ALTER TABLE linkedin_staging.creative_sponsored_video owner to jabmo;
 
 
--- linkedin_development.creative_text_ads definition
+-- linkedin_staging.creative_text_ads definition
 
 -- Drop table
 
--- DROP TABLE linkedin_development.creative_text_ads;
+-- DROP TABLE linkedin_staging.creative_text_ads;
 
---DROP TABLE linkedin_development.creative_text_ads;
-CREATE TABLE IF NOT EXISTS linkedin_development.creative_text_ads
+--DROP TABLE linkedin_staging.creative_text_ads;
+CREATE TABLE IF NOT EXISTS linkedin_staging.creative_text_ads
 (
 	jab_id INT IDENTITY(1,1)
 	,jab_created_at TIMESTAMP WITHOUT TIME ZONE   ENCODE az64 default sysdate
@@ -183,17 +183,17 @@ CREATE TABLE IF NOT EXISTS linkedin_development.creative_text_ads
 )
 DISTSTYLE AUTO
 ;
--- ALTER TABLE linkedin_development.creative_text_ads owner to jabmo;
+-- ALTER TABLE linkedin_staging.creative_text_ads owner to jabmo;
 
 
--- linkedin_development.creative_url definition
+-- linkedin_staging.creative_url definition
 
 -- Drop table
 
--- DROP TABLE linkedin_development.creative_url;
+-- DROP TABLE linkedin_staging.creative_url;
 
---DROP TABLE linkedin_development.creative_url;
-CREATE TABLE IF NOT EXISTS linkedin_development.creative_url
+--DROP TABLE linkedin_staging.creative_url;
+CREATE TABLE IF NOT EXISTS linkedin_staging.creative_url
 (
 	jab_id INT IDENTITY(1,1)
 	,jab_created_at TIMESTAMP WITHOUT TIME ZONE   ENCODE az64 default sysdate
@@ -203,17 +203,17 @@ CREATE TABLE IF NOT EXISTS linkedin_development.creative_url
 )
 DISTSTYLE AUTO
 ;
--- ALTER TABLE linkedin_development.creative_url owner to jabmo;
+-- ALTER TABLE linkedin_staging.creative_url owner to jabmo;
 
 
--- linkedin_development.pivot_creative definition
+-- linkedin_staging.pivot_creative definition
 
 -- Drop table
 
--- DROP TABLE linkedin_development.pivot_creative;
+-- DROP TABLE linkedin_staging.pivot_creative;
 
---DROP TABLE linkedin_development.pivot_creative;
-CREATE TABLE IF NOT EXISTS linkedin_development.pivot_creative
+--DROP TABLE linkedin_staging.pivot_creative;
+CREATE TABLE IF NOT EXISTS linkedin_staging.pivot_creative
 (
 	jab_id INT IDENTITY(1,1)
 	,jab_created_at TIMESTAMP WITHOUT TIME ZONE   ENCODE az64 default sysdate
@@ -232,17 +232,17 @@ CREATE TABLE IF NOT EXISTS linkedin_development.pivot_creative
 )
 DISTSTYLE AUTO
 ;
--- ALTER TABLE linkedin_development.pivot_creative owner to jabmo;
+-- ALTER TABLE linkedin_staging.pivot_creative owner to jabmo;
 
 
--- linkedin_development.pivot_job_title definition
+-- linkedin_staging.pivot_job_title definition
 
 -- Drop table
 
--- DROP TABLE linkedin_development.pivot_job_title;
+-- DROP TABLE linkedin_staging.pivot_job_title;
 
---DROP TABLE linkedin_development.pivot_job_title;
-CREATE TABLE IF NOT EXISTS linkedin_development.pivot_job_title
+--DROP TABLE linkedin_staging.pivot_job_title;
+CREATE TABLE IF NOT EXISTS linkedin_staging.pivot_job_title
 (
 	jab_id INT IDENTITY(1,1)
 	,jab_created_at TIMESTAMP WITHOUT TIME ZONE   ENCODE az64 default sysdate
@@ -262,17 +262,17 @@ DISTSTYLE AUTO
 	facet_id
 	)
 ;
--- ALTER TABLE linkedin_development.pivot_job_title owner to jabmo;
+-- ALTER TABLE linkedin_staging.pivot_job_title owner to jabmo;
 
 
--- linkedin_development.pivot_member_company definition
+-- linkedin_staging.pivot_member_company definition
 
 -- Drop table
 
--- DROP TABLE linkedin_development.pivot_member_company;
+-- DROP TABLE linkedin_staging.pivot_member_company;
 
---DROP TABLE linkedin_development.pivot_member_company;
-CREATE TABLE IF NOT EXISTS linkedin_development.pivot_member_company
+--DROP TABLE linkedin_staging.pivot_member_company;
+CREATE TABLE IF NOT EXISTS linkedin_staging.pivot_member_company
 (
 	jab_id INT IDENTITY(1,1)
 	,jab_created_at TIMESTAMP WITHOUT TIME ZONE   ENCODE az64 default sysdate
@@ -289,17 +289,16 @@ CREATE TABLE IF NOT EXISTS linkedin_development.pivot_member_company
 )
 DISTSTYLE AUTO
 ;
--- ALTER TABLE linkedin_development.pivot_member_company owner to jabmo;
+-- ALTER TABLE linkedin_staging.pivot_member_company owner to jabmo;
 
 
--- linkedin_development.pivot_member_country definition
+-- linkedin_staging.pivot_member_county definition
 
 -- Drop table
 
--- DROP TABLE linkedin_development.pivot_member_country;
+-- DROP TABLE linkedin_staging.pivot_member_county;
 
---DROP TABLE linkedin_development.pivot_member_country;
-CREATE TABLE IF NOT EXISTS linkedin_development.pivot_member_country
+CREATE TABLE IF NOT EXISTS linkedin_staging.pivot_member_county
 (
 	jab_id INT IDENTITY(1,1)
 	,jab_created_at TIMESTAMP WITHOUT TIME ZONE   ENCODE az64 default sysdate
@@ -313,22 +312,52 @@ CREATE TABLE IF NOT EXISTS linkedin_development.pivot_member_country
 	,time_granularity VARCHAR(255)   ENCODE lzo
 	,start_date TIMESTAMP WITHOUT TIME ZONE   ENCODE az64
 	,end_date TIMESTAMP WITHOUT TIME ZONE   ENCODE az64
-	,"region" VARCHAR(255)   ENCODE lzo
+	,region VARCHAR(255)   ENCODE lzo
 	,city VARCHAR(255)   ENCODE lzo
 )
 DISTSTYLE AUTO
 ;
--- ALTER TABLE linkedin_development.pivot_member_country owner to jabmo;
+-- ALTER TABLE linkedin_staging.pivot_member_county owner to jabmo;
 
 
--- linkedin_development.pivot_job_title_full definition
+-- linkedin_staging.pivot_member_country definition
 
 -- Drop table
 
--- DROP TABLE linkedin_development.pivot_job_title_full;
+-- DROP TABLE linkedin_staging.pivot_member_country;
 
---DROP TABLE linkedin_development.pivot_job_title_full;
-CREATE TABLE IF NOT EXISTS linkedin_development.pivot_job_title_full
+CREATE TABLE IF NOT EXISTS linkedin_staging.pivot_member_country
+(
+	jab_id INT IDENTITY(1,1)
+	,jab_created_at TIMESTAMP WITHOUT TIME ZONE   ENCODE az64 default sysdate
+	,geo_id INTEGER NOT NULL  ENCODE az64
+	,impressions INTEGER NOT NULL  ENCODE az64
+	,clicks INTEGER NOT NULL  ENCODE az64
+	,cost_in_usd VARCHAR(50) NOT NULL  ENCODE lzo
+	,facet VARCHAR(50) NOT NULL  ENCODE lzo
+	,facet_id INTEGER NOT NULL  ENCODE az64
+	,country VARCHAR(255)   ENCODE lzo
+	,time_granularity VARCHAR(255)   ENCODE lzo
+	,start_date TIMESTAMP WITHOUT TIME ZONE   ENCODE az64
+	,end_date TIMESTAMP WITHOUT TIME ZONE   ENCODE az64
+)
+DISTSTYLE AUTO
+;
+-- ALTER TABLE linkedin_staging.pivot_member_country owner to jabmo;
+
+
+
+
+
+
+-- linkedin_staging.pivot_job_title_full definition
+
+-- Drop table
+
+-- DROP TABLE linkedin_staging.pivot_job_title_full;
+
+--DROP TABLE linkedin_staging.pivot_job_title_full;
+CREATE TABLE IF NOT EXISTS linkedin_staging.pivot_job_title_full
 (
 	jab_id INT IDENTITY(1,1)
 	,jab_created_at TIMESTAMP WITHOUT TIME ZONE   ENCODE az64 default sysdate
@@ -348,17 +377,17 @@ DISTSTYLE AUTO
 	facet_id
 	)
 ;
---ALTER TABLE linkedin_development.pivot_job_title_full owner to jabmo;
+--ALTER TABLE linkedin_staging.pivot_job_title_full owner to jabmo;
 
 
--- linkedin_development.pivot_member_company_full definition
+-- linkedin_staging.pivot_member_company_full definition
 
 -- Drop table
 
--- DROP TABLE linkedin_development.pivot_member_company_full;
+-- DROP TABLE linkedin_staging.pivot_member_company_full;
 
---DROP TABLE linkedin_development.pivot_member_company_full;
-CREATE TABLE IF NOT EXISTS linkedin_development.pivot_member_company_full
+--DROP TABLE linkedin_staging.pivot_member_company_full;
+CREATE TABLE IF NOT EXISTS linkedin_staging.pivot_member_company_full
 (
 	jab_id INT IDENTITY(1,1)
 	,jab_created_at TIMESTAMP WITHOUT TIME ZONE   ENCODE az64 default sysdate
@@ -375,17 +404,17 @@ CREATE TABLE IF NOT EXISTS linkedin_development.pivot_member_company_full
 )
 DISTSTYLE AUTO
 ;
---ALTER TABLE linkedin_development.pivot_member_company owner to jabmo;
+--ALTER TABLE linkedin_staging.pivot_member_company owner to jabmo;
 
 
--- linkedin_development.pivot_member_country_full definition
+-- linkedin_staging.pivot_member_country_full definition
 
 -- Drop table
 
--- DROP TABLE linkedin_development.pivot_member_country_full;
+-- DROP TABLE linkedin_staging.pivot_member_country_full;
 
---DROP TABLE linkedin_development.pivot_member_country_full;
-CREATE TABLE IF NOT EXISTS linkedin_development.pivot_member_country_full
+--DROP TABLE linkedin_staging.pivot_member_country_full;
+CREATE TABLE IF NOT EXISTS linkedin_staging.pivot_member_country_full
 (
 	jab_id INT IDENTITY(1,1)
 	,jab_created_at TIMESTAMP WITHOUT TIME ZONE   ENCODE az64 default sysdate
@@ -404,21 +433,21 @@ CREATE TABLE IF NOT EXISTS linkedin_development.pivot_member_country_full
 )
 DISTSTYLE AUTO
 ;
--- ALTER TABLE linkedin_development.pivot_member_country_full owner to jabmo;
+-- ALTER TABLE linkedin_staging.pivot_member_country_full owner to jabmo;
 
 
 
 
 
 
--- linkedin_development.social_metrics definition
+-- linkedin_staging.social_metrics definition
 
 -- Drop table
 
--- DROP TABLE linkedin_development.social_metrics;
+-- DROP TABLE linkedin_staging.social_metrics;
 
---DROP TABLE linkedin_development.social_metrics;
-CREATE TABLE IF NOT EXISTS linkedin_development.social_metrics
+--DROP TABLE linkedin_staging.social_metrics;
+CREATE TABLE IF NOT EXISTS linkedin_staging.social_metrics
 (
 	jab_id INT IDENTITY(1,1)
 	,jab_created_at TIMESTAMP WITHOUT TIME ZONE   ENCODE az64 default sysdate
@@ -438,4 +467,4 @@ CREATE TABLE IF NOT EXISTS linkedin_development.social_metrics
 )
 DISTSTYLE AUTO
 ;
--- ALTER TABLE linkedin_development.social_metrics owner to jabmo;
+-- ALTER TABLE linkedin_staging.social_metrics owner to jabmo;
