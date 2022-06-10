@@ -126,8 +126,12 @@
                         "start_date": {
                             "type": "group",
                             "offset_type": "from_today",
-                            "offset_value": "3000",
+                            "offset_value": null,
                             "offset_range_position": "start_day",
+                            "use_max_from_field": {
+                                "model": "social_metrics",
+                                "field": "start_date"
+                            },
                             "url_params": {
                                 "dateRange.start.day": {
                                     "type": "filter_by",
@@ -427,7 +431,7 @@
                         "start_date": {
                             "type": "group",
                             "offset_type": "from_today",
-                            "offset_value": "36",
+                            "offset_value": "12",
                             "offset_range_position": "start_day",
                             "url_params": {
                                 "dateRange.start.day": {
@@ -452,7 +456,115 @@
                             "type": "group",
                             "offset_type": "from_today",
                             "offset_unity": "days",
-                            "offset_value": "26",
+                            "offset_value": "1",
+                            "offset_range_position": "end_day",
+                            "url_params": {
+                                "dateRange.end.day": {
+                                    "type": "filter_by",
+                                    "value_type": "date",
+                                    "url_query_parameter_value": "{day}",
+                                    "offset": ""
+                                },
+                                "dateRange.end.month": {
+                                    "type": "filter_by",
+                                    "value_type": "date",
+                                    "url_query_parameter_value": "{month}"
+                                },
+                                "dateRange.end.year": {
+                                    "type": "filter_by",
+                                    "value_type": "date",
+                                    "url_query_parameter_value": "{year}"
+                                }
+                            }
+                        }
+                    },
+                    "statics": {
+                        "timeGranularity": "MONTHLY",
+                        "start": "0",
+                        "pivot": "MEMBER_COUNTRY_V2",
+                        "fields": "pivotValue,dateRange,impressions,costInUsd,clicks,shares,pivot",
+                        "projection": "(*,elements*(pivotValue~,dateRange(*),impressions,costInUsd,clicks,shares,pivot))"
+                    }
+                }
+            },
+            "request": {
+                "header": null
+            }
+        }
+    },
+    {
+        "pivot_member_county_monthly_update": {
+            "actions": [
+                "insert"
+            ],
+            "exclude_existing_in_db": false,
+            "source": "linkedin",
+            "destination": "redshift",
+            "request_data_source": "redshift",
+            "model": "pivot_member_county",
+            "url": {
+                "base": "https://api.linkedin.com/v2/",
+                "category": "adAnalyticsV2",
+                "q": "analytics",
+                "response_datas_key": "elements",
+                "params": {
+                    "db": {
+                        "campaigns[0]": {
+                            "type": [
+                                "db",
+                                "args",
+                                "rawsql"
+                            ],
+                            "args_fields": [],
+                            "kwargs_fields": [
+                                [
+                                    "campaign_id",
+                                    "urn:li:sponsoredCampaign:{}",
+                                    "campaigns"
+                                ]
+                            ],
+                            "db_fields": [
+                                {
+                                    "origin_key": "campaign_id",
+                                    "destination_key": "facet_id"
+                                }
+                            ],
+                            "raw_sql_2": "select distinct(campaign_id) from {schema}.account_pivot_campaign where start_date between (select date_trunc('month', getdate() - interval '1 month')) and (select last_day(getdate() - interval '1 month'))",
+                            "raw_sql": "select distinct(campaign_id) from {schema}.account_pivot_campaign"
+                        }
+                    },
+                    "date_range": {
+                        "split_allowed": true,
+                        "offset_unity": "months",
+                        "start_date": {
+                            "type": "group",
+                            "offset_type": "from_today",
+                            "offset_value": "12",
+                            "offset_range_position": "start_day",
+                            "url_params": {
+                                "dateRange.start.day": {
+                                    "type": "filter_by",
+                                    "value_type": "date",
+                                    "url_query_parameter_value": "{day}",
+                                    "offset": ""
+                                },
+                                "dateRange.start.month": {
+                                    "type": "filter_by",
+                                    "value_type": "date",
+                                    "url_query_parameter_value": "{month}"
+                                },
+                                "dateRange.start.year": {
+                                    "type": "filter_by",
+                                    "value_type": "date",
+                                    "url_query_parameter_value": "{year}"
+                                }
+                            }
+                        },
+                        "end_date": {
+                            "type": "group",
+                            "offset_type": "from_today",
+                            "offset_unity": "days",
+                            "offset_value": "1",
                             "offset_range_position": "end_day",
                             "url_params": {
                                 "dateRange.end.day": {
@@ -636,8 +748,12 @@
                         "start_date": {
                             "type": "group",
                             "offset_type": "from_today",
-                            "offset_value": "3000",
+                            "offset_value": null,
                             "offset_range_position": "start_day",
+                            "use_max_from_field": {
+                                "model": "account_pivot_campaign",
+                                "field": "start_date"
+                            },
                             "url_params": {
                                 "dateRange.start.day": {
                                     "type": "filter_by",
@@ -789,7 +905,7 @@
                         "start_date": {
                             "type": "group",
                             "offset_type": "from_today",
-                            "offset_value": "25",
+                            "offset_value": "12",
                             "offset_range_position": "start_day",
                             "url_params": {
                                 "dateRange.start.day": {
@@ -1030,7 +1146,7 @@
                         "start_date": {
                             "type": "group",
                             "offset_type": "from_today",
-                            "offset_value": "24",
+                            "offset_value": "12",
                             "offset_range_position": "start_day",
                             "url_params": {
                                 "dateRange.start.day": {
@@ -1055,7 +1171,7 @@
                             "type": "group",
                             "offset_type": "from_today",
                             "offset_unity": "days",
-                            "offset_value": "24",
+                            "offset_value": "1",
                             "offset_range_position": "end_day",
                             "url_params": {
                                 "dateRange.end.day": {
