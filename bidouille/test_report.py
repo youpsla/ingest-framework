@@ -154,9 +154,7 @@ def download_results(request_id, authorization_data):
     )
 
     output_status_message("Download result file: {0}".format(result_file_path))
-    output_status_message(
-        "Status: {0}".format(reporting_operation_status.status)
-    )
+    output_status_message("Status: {0}".format(reporting_operation_status.status))
 
 
 def download_report(reporting_download_parameters):
@@ -189,15 +187,11 @@ def download_report(reporting_download_parameters):
     # Output the report metadata
 
     record_count = report_container.record_count
-    output_status_message(
-        "ReportName: {0}".format(report_container.report_name)
-    )
+    output_status_message("ReportName: {0}".format(report_container.report_name))
     output_status_message(
         "ReportTimeStart: {0}".format(report_container.report_time_start)
     )
-    output_status_message(
-        "ReportTimeEnd: {0}".format(report_container.report_time_end)
-    )
+    output_status_message("ReportTimeEnd: {0}".format(report_container.report_time_end))
     output_status_message(
         "LastCompletedAvailableDate: {0}".format(
             report_container.last_completed_available_date
@@ -234,14 +228,10 @@ def download_report(reporting_download_parameters):
             distinct_devices.add(record.value("DeviceType"))
             distinct_networks.add(record.value("Network"))
 
-        output_status_message(
-            "Total Impressions: {0}".format(total_impressions)
-        )
+        output_status_message("Total Impressions: {0}".format(total_impressions))
         output_status_message("Total Clicks: {0}".format(total_clicks))
         output_status_message(
-            "Average Impressions: {0}".format(
-                total_impressions * 1.0 / record_count
-            )
+            "Average Impressions: {0}".format(total_impressions * 1.0 / record_count)
         )
         output_status_message(
             "Average Clicks: {0}".format(total_clicks * 1.0 / record_count)
@@ -279,17 +269,15 @@ def get_report_request(account_id):
     time.CustomDateRangeEnd = None
     return_only_complete_data = False
 
-    campaign_performance_report_request = (
-        get_campaign_performance_report_request(
-            account_id=account_id,
-            aggregation=aggregation,
-            exclude_column_headers=exclude_column_headers,
-            exclude_report_footer=exclude_report_footer,
-            exclude_report_header=exclude_report_header,
-            report_file_format=REPORT_FILE_FORMAT,
-            return_only_complete_data=return_only_complete_data,
-            time=time,
-        )
+    campaign_performance_report_request = get_campaign_performance_report_request(
+        account_id=account_id,
+        aggregation=aggregation,
+        exclude_column_headers=exclude_column_headers,
+        exclude_report_footer=exclude_report_footer,
+        exclude_report_header=exclude_report_header,
+        report_file_format=REPORT_FILE_FORMAT,
+        return_only_complete_data=return_only_complete_data,
+        time=time,
     )
 
     # BudgetSummaryReportRequest does not contain a definition for Aggregation.
@@ -303,17 +291,15 @@ def get_report_request(account_id):
         time=time,
     )
 
-    campaign_performance_report_request = (
-        get_campaign_performance_report_request(
-            account_id=account_id,
-            aggregation=aggregation,
-            exclude_column_headers=exclude_column_headers,
-            exclude_report_footer=exclude_report_footer,
-            exclude_report_header=exclude_report_header,
-            report_file_format=REPORT_FILE_FORMAT,
-            return_only_complete_data=return_only_complete_data,
-            time=time,
-        )
+    campaign_performance_report_request = get_campaign_performance_report_request(
+        account_id=account_id,
+        aggregation=aggregation,
+        exclude_column_headers=exclude_column_headers,
+        exclude_report_footer=exclude_report_footer,
+        exclude_report_header=exclude_report_header,
+        report_file_format=REPORT_FILE_FORMAT,
+        return_only_complete_data=return_only_complete_data,
+        time=time,
     )
 
     keyword_performance_report_request = get_keyword_performance_report_request(
@@ -365,9 +351,7 @@ def get_ad_performance_report_request(
     time,
 ):
 
-    report_request = reporting_service.factory.create(
-        "AdPerformanceReportRequest"
-    )
+    report_request = reporting_service.factory.create("AdPerformanceReportRequest")
     report_request.Aggregation = "Summary"
     report_request.ExcludeColumnHeaders = exclude_column_headers
     report_request.ExcludeReportFooter = exclude_report_footer
@@ -427,9 +411,7 @@ def get_budget_summary_report_request(
     time,
 ):
 
-    report_request = reporting_service.factory.create(
-        "BudgetSummaryReportRequest"
-    )
+    report_request = reporting_service.factory.create("BudgetSummaryReportRequest")
     report_request.ExcludeColumnHeaders = exclude_column_headers
     report_request.ExcludeReportFooter = exclude_report_footer
     report_request.ExcludeReportHeader = exclude_report_header
@@ -437,9 +419,7 @@ def get_budget_summary_report_request(
     report_request.ReturnOnlyCompleteData = return_only_complete_data
     report_request.Time = time
     report_request.ReportName = "My Budget Summary Report"
-    scope = reporting_service.factory.create(
-        "AccountThroughCampaignReportScope"
-    )
+    scope = reporting_service.factory.create("AccountThroughCampaignReportScope")
     scope.AccountIds = {"long": [account_id]}
     scope.Campaigns = None
     report_request.Scope = scope
@@ -488,9 +468,7 @@ def get_campaign_performance_report_request(
     report_request.ReturnOnlyCompleteData = return_only_complete_data
     report_request.Time = time
     report_request.ReportName = "My Campaign Performance Report"
-    scope = reporting_service.factory.create(
-        "AccountThroughCampaignReportScope"
-    )
+    scope = reporting_service.factory.create("AccountThroughCampaignReportScope")
     scope.AccountIds = {"long": [account_id]}
     scope.Campaigns = None
     report_request.Scope = scope
@@ -526,9 +504,7 @@ def get_keyword_performance_report_request(
     time,
 ):
 
-    report_request = reporting_service.factory.create(
-        "KeywordPerformanceReportRequest"
-    )
+    report_request = reporting_service.factory.create("KeywordPerformanceReportRequest")
     report_request.Aggregation = aggregation
     report_request.ExcludeColumnHeaders = exclude_column_headers
     report_request.ExcludeReportFooter = exclude_report_footer

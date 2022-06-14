@@ -15,7 +15,7 @@ def main(authorization_data):
 
     try:
         # Download all campaigns, ad groups, and ads in the account.
-        entities = 'Campaigns', 'AdGroups', 'Ads'
+        entities = "Campaigns", "AdGroups", "Ads"
 
         # DownloadParameters is used for Option A below.
         download_parameters = DownloadParameters(

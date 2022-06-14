@@ -17,9 +17,7 @@ from src.utils.custom_logger import logger
 
 def get_params_json_file_path():
     app_home = os.environ["APPLICATION_HOME"]
-    return os.path.realpath(
-        os.path.join(app_home, "configs", CHANNEL, "channel.json")
-    )
+    return os.path.realpath(os.path.join(app_home, "configs", CHANNEL, "channel.json"))
 
 
 def get_channel_params():
@@ -67,9 +65,7 @@ def main():
     with db_connection.cursor() as cursor:
         cursor.execute("COMMIT;")
         # Transfer from tmp dir to s3
-    logger.info(
-        "All tasks have runned successfully. Daily Worflow ended with success."
-    )
+    logger.info("All tasks have runned successfully. Daily Worflow ended with success.")
 
     end = time.time()
     logger.info(end - start)
