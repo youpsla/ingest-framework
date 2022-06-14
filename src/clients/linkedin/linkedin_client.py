@@ -1,6 +1,7 @@
 import json
 import time
 from datetime import datetime
+from threading import current_thread, get_ident, get_native_id
 from urllib.parse import urlencode
 
 import requests
@@ -206,7 +207,6 @@ class LinkedInClient(Client):
             print(f"Chunck with {len(lst)} queries")
             with concurrent.futures.ThreadPoolExecutor(max_workers=40) as executor:
                 for endpoint in lst:
-                    print(endpoint)
                     threads.append(
                         (
                             executor.submit(self.do_get_query, endpoint[0], headers),
@@ -312,6 +312,7 @@ class LinkedInClient(Client):
         Returns:
             A json str repeenting the API response
         """
+        cpt = 1
         try:
             response = self.http_adapter.get(url=endpoint, headers=headers)
         except ConnectionError as e:
@@ -325,12 +326,16 @@ class LinkedInClient(Client):
         except RetryError as e:
             print("Too many retries. 429.")
             print(e)
-            import time
 
             print("429 limit reached. Wait 5 minutes.")
             time.sleep(300)
-            print("Restarting after 300 seconds of pause")
+            c_thread = current_thread()
+            print(
+                f"{cpt} attemp(s) failed. Restarting thread after 300 seconds of pause: name={c_thread.name}, idnet={get_ident()}, id={get_native_id()}"
+            )
             response = self.do_get_query(endpoint=endpoint, headers=headers)
+            if cpt == 5:
+                raise TimeoutError("Failed to reach endpoint: {endpoint}")
 
             return None
         except Exception as e:

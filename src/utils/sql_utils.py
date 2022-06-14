@@ -18,6 +18,7 @@ class SqlQuery:
         raw_sql=None,
         where=None,
         update_key=None,
+        filter_field=None,
     ):
         self.qtype = qtype
         self.fields = fields
@@ -29,6 +30,7 @@ class SqlQuery:
         self.sql = None
         self.where = where
         self.update_key = update_key
+        self.filter_field = filter_field
         self._values_list = None
 
     @property
@@ -121,7 +123,8 @@ class SqlQuery:
         sql = (
             f"SELECT {'*' if not self.fields else ','.join(self.fields)}"
             f" from {self.schema_table}"
-            f" {'where '+self.where if self.where else ''}"
+            # f" {'where '+self.where if self.where else ''}"
+            f" {'where '+self.filter_field['name'] +'=' + str(self.filter_field['value']) if self.filter_field else ''}"
         )
         return sql
 
