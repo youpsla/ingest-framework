@@ -133,7 +133,12 @@ class Client:
                     db_connection=db_connection,
                     channel=self.task.channel,
                 )
-                tmp = model.get_all(fields=v["all_fields"])
+                if self.task.params.get("retrieve_history", False):
+                    tmp = model.get_all(
+                        fields=v["all_fields"], filter_field=v["filter_field"]
+                    )
+                else:
+                    tmp = model.get_all(fields=v["all_fields"])
 
             kwargs_list, args_list, sql_list = [], [], []
 
@@ -175,17 +180,17 @@ class Client:
         # day = today - timedelta(**tmp)
         return day
 
-    def get_day_ranges_list(self, date_range_params):
-
+    def get_start_date(self, start_date_params=None, offset_unity=None):
         # Use max(field) to retrieve start_date.
         # If source table is empty, then the "offset_value" is used.
-        if date_range_params.get("start_date", {}).get("use_max_from_field", None):
+
+        if start_date_params.get("use_max_from_field", None):
             tmp_date = Model(
-                date_range_params["start_date"]["use_max_from_field"]["model"],
+                start_date_params["use_max_from_field"]["model"],
                 db_connection=self.task.db_connection,
                 channel=self.task.channel,
             ).get_max_for_date_field_plus_one_day(
-                date_range_params["start_date"]["use_max_from_field"]["field"]
+                start_date_params["use_max_from_field"]["field"]
             )[
                 0
             ][
@@ -193,18 +198,40 @@ class Client:
             ]
             if tmp_date:
                 start_date = tmp_date.date()
+        else:
+            if start_date_params["offset_value"] is not None:
+                start_date = self.get_day_relative_to_today_from_params(
+                    start_date_params, offset_unity
+                )
 
-        if date_range_params["start_date"]["offset_value"] is not None:
-            offset_unity = date_range_params["offset_unity"]
-            start_date = self.get_day_relative_to_today_from_params(
-                date_range_params["start_date"], offset_unity
-            )
+        return start_date
 
+    def get_end_date(self, end_date_params=None, offset_unity=None):
         end_date = self.get_day_relative_to_today_from_params(
-            date_range_params["end_date"], date_range_params["end_date"]["offset_unity"]
+            end_date_params, offset_unity
+        )
+        return end_date
+
+    def get_day_ranges_list(self, date_range_params):
+
+        offset_unity = date_range_params["offset_unity"]
+
+        start_date = self.get_start_date(
+            start_date_params=date_range_params["start_date"],
+            offset_unity=offset_unity,
         )
 
+        end_date = self.get_end_date(
+            end_date_params=date_range_params["end_date"], offset_unity=offset_unity
+        )
+
+        if end_date == datetime.date(datetime.today()):
+            raise ValueError(
+                "end_date can't be today. Must be previous day or older one."
+            )
+
         result = []
+
         if start_date != end_date and date_range_params["split_allowed"] is True:
             delta = end_date - start_date
             days = [start_date + timedelta(days=i) for i in range(delta.days + 1)]
@@ -312,14 +339,25 @@ class Client:
             zip_data = list(zip_longest(sql_list, kwargs_list, args_list, fillvalue=[]))
 
             date_range = params.get("date_range", None)
+
+            idx_to_del = []
             if date_range:
                 result = []
-                for zd in zip_data:
-                    for dr in self.get_date_ranges_list(params["date_range"]):
+                for idx, zd in enumerate(zip_data):
+                    date_range_list = self.get_date_ranges_list(params["date_range"])
+                    # Check if date_range parameters are consistent.
+                    # if len(date_range_list) == 0:
+                    #     idx_to_del.append(idx)
+                    #     continue
+                    for dr in date_range_list:
                         tmp = copy.deepcopy(zd)
                         for d in dr:
                             tmp[1].extend(d)
                         result.append(tmp)
+
+                # for ele in sorted(idx_to_del, reverse=True):
+                #     del result[ele]
+
                 return result
 
             return zip_data

@@ -60,6 +60,8 @@ class Model:
             IOError: An error occurred accessing the smalltable.
 
         """
+
+        # TODO: Add cache here because retrieved each time Model is instantiated.
         if self._params is None:
             """Get task params from Json file. Store as property for reuse."""
             with open(self.get_params_json_file_path(), "r") as f:
@@ -148,7 +150,7 @@ class Model:
             result.append(f)
         return result
 
-    def get_all(self, fields=None):
+    def get_all(self, fields=None, filter_field=None):
         """Get all record for a table corresponding to the current model.
 
         Args:
@@ -158,7 +160,13 @@ class Model:
             A list of tuples. each tuple representing a record of the query result.
 
         """
-        q = SqlQuery(self.db_connection, "select", model=self, fields=fields)
+        q = SqlQuery(
+            self.db_connection,
+            "select",
+            model=self,
+            fields=fields,
+            filter_field=filter_field,
+        )
         res = q.run()
         return res
 

@@ -5,7 +5,7 @@ Resources:
   Function:
     Type: AWS::Serverless::Function
     Properties:
-      Description: LinkedIn API Ingest Microservice V2a - Production
+      Description: LinkedIn API Ingest Microservice V2b - Staging
       Handler: linkedin.lambda_f.lambda_handler
       CodeUri: .
       Runtime: python3.8
@@ -16,7 +16,7 @@ Resources:
         - arn:aws:lambda:eu-west-1:943013980633:layer:SentryPythonServerlessSDK:24
       Role: arn:aws:iam::467882466042:role/Linkedin-lambda-prod-rw
       Timeout: 900
-      MemorySize: 1024
+      MemorySize: 2048
       Environment:
         Variables:
           WEB_INGEST_PROD_RW_SECRET_NAME: jabmo/db/redshift/web-ingest/prod/rw
