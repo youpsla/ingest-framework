@@ -53,7 +53,7 @@ def main():
     channel_params = get_channel_params()
 
     # Daily tasks run
-    logger.info(f"Daily tasks run: {channel_params['daily_tasks_list']}")
+    logger.info(f"{CHANNEL} - {channel_params['daily_tasks_list']}")
 
     db_connection = RedshiftClient().db_connection
     with db_connection.cursor() as cursor:

@@ -1,0 +1,29 @@
+[
+    {
+        "get_contacts": {
+            "actions": [
+                "insert",
+                "update"
+            ],
+            "exclude_existing_in_db": true,
+            "exclude_key": "email",
+            "source": "hubspot",
+            "destination": "redshift",
+            "destination_unique_keys": [
+                "email"
+            ],
+            "request_data_source": "redshift",
+            "update_key": "email",
+            "model": "contacts",
+
+
+            "url": {
+                "type": "service",
+                "service_name": "get_contacts",
+                "response_data_key": [
+                    "results"
+                ]
+            }
+        }
+    }
+]

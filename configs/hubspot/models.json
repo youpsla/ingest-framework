@@ -1,0 +1,47 @@
+[
+    {
+        "contacts": {
+            "id": {
+                "type": "raw",
+                "source_path": [
+                    "id"
+                ]
+            },
+            "email": {
+                "type": "raw",
+                "source_path": [
+                    "properties"
+                    "email"
+                ]
+            },
+            "firstname": {
+                "type": "raw",
+                "source_path": [
+                    "properties"
+                    "firstname"
+                ]
+            },
+            "lastname": {
+                "type": "raw",
+                "source_path": [
+                    "properties"
+                    "lastname"
+                ]
+            },
+            "created_date": {
+                "type": "raw",
+                "source_path": [
+                    "properties"
+                    "createddate"
+                ]
+            },
+            "last_modified_date": {
+                "type": "raw",
+                "source_path": [
+                    "properties"
+                    "lastmodifieddate"
+                ]
+            }
+        }
+    }
+]
