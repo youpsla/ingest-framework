@@ -1,470 +1,1695 @@
--- DROP SCHEMA linkedin_staging.
+create schema new_linkedin;
 
-CREATE SCHEMA linkedin_staging
--- linkedin_staging.account_pivot_campaign definition
+alter schema new_linkedin owner to jabmo;
 
--- Drop table
+grant usage on schema new_linkedin to jabmoro;
 
--- DROP TABLE linkedin_staging.account_pivot_campaign;
-
---DROP TABLE linkedin_staging.account_pivot_campaign;
-CREATE TABLE IF NOT EXISTS linkedin_staging.account_pivot_campaign
+create table account_pivot_campaign
 (
-	jab_id INT IDENTITY(1,1)
-	,jab_created_at TIMESTAMP WITHOUT TIME ZONE   ENCODE az64 default sysdate
-	,advertiser_id INTEGER NOT NULL  ENCODE az64
-	,campaign_id INTEGER NOT NULL  ENCODE az64
-	,campaign_name VARCHAR(255)   ENCODE lzo
-	,campaign_status VARCHAR(255)   ENCODE lzo
-	,campaign_group_id INTEGER NOT NULL  ENCODE az64
-	,impressions INTEGER NOT NULL  ENCODE az64
-	,clicks INTEGER NOT NULL  ENCODE az64
-	,shares INTEGER NOT NULL  ENCODE az64
-	,costinusd VARCHAR(50) NOT NULL  ENCODE lzo
-	,ad_format VARCHAR(255)   ENCODE lzo
-	,start_date TIMESTAMP WITHOUT TIME ZONE   ENCODE az64
-	,end_date TIMESTAMP WITHOUT TIME ZONE   ENCODE az64
-	,entry_date TIMESTAMP WITHOUT TIME ZONE   ENCODE az64
-)
-DISTSTYLE AUTO
-;
--- ALTER TABLE linkedin_staging.account_pivot_campaign owner to jabmo;
+    jab_id            integer   default "identity"(4116140, 0, '1,1'::text) encode az64,
+    jab_created_at    timestamp default ('now'::text)::timestamp without time zone encode az64,
+    advertiser_id     integer     not null encode az64,
+    campaign_id       integer     not null encode az64,
+    campaign_name     varchar(255),
+    campaign_status   varchar(255),
+    campaign_group_id integer     not null encode az64,
+    impressions       integer     not null encode az64,
+    clicks            integer     not null encode az64,
+    shares            integer     not null encode az64,
+    costinusd         varchar(50) not null,
+    ad_format         varchar(255),
+    start_date        timestamp encode az64,
+    end_date          timestamp encode az64,
+    entry_date        timestamp encode az64
+);
 
+alter table account_pivot_campaign
+    owner to jabmo;
 
--- linkedin_staging.accounts definition
+grant select on account_pivot_campaign to public;
 
--- Drop table
+grant select on account_pivot_campaign to jabmoro;
 
--- DROP TABLE linkedin_staging.accounts;
-
---DROP TABLE linkedin_staging.accounts;
-CREATE TABLE IF NOT EXISTS linkedin_staging.accounts
+create table accounts
 (
-	jab_id INT IDENTITY(1,1)
-	,jab_created_at TIMESTAMP WITHOUT TIME ZONE   ENCODE az64 default sysdate
-	,id INTEGER NOT NULL  ENCODE az64
-	,name VARCHAR(255) NOT NULL  ENCODE lzo
-	,currency VARCHAR(50) NOT NULL  ENCODE lzo
-	,account_type VARCHAR(50) NOT NULL  ENCODE lzo
-	,created_date TIMESTAMP WITHOUT TIME ZONE NOT NULL  ENCODE az64
-	,last_modified_date TIMESTAMP WITHOUT TIME ZONE NOT NULL  ENCODE az64
-	,status VARCHAR(50) NOT NULL  ENCODE lzo
-	,ref VARCHAR(255)   ENCODE lzo
-)
-DISTSTYLE AUTO
-;
--- ALTER TABLE linkedin_staging.accounts owner to jabmo;
+    jab_id             integer   default "identity"(4116152, 0, '1,1'::text) encode az64,
+    jab_created_at     timestamp default ('now'::text)::timestamp without time zone encode az64,
+    id                 integer      not null encode az64,
+    name               varchar(255) not null,
+    currency           varchar(50)  not null,
+    account_type       varchar(50)  not null,
+    created_date       timestamp    not null encode az64,
+    last_modified_date timestamp    not null encode az64,
+    status             varchar(50)  not null,
+    ref                varchar(255),
+    retrieve_history   boolean   default false
+);
 
+alter table accounts
+    owner to jabmo;
 
--- linkedin_staging.campaign_groups definition
+grant select on accounts to public;
 
--- Drop table
+grant select on accounts to jabmoro;
 
--- DROP TABLE linkedin_staging.campaign_groups;
-
---DROP TABLE linkedin_staging.campaign_groups;
-CREATE TABLE IF NOT EXISTS linkedin_staging.campaign_groups
+create table campaign_groups
 (
-	jab_id INT IDENTITY(1,1)
-	,jab_created_at TIMESTAMP WITHOUT TIME ZONE   ENCODE az64 default sysdate
-	,id INTEGER NOT NULL  ENCODE az64
-	,name VARCHAR(255) NOT NULL  ENCODE lzo
-	,created_date TIMESTAMP WITHOUT TIME ZONE NOT NULL  ENCODE az64
-	,last_modified_date TIMESTAMP WITHOUT TIME ZONE NOT NULL  ENCODE az64
-	,account_id INTEGER NOT NULL  ENCODE az64
-	,status VARCHAR(50) NOT NULL  ENCODE lzo
-)
-DISTSTYLE AUTO
-;
--- ALTER TABLE linkedin_staging.campaign_groups owner to jabmo;
+    jab_id             integer   default "identity"(4116164, 0, '1,1'::text) encode az64,
+    jab_created_at     timestamp default ('now'::text)::timestamp without time zone encode az64,
+    id                 integer      not null encode az64,
+    name               varchar(255) not null,
+    created_date       timestamp    not null encode az64,
+    last_modified_date timestamp    not null encode az64,
+    account_id         integer      not null encode az64,
+    status             varchar(50)  not null
+);
 
+alter table campaign_groups
+    owner to jabmo;
 
--- linkedin_staging.campaigns definition
+grant select on campaign_groups to public;
 
--- Drop table
+grant select on campaign_groups to jabmoro;
 
--- DROP TABLE linkedin_staging.campaigns;
-
---DROP TABLE linkedin_staging.campaigns;
-CREATE TABLE IF NOT EXISTS linkedin_staging.campaigns
+create table campaigns
 (
-	jab_id INT IDENTITY(1,1)
-	,jab_created_at TIMESTAMP WITHOUT TIME ZONE   ENCODE az64 default sysdate
-	,id INTEGER NOT NULL  ENCODE az64
-	,name VARCHAR(255) NOT NULL  ENCODE lzo
-	,campaign_group_id INTEGER NOT NULL  ENCODE az64
-	,account_id INTEGER NOT NULL  ENCODE az64
-	,associated_entity VARCHAR(255) NOT NULL  ENCODE lzo
-	,created_date TIMESTAMP WITHOUT TIME ZONE NOT NULL  ENCODE az64
-	,last_modified_date TIMESTAMP WITHOUT TIME ZONE NOT NULL  ENCODE az64
-	,status VARCHAR(50) NOT NULL  ENCODE lzo
-	,cost_type VARCHAR(15) NOT NULL  ENCODE lzo
-	,unit_cost_currency_code VARCHAR(15) NOT NULL  ENCODE lzo
-	,unit_cost_amount VARCHAR(15) NOT NULL  ENCODE lzo
-	,daily_budget_currency_code VARCHAR(15)   ENCODE lzo
-	,daily_budget_amount VARCHAR(15)   ENCODE lzo
-	,ad_format VARCHAR(255)   ENCODE lzo
-)
-DISTSTYLE AUTO
-;
--- ALTER TABLE linkedin_staging.campaigns owner to jabmo;
+    jab_id                     integer   default "identity"(4116176, 0, '1,1'::text) encode az64,
+    jab_created_at             timestamp default ('now'::text)::timestamp without time zone encode az64,
+    id                         integer      not null encode az64,
+    name                       varchar(255) not null,
+    campaign_group_id          integer      not null encode az64,
+    account_id                 integer      not null encode az64,
+    associated_entity          varchar(255) not null,
+    created_date               timestamp    not null encode az64,
+    last_modified_date         timestamp    not null encode az64,
+    status                     varchar(50)  not null,
+    cost_type                  varchar(15)  not null,
+    unit_cost_currency_code    varchar(15)  not null,
+    unit_cost_amount           varchar(15)  not null,
+    daily_budget_currency_code varchar(15),
+    daily_budget_amount        varchar(15),
+    ad_format                  varchar(255)
+);
 
+alter table campaigns
+    owner to jabmo;
 
--- linkedin_staging.creative_sponsored_update definition
+grant select on campaigns to public;
 
--- Drop table
+grant select on campaigns to jabmoro;
 
--- DROP TABLE linkedin_staging.creative_sponsored_update;
-
---DROP TABLE linkedin_staging.creative_sponsored_update;
-CREATE TABLE IF NOT EXISTS linkedin_staging.creative_sponsored_update
+create table creative_sponsored_update
 (
-	jab_id INT IDENTITY(1,1)
-	,jab_created_at TIMESTAMP WITHOUT TIME ZONE   ENCODE az64 default sysdate
-	,creative_id INTEGER   ENCODE az64
-	,title VARCHAR(800)   ENCODE lzo
-	,text VARCHAR(5000)   ENCODE lzo
-	,creative_url VARCHAR(5000)   ENCODE lzo
-	,description VARCHAR(5000)   ENCODE lzo
-	,subject VARCHAR(800)   ENCODE lzo
-)
-DISTSTYLE AUTO
-;
--- ALTER TABLE linkedin_staging.creative_sponsored_update owner to jabmo;
+    jab_id         integer   default "identity"(4116188, 0, '1,1'::text) encode az64,
+    jab_created_at timestamp default ('now'::text)::timestamp without time zone encode az64,
+    creative_id    integer encode az64,
+    title          varchar(800),
+    text           varchar(5000),
+    creative_url   varchar(5000),
+    description    varchar(5000),
+    subject        varchar(800)
+);
 
+alter table creative_sponsored_update
+    owner to jabmo;
 
--- linkedin_staging.creative_sponsored_video definition
+grant select on creative_sponsored_update to public;
 
--- Drop table
+grant select on creative_sponsored_update to jabmoro;
 
--- DROP TABLE linkedin_staging.creative_sponsored_video;
-
---DROP TABLE linkedin_staging.creative_sponsored_video;
-CREATE TABLE IF NOT EXISTS linkedin_staging.creative_sponsored_video
+create table creative_sponsored_video
 (
-	jab_id INT IDENTITY(1,1)
-	,jab_created_at TIMESTAMP WITHOUT TIME ZONE   ENCODE az64 default sysdate
-	,creative_id INTEGER NOT NULL  ENCODE az64
-	,campaign_id INTEGER NOT NULL  ENCODE az64
-	,creative_name VARCHAR(255)   ENCODE lzo
-	,ugc_ref VARCHAR(255)   ENCODE lzo
-	,status VARCHAR(255)   ENCODE lzo
-	,duration_video INTEGER   ENCODE az64
-	,created_date TIMESTAMP WITHOUT TIME ZONE   ENCODE az64
-	,width VARCHAR(50)   ENCODE lzo
-	,height VARCHAR(50)   ENCODE lzo
-)
-DISTSTYLE AUTO
-;
--- ALTER TABLE linkedin_staging.creative_sponsored_video owner to jabmo;
+    jab_id         integer   default "identity"(4116200, 0, '1,1'::text) encode az64,
+    jab_created_at timestamp default ('now'::text)::timestamp without time zone encode az64,
+    creative_id    integer not null encode az64,
+    campaign_id    integer not null encode az64,
+    creative_name  varchar(255),
+    ugc_ref        varchar(255),
+    status         varchar(255),
+    duration_video integer encode az64,
+    created_date   timestamp encode az64,
+    width          varchar(50),
+    height         varchar(50)
+);
 
+alter table creative_sponsored_video
+    owner to jabmo;
 
--- linkedin_staging.creative_text_ads definition
+grant select on creative_sponsored_video to public;
 
--- Drop table
+grant select on creative_sponsored_video to jabmoro;
 
--- DROP TABLE linkedin_staging.creative_text_ads;
-
---DROP TABLE linkedin_staging.creative_text_ads;
-CREATE TABLE IF NOT EXISTS linkedin_staging.creative_text_ads
+create table creative_text_ads
 (
-	jab_id INT IDENTITY(1,1)
-	,jab_created_at TIMESTAMP WITHOUT TIME ZONE   ENCODE az64 default sysdate
-	,id INTEGER NOT NULL  ENCODE az64
-	,title VARCHAR(255)   ENCODE lzo
-	,text VARCHAR(255)   ENCODE lzo
-	,vector_image VARCHAR(255)   ENCODE lzo
-	,click_uri VARCHAR(255)   ENCODE lzo
-	,"type" VARCHAR(255)   ENCODE lzo
-	,status VARCHAR(255)   ENCODE lzo
-	,created_date TIMESTAMP WITHOUT TIME ZONE   ENCODE az64
-	,modified_date TIMESTAMP WITHOUT TIME ZONE   ENCODE az64
-	,entry_date TIMESTAMP WITHOUT TIME ZONE   ENCODE az64
-)
-DISTSTYLE AUTO
-;
--- ALTER TABLE linkedin_staging.creative_text_ads owner to jabmo;
+    jab_id         integer   default "identity"(4116212, 0, '1,1'::text) encode az64,
+    jab_created_at timestamp default ('now'::text)::timestamp without time zone encode az64,
+    id             integer not null encode az64,
+    title          varchar(255),
+    text           varchar(255),
+    vector_image   varchar(255),
+    click_uri      varchar(255),
+    type           varchar(255),
+    status         varchar(255),
+    created_date   timestamp encode az64,
+    modified_date  timestamp encode az64,
+    entry_date     timestamp encode az64
+);
 
+alter table creative_text_ads
+    owner to jabmo;
 
--- linkedin_staging.creative_url definition
+grant select on creative_text_ads to public;
 
--- Drop table
+grant select on creative_text_ads to jabmoro;
 
--- DROP TABLE linkedin_staging.creative_url;
-
---DROP TABLE linkedin_staging.creative_url;
-CREATE TABLE IF NOT EXISTS linkedin_staging.creative_url
+create table creative_url
 (
-	jab_id INT IDENTITY(1,1)
-	,jab_created_at TIMESTAMP WITHOUT TIME ZONE   ENCODE az64 default sysdate
-	,creative_id INTEGER NOT NULL  ENCODE az64
-	,linkedin_url VARCHAR(5000)   ENCODE lzo
-	,preview_url VARCHAR(5000)   ENCODE lzo
-)
-DISTSTYLE AUTO
-;
--- ALTER TABLE linkedin_staging.creative_url owner to jabmo;
+    jab_id         integer   default "identity"(4116224, 0, '1,1'::text) encode az64,
+    jab_created_at timestamp default ('now'::text)::timestamp without time zone encode az64,
+    creative_id    integer not null encode az64,
+    linkedin_url   varchar(5000),
+    preview_url    varchar(5000)
+);
 
+alter table creative_url
+    owner to jabmo;
 
--- linkedin_staging.pivot_creative definition
+grant select on creative_url to public;
 
--- Drop table
+grant select on creative_url to jabmoro;
 
--- DROP TABLE linkedin_staging.pivot_creative;
-
---DROP TABLE linkedin_staging.pivot_creative;
-CREATE TABLE IF NOT EXISTS linkedin_staging.pivot_creative
+create table pivot_creative
 (
-	jab_id INT IDENTITY(1,1)
-	,jab_created_at TIMESTAMP WITHOUT TIME ZONE   ENCODE az64 default sysdate
-	,creative_id INTEGER NOT NULL  ENCODE az64
-	,impressions INTEGER NOT NULL  ENCODE az64
-	,clicks INTEGER NOT NULL  ENCODE az64
-	,cost_in_usd VARCHAR(50) NOT NULL  ENCODE lzo
-	,facet VARCHAR(50) NOT NULL  ENCODE lzo
-	,facet_id INTEGER NOT NULL  ENCODE az64
-	,start_date TIMESTAMP WITHOUT TIME ZONE   ENCODE az64
-	,end_date TIMESTAMP WITHOUT TIME ZONE   ENCODE az64
-	,time_granularity VARCHAR(255)   ENCODE lzo
-	,account_id INTEGER   ENCODE az64
-	,creative_type VARCHAR(255)   ENCODE lzo
-	,status VARCHAR(50)   ENCODE lzo
-)
-DISTSTYLE AUTO
-;
--- ALTER TABLE linkedin_staging.pivot_creative owner to jabmo;
+    jab_id           integer   default "identity"(4116236, 0, '1,1'::text) encode az64,
+    jab_created_at   timestamp default ('now'::text)::timestamp without time zone encode az64,
+    creative_id      integer     not null encode az64,
+    impressions      integer     not null encode az64,
+    clicks           integer     not null encode az64,
+    cost_in_usd      varchar(50) not null,
+    facet            varchar(50) not null,
+    facet_id         integer     not null encode az64,
+    start_date       timestamp encode az64,
+    end_date         timestamp encode az64,
+    time_granularity varchar(255),
+    account_id       integer encode az64,
+    creative_type    varchar(255),
+    status           varchar(50)
+);
 
+alter table pivot_creative
+    owner to jabmo;
 
--- linkedin_staging.pivot_job_title definition
+grant select on pivot_creative to public;
 
--- Drop table
+grant select on pivot_creative to jabmoro;
 
--- DROP TABLE linkedin_staging.pivot_job_title;
-
---DROP TABLE linkedin_staging.pivot_job_title;
-CREATE TABLE IF NOT EXISTS linkedin_staging.pivot_job_title
+create table pivot_job_title
 (
-	jab_id INT IDENTITY(1,1)
-	,jab_created_at TIMESTAMP WITHOUT TIME ZONE   ENCODE az64 default sysdate
-	,id INTEGER NOT NULL  ENCODE az64
-	,impressions INTEGER NOT NULL  ENCODE az64
-	,clicks INTEGER NOT NULL  ENCODE az64
-	,cost_in_usd VARCHAR(50) NOT NULL  ENCODE lzo
-	,facet VARCHAR(50) NOT NULL  ENCODE lzo
-	,facet_id INTEGER NOT NULL  ENCODE az64
-	,start_date TIMESTAMP WITHOUT TIME ZONE   ENCODE az64
-	,end_date TIMESTAMP WITHOUT TIME ZONE   ENCODE az64
-	,time_granularity VARCHAR(255)   ENCODE lzo
-	,job_title VARCHAR(255)   ENCODE lzo
+    jab_id           integer   default "identity"(4116248, 0, '1,1'::text) encode az64,
+    jab_created_at   timestamp default ('now'::text)::timestamp without time zone encode az64,
+    id               integer     not null encode az64,
+    impressions      integer     not null encode az64,
+    clicks           integer     not null encode az64,
+    cost_in_usd      varchar(50) not null,
+    facet            varchar(50) not null,
+    facet_id         integer     not null encode az64,
+    start_date       timestamp encode az64,
+    end_date         timestamp encode az64,
+    time_granularity varchar(255),
+    job_title        varchar(255)
 )
-DISTSTYLE AUTO
- SORTKEY (
-	facet_id
-	)
-;
--- ALTER TABLE linkedin_staging.pivot_job_title owner to jabmo;
+    sortkey (facet_id);
 
+alter table pivot_job_title
+    owner to jabmo;
 
--- linkedin_staging.pivot_member_company definition
+grant select on pivot_job_title to public;
 
--- Drop table
+grant select on pivot_job_title to jabmoro;
 
--- DROP TABLE linkedin_staging.pivot_member_company;
-
---DROP TABLE linkedin_staging.pivot_member_company;
-CREATE TABLE IF NOT EXISTS linkedin_staging.pivot_member_company
+create table pivot_member_company
 (
-	jab_id INT IDENTITY(1,1)
-	,jab_created_at TIMESTAMP WITHOUT TIME ZONE   ENCODE az64 default sysdate
-	,organization_id INTEGER NOT NULL  ENCODE az64
-	,impressions INTEGER NOT NULL  ENCODE az64
-	,clicks INTEGER NOT NULL  ENCODE az64
-	,cost_in_usd VARCHAR(50) NOT NULL  ENCODE lzo
-	,start_date TIMESTAMP WITHOUT TIME ZONE NOT NULL  ENCODE az64
-	,end_date TIMESTAMP WITHOUT TIME ZONE NOT NULL  ENCODE az64
-	,facet VARCHAR(50) NOT NULL  ENCODE lzo
-	,facet_id INTEGER NOT NULL  ENCODE az64
-	,organization_name VARCHAR(255)   ENCODE lzo
-	,time_granularity VARCHAR(255)   ENCODE lzo
-)
-DISTSTYLE AUTO
-;
--- ALTER TABLE linkedin_staging.pivot_member_company owner to jabmo;
+    jab_id            integer   default "identity"(4116260, 0, '1,1'::text) encode az64,
+    jab_created_at    timestamp default ('now'::text)::timestamp without time zone encode az64,
+    organization_id   integer     not null encode az64,
+    impressions       integer     not null encode az64,
+    clicks            integer     not null encode az64,
+    cost_in_usd       varchar(50) not null,
+    start_date        timestamp   not null encode az64,
+    end_date          timestamp   not null encode az64,
+    facet             varchar(50) not null,
+    facet_id          integer     not null encode az64,
+    organization_name varchar(255),
+    time_granularity  varchar(255)
+);
 
+alter table pivot_member_company
+    owner to jabmo;
 
--- linkedin_staging.pivot_member_county definition
+grant select on pivot_member_company to public;
 
--- Drop table
+grant select on pivot_member_company to jabmoro;
 
--- DROP TABLE linkedin_staging.pivot_member_county;
-
-CREATE TABLE IF NOT EXISTS linkedin_staging.pivot_member_county
+create table pivot_member_county
 (
-	jab_id INT IDENTITY(1,1)
-	,jab_created_at TIMESTAMP WITHOUT TIME ZONE   ENCODE az64 default sysdate
-	,geo_id INTEGER NOT NULL  ENCODE az64
-	,impressions INTEGER NOT NULL  ENCODE az64
-	,clicks INTEGER NOT NULL  ENCODE az64
-	,cost_in_usd VARCHAR(50) NOT NULL  ENCODE lzo
-	,facet VARCHAR(50) NOT NULL  ENCODE lzo
-	,facet_id INTEGER NOT NULL  ENCODE az64
-	,country VARCHAR(255)   ENCODE lzo
-	,time_granularity VARCHAR(255)   ENCODE lzo
-	,start_date TIMESTAMP WITHOUT TIME ZONE   ENCODE az64
-	,end_date TIMESTAMP WITHOUT TIME ZONE   ENCODE az64
-	,region VARCHAR(255)   ENCODE lzo
-	,city VARCHAR(255)   ENCODE lzo
-)
-DISTSTYLE AUTO
-;
--- ALTER TABLE linkedin_staging.pivot_member_county owner to jabmo;
+    jab_id           integer   default "identity"(4116272, 0, '1,1'::text) encode az64,
+    jab_created_at   timestamp default ('now'::text)::timestamp without time zone encode az64,
+    geo_id           integer     not null encode az64,
+    impressions      integer     not null encode az64,
+    clicks           integer     not null encode az64,
+    cost_in_usd      varchar(50) not null,
+    facet            varchar(50) not null,
+    facet_id         integer     not null encode az64,
+    country          varchar(255),
+    time_granularity varchar(255),
+    start_date       timestamp encode az64,
+    end_date         timestamp encode az64,
+    region           varchar(255),
+    city             varchar(255)
+);
 
+alter table pivot_member_county
+    owner to jabmo;
 
--- linkedin_staging.pivot_member_country definition
+grant select on pivot_member_county to public;
 
--- Drop table
+grant select on pivot_member_county to jabmoro;
 
--- DROP TABLE linkedin_staging.pivot_member_country;
-
-CREATE TABLE IF NOT EXISTS linkedin_staging.pivot_member_country
+create table pivot_member_country
 (
-	jab_id INT IDENTITY(1,1)
-	,jab_created_at TIMESTAMP WITHOUT TIME ZONE   ENCODE az64 default sysdate
-	,geo_id INTEGER NOT NULL  ENCODE az64
-	,impressions INTEGER NOT NULL  ENCODE az64
-	,clicks INTEGER NOT NULL  ENCODE az64
-	,cost_in_usd VARCHAR(50) NOT NULL  ENCODE lzo
-	,facet VARCHAR(50) NOT NULL  ENCODE lzo
-	,facet_id INTEGER NOT NULL  ENCODE az64
-	,country VARCHAR(255)   ENCODE lzo
-	,time_granularity VARCHAR(255)   ENCODE lzo
-	,start_date TIMESTAMP WITHOUT TIME ZONE   ENCODE az64
-	,end_date TIMESTAMP WITHOUT TIME ZONE   ENCODE az64
-)
-DISTSTYLE AUTO
-;
--- ALTER TABLE linkedin_staging.pivot_member_country owner to jabmo;
+    jab_id           integer   default "identity"(4116284, 0, '1,1'::text) encode az64,
+    jab_created_at   timestamp default ('now'::text)::timestamp without time zone encode az64,
+    geo_id           integer     not null encode az64,
+    impressions      integer     not null encode az64,
+    clicks           integer     not null encode az64,
+    cost_in_usd      varchar(50) not null,
+    facet            varchar(50) not null,
+    facet_id         integer     not null encode az64,
+    country          varchar(255),
+    time_granularity varchar(255),
+    start_date       timestamp encode az64,
+    end_date         timestamp encode az64
+);
 
+alter table pivot_member_country
+    owner to jabmo;
 
+grant select on pivot_member_country to public;
 
+grant select on pivot_member_country to jabmoro;
 
-
-
--- linkedin_staging.pivot_job_title_full definition
-
--- Drop table
-
--- DROP TABLE linkedin_staging.pivot_job_title_full;
-
---DROP TABLE linkedin_staging.pivot_job_title_full;
-CREATE TABLE IF NOT EXISTS linkedin_staging.pivot_job_title_full
+create table pivot_job_title_full
 (
-	jab_id INT IDENTITY(1,1)
-	,jab_created_at TIMESTAMP WITHOUT TIME ZONE   ENCODE az64 default sysdate
-	,id INTEGER NOT NULL  ENCODE az64
-	,impressions INTEGER NOT NULL  ENCODE az64
-	,clicks INTEGER NOT NULL  ENCODE az64
-	,cost_in_usd VARCHAR(50) NOT NULL  ENCODE lzo
-	,facet VARCHAR(50) NOT NULL  ENCODE lzo
-	,facet_id INTEGER NOT NULL  ENCODE az64
-	,start_date TIMESTAMP WITHOUT TIME ZONE   ENCODE az64
-	,end_date TIMESTAMP WITHOUT TIME ZONE   ENCODE az64
-	,time_granularity VARCHAR(255)   ENCODE lzo
-	,job_title VARCHAR(255)   ENCODE lzo
+    jab_id           integer   default "identity"(4116296, 0, '1,1'::text) encode az64,
+    jab_created_at   timestamp default ('now'::text)::timestamp without time zone encode az64,
+    id               integer     not null encode az64,
+    impressions      integer     not null encode az64,
+    clicks           integer     not null encode az64,
+    cost_in_usd      varchar(50) not null,
+    facet            varchar(50) not null,
+    facet_id         integer     not null encode az64,
+    start_date       timestamp encode az64,
+    end_date         timestamp encode az64,
+    time_granularity varchar(255),
+    job_title        varchar(255)
 )
-DISTSTYLE AUTO
- SORTKEY (
-	facet_id
-	)
-;
---ALTER TABLE linkedin_staging.pivot_job_title_full owner to jabmo;
+    sortkey (facet_id);
 
+alter table pivot_job_title_full
+    owner to jabmo;
 
--- linkedin_staging.pivot_member_company_full definition
+grant select on pivot_job_title_full to public;
 
--- Drop table
+grant select on pivot_job_title_full to jabmoro;
 
--- DROP TABLE linkedin_staging.pivot_member_company_full;
-
---DROP TABLE linkedin_staging.pivot_member_company_full;
-CREATE TABLE IF NOT EXISTS linkedin_staging.pivot_member_company_full
+create table pivot_member_company_full
 (
-	jab_id INT IDENTITY(1,1)
-	,jab_created_at TIMESTAMP WITHOUT TIME ZONE   ENCODE az64 default sysdate
-	,organization_id INTEGER NOT NULL  ENCODE az64
-	,impressions INTEGER NOT NULL  ENCODE az64
-	,clicks INTEGER NOT NULL  ENCODE az64
-	,cost_in_usd VARCHAR(50) NOT NULL  ENCODE lzo
-	,start_date TIMESTAMP WITHOUT TIME ZONE NOT NULL  ENCODE az64
-	,end_date TIMESTAMP WITHOUT TIME ZONE NOT NULL  ENCODE az64
-	,facet VARCHAR(50) NOT NULL  ENCODE lzo
-	,facet_id INTEGER NOT NULL  ENCODE az64
-	,organization_name VARCHAR(255)   ENCODE lzo
-	,time_granularity VARCHAR(255)   ENCODE lzo
-)
-DISTSTYLE AUTO
-;
---ALTER TABLE linkedin_staging.pivot_member_company owner to jabmo;
+    jab_id            integer   default "identity"(4116308, 0, '1,1'::text) encode az64,
+    jab_created_at    timestamp default ('now'::text)::timestamp without time zone encode az64,
+    organization_id   integer     not null encode az64,
+    impressions       integer     not null encode az64,
+    clicks            integer     not null encode az64,
+    cost_in_usd       varchar(50) not null,
+    start_date        timestamp   not null encode az64,
+    end_date          timestamp   not null encode az64,
+    facet             varchar(50) not null,
+    facet_id          integer     not null encode az64,
+    organization_name varchar(255),
+    time_granularity  varchar(255)
+);
 
+alter table pivot_member_company_full
+    owner to jabmo;
 
--- linkedin_staging.pivot_member_country_full definition
+grant select on pivot_member_company_full to public;
 
--- Drop table
+grant select on pivot_member_company_full to jabmoro;
 
--- DROP TABLE linkedin_staging.pivot_member_country_full;
-
---DROP TABLE linkedin_staging.pivot_member_country_full;
-CREATE TABLE IF NOT EXISTS linkedin_staging.pivot_member_country_full
+create table pivot_member_country_full
 (
-	jab_id INT IDENTITY(1,1)
-	,jab_created_at TIMESTAMP WITHOUT TIME ZONE   ENCODE az64 default sysdate
-	,geo_id INTEGER NOT NULL  ENCODE az64
-	,impressions INTEGER NOT NULL  ENCODE az64
-	,clicks INTEGER NOT NULL  ENCODE az64
-	,cost_in_usd VARCHAR(50) NOT NULL  ENCODE lzo
-	,facet VARCHAR(50) NOT NULL  ENCODE lzo
-	,facet_id INTEGER NOT NULL  ENCODE az64
-	,country VARCHAR(255)   ENCODE lzo
-	,time_granularity VARCHAR(255)   ENCODE lzo
-	,start_date TIMESTAMP WITHOUT TIME ZONE   ENCODE az64
-	,end_date TIMESTAMP WITHOUT TIME ZONE   ENCODE az64
-	,"region" VARCHAR(255)   ENCODE lzo
-	,city VARCHAR(255)   ENCODE lzo
-)
-DISTSTYLE AUTO
-;
--- ALTER TABLE linkedin_staging.pivot_member_country_full owner to jabmo;
+    jab_id           integer   default "identity"(4116320, 0, '1,1'::text) encode az64,
+    jab_created_at   timestamp default ('now'::text)::timestamp without time zone encode az64,
+    geo_id           integer     not null encode az64,
+    impressions      integer     not null encode az64,
+    clicks           integer     not null encode az64,
+    cost_in_usd      varchar(50) not null,
+    facet            varchar(50) not null,
+    facet_id         integer     not null encode az64,
+    country          varchar(255),
+    time_granularity varchar(255),
+    start_date       timestamp encode az64,
+    end_date         timestamp encode az64,
+    region           varchar(255),
+    city             varchar(255)
+);
 
+alter table pivot_member_country_full
+    owner to jabmo;
 
+grant select on pivot_member_country_full to public;
 
+grant select on pivot_member_country_full to jabmoro;
 
-
-
--- linkedin_staging.social_metrics definition
-
--- Drop table
-
--- DROP TABLE linkedin_staging.social_metrics;
-
---DROP TABLE linkedin_staging.social_metrics;
-CREATE TABLE IF NOT EXISTS linkedin_staging.social_metrics
+create table social_metrics
 (
-	jab_id INT IDENTITY(1,1)
-	,jab_created_at TIMESTAMP WITHOUT TIME ZONE   ENCODE az64 default sysdate
-	,creative_id INTEGER   ENCODE az64
-	,campaign_id INTEGER   ENCODE az64
-	,advertiser_id INTEGER   ENCODE az64
-	,costinusd NUMERIC(18,0)   ENCODE az64
-	,start_date TIMESTAMP WITHOUT TIME ZONE   ENCODE az64
-	,end_date TIMESTAMP WITHOUT TIME ZONE   ENCODE az64
-	,impressions INTEGER   ENCODE az64
-	,shares INTEGER   ENCODE az64
-	,clicks INTEGER   ENCODE az64
-	,likes INTEGER   ENCODE az64
-	,status VARCHAR(255)   ENCODE lzo
-	,creative_type VARCHAR(255)   ENCODE lzo
-	,time_granularity VARCHAR(50)   ENCODE lzo
-)
-DISTSTYLE AUTO
-;
--- ALTER TABLE linkedin_staging.social_metrics owner to jabmo;
+    jab_id           integer   default "identity"(4116332, 0, '1,1'::text) encode az64,
+    jab_created_at   timestamp default ('now'::text)::timestamp without time zone encode az64,
+    creative_id      integer encode az64,
+    campaign_id      integer encode az64,
+    advertiser_id    integer encode az64,
+    costinusd        numeric(18) encode az64,
+    start_date       timestamp encode az64,
+    end_date         timestamp encode az64,
+    impressions      integer encode az64,
+    shares           integer encode az64,
+    clicks           integer encode az64,
+    likes            integer encode az64,
+    status           varchar(255),
+    creative_type    varchar(255),
+    time_granularity varchar(50)
+);
+
+alter table social_metrics
+    owner to jabmo;
+
+grant select on social_metrics to public;
+
+grant select on social_metrics to jabmoro;
+
+create table staging
+(
+    jab_id             integer encode az64,
+    jab_created_at     timestamp encode az64,
+    id                 integer      not null encode az64,
+    name               varchar(255) not null,
+    created_date       timestamp    not null encode az64,
+    last_modified_date timestamp    not null encode az64,
+    account_id         integer      not null encode az64,
+    status             varchar(50)  not null
+);
+
+alter table staging
+    owner to jabmo;
+
+grant select on staging to public;
+
+create view v_pivot_member_company_clicks
+            (organization_id, impressions, clicks, cost_in_usd, start_date, end_date, facet, facet_id, jab_created_at,
+             organization_name, time_granularity, gen_num, id)
+as
+SELECT t.organization_id,
+       t.impressions,
+       t.clicks,
+       t.cost_in_usd,
+       t.start_date,
+       t.end_date,
+       t.facet,
+       t.facet_id,
+       t.jab_created_at,
+       t.organization_name,
+       t.time_granularity,
+       g.gen_num,
+       md5((((((t.clicks::character varying::text || g.gen_num::character varying::text) ||
+               t.impressions::character varying::text) || t.organization_id::character varying::text) ||
+             t.facet_id::character varying::text) || t.start_date::character varying::text) ||
+           t.organization_id::character varying::text) AS id
+FROM new_linkedin.pivot_member_company t
+         JOIN (SELECT 10000 * t1.num + 1000 * t2.num + 100 * t3.num + 10 * t4.num + t5.num AS gen_num
+               FROM (((((((((SELECT 1 AS num
+                             UNION
+                             SELECT 2)
+                            UNION
+                            SELECT 3)
+                           UNION
+                           SELECT 4)
+                          UNION
+                          SELECT 5)
+                         UNION
+                         SELECT 6)
+                        UNION
+                        SELECT 7)
+                       UNION
+                       SELECT 8)
+                      UNION
+                      SELECT 9)
+                     UNION
+                     SELECT 0) t1
+                        JOIN (((((((((SELECT 1 AS num
+                                      UNION
+                                      SELECT 2)
+                                     UNION
+                                     SELECT 3)
+                                    UNION
+                                    SELECT 4)
+                                   UNION
+                                   SELECT 5)
+                                  UNION
+                                  SELECT 6)
+                                 UNION
+                                 SELECT 7)
+                                UNION
+                                SELECT 8)
+                               UNION
+                               SELECT 9)
+                              UNION
+                              SELECT 0) t2 ON 1 = 1
+                        JOIN (((((((((SELECT 1 AS num
+                                      UNION
+                                      SELECT 2)
+                                     UNION
+                                     SELECT 3)
+                                    UNION
+                                    SELECT 4)
+                                   UNION
+                                   SELECT 5)
+                                  UNION
+                                  SELECT 6)
+                                 UNION
+                                 SELECT 7)
+                                UNION
+                                SELECT 8)
+                               UNION
+                               SELECT 9)
+                              UNION
+                              SELECT 0) t3 ON 1 = 1
+                        JOIN (((((((((SELECT 1 AS num
+                                      UNION
+                                      SELECT 2)
+                                     UNION
+                                     SELECT 3)
+                                    UNION
+                                    SELECT 4)
+                                   UNION
+                                   SELECT 5)
+                                  UNION
+                                  SELECT 6)
+                                 UNION
+                                 SELECT 7)
+                                UNION
+                                SELECT 8)
+                               UNION
+                               SELECT 9)
+                              UNION
+                              SELECT 0) t4 ON 1 = 1
+                        JOIN (((((((((SELECT 1 AS num
+                                      UNION
+                                      SELECT 2)
+                                     UNION
+                                     SELECT 3)
+                                    UNION
+                                    SELECT 4)
+                                   UNION
+                                   SELECT 5)
+                                  UNION
+                                  SELECT 6)
+                                 UNION
+                                 SELECT 7)
+                                UNION
+                                SELECT 8)
+                               UNION
+                               SELECT 9)
+                              UNION
+                              SELECT 0) t5 ON 1 = 1
+               WHERE (10000 * t1.num + 1000 * t2.num + 100 * t3.num + 10 * t4.num + t5.num) > 0
+               ORDER BY 10000 * t1.num + 1000 * t2.num + 100 * t3.num + 10 * t4.num + t5.num) g ON 1 = 1
+WHERE g.gen_num <= t.clicks;
+
+alter table v_pivot_member_company_clicks
+    owner to jabmo;
+
+grant select on v_pivot_member_company_clicks to public;
+
+grant select on v_pivot_member_company_clicks to jabmoro;
+
+create view v_pivot_member_country_clicks
+            (geo_id, impressions, clicks, cost_in_usd, facet, facet_id, country, time_granularity, start_date, end_date,
+             jab_created_at, gen_num, id)
+as
+SELECT t.geo_id,
+       t.impressions,
+       t.clicks,
+       t.cost_in_usd,
+       t.facet,
+       t.facet_id,
+       t.country,
+       t.time_granularity,
+       t.start_date,
+       t.end_date,
+       t.jab_created_at,
+       g.gen_num,
+       md5((((((t.clicks::character varying::text || g.gen_num::character varying::text) ||
+               t.impressions::character varying::text) || t.geo_id::character varying::text) ||
+             t.facet_id::character varying::text) || t.start_date::character varying::text) ||
+           t.geo_id::character varying::text) AS id
+FROM new_linkedin.pivot_member_country t
+         JOIN (SELECT 10000 * t1.num + 1000 * t2.num + 100 * t3.num + 10 * t4.num + t5.num AS gen_num
+               FROM (((((((((SELECT 1 AS num
+                             UNION
+                             SELECT 2)
+                            UNION
+                            SELECT 3)
+                           UNION
+                           SELECT 4)
+                          UNION
+                          SELECT 5)
+                         UNION
+                         SELECT 6)
+                        UNION
+                        SELECT 7)
+                       UNION
+                       SELECT 8)
+                      UNION
+                      SELECT 9)
+                     UNION
+                     SELECT 0) t1
+                        JOIN (((((((((SELECT 1 AS num
+                                      UNION
+                                      SELECT 2)
+                                     UNION
+                                     SELECT 3)
+                                    UNION
+                                    SELECT 4)
+                                   UNION
+                                   SELECT 5)
+                                  UNION
+                                  SELECT 6)
+                                 UNION
+                                 SELECT 7)
+                                UNION
+                                SELECT 8)
+                               UNION
+                               SELECT 9)
+                              UNION
+                              SELECT 0) t2 ON 1 = 1
+                        JOIN (((((((((SELECT 1 AS num
+                                      UNION
+                                      SELECT 2)
+                                     UNION
+                                     SELECT 3)
+                                    UNION
+                                    SELECT 4)
+                                   UNION
+                                   SELECT 5)
+                                  UNION
+                                  SELECT 6)
+                                 UNION
+                                 SELECT 7)
+                                UNION
+                                SELECT 8)
+                               UNION
+                               SELECT 9)
+                              UNION
+                              SELECT 0) t3 ON 1 = 1
+                        JOIN (((((((((SELECT 1 AS num
+                                      UNION
+                                      SELECT 2)
+                                     UNION
+                                     SELECT 3)
+                                    UNION
+                                    SELECT 4)
+                                   UNION
+                                   SELECT 5)
+                                  UNION
+                                  SELECT 6)
+                                 UNION
+                                 SELECT 7)
+                                UNION
+                                SELECT 8)
+                               UNION
+                               SELECT 9)
+                              UNION
+                              SELECT 0) t4 ON 1 = 1
+                        JOIN (((((((((SELECT 1 AS num
+                                      UNION
+                                      SELECT 2)
+                                     UNION
+                                     SELECT 3)
+                                    UNION
+                                    SELECT 4)
+                                   UNION
+                                   SELECT 5)
+                                  UNION
+                                  SELECT 6)
+                                 UNION
+                                 SELECT 7)
+                                UNION
+                                SELECT 8)
+                               UNION
+                               SELECT 9)
+                              UNION
+                              SELECT 0) t5 ON 1 = 1
+               WHERE (10000 * t1.num + 1000 * t2.num + 100 * t3.num + 10 * t4.num + t5.num) > 0
+               ORDER BY 10000 * t1.num + 1000 * t2.num + 100 * t3.num + 10 * t4.num + t5.num) g ON 1 = 1
+WHERE g.gen_num <= t.clicks;
+
+alter table v_pivot_member_country_clicks
+    owner to jabmo;
+
+grant select on v_pivot_member_country_clicks to public;
+
+grant select on v_pivot_member_country_clicks to jabmoro;
+
+create view v_social_metrics_clicks
+            (creative_id, campaign_id, advertiser_id, costinusd, start_date, end_date, impressions, shares, clicks,
+             likes, status, creative_type, time_granularity, gen_num, id)
+as
+SELECT t.creative_id,
+       t.campaign_id,
+       t.advertiser_id,
+       t.costinusd,
+       t.start_date,
+       t.end_date,
+       t.impressions,
+       t.shares,
+       t.clicks,
+       t.likes,
+       t.status,
+       t.creative_type,
+       t.time_granularity,
+       g.gen_num,
+       md5((((t.clicks::character varying::text || g.gen_num::character varying::text) ||
+             t.impressions::character varying::text) || t.start_date::character varying::text) ||
+           t.creative_id::character varying::text) AS id
+FROM new_linkedin.social_metrics t
+         JOIN (SELECT 10000 * t1.num + 1000 * t2.num + 100 * t3.num + 10 * t4.num + t5.num AS gen_num
+               FROM (((((((((SELECT 1 AS num
+                             UNION
+                             SELECT 2)
+                            UNION
+                            SELECT 3)
+                           UNION
+                           SELECT 4)
+                          UNION
+                          SELECT 5)
+                         UNION
+                         SELECT 6)
+                        UNION
+                        SELECT 7)
+                       UNION
+                       SELECT 8)
+                      UNION
+                      SELECT 9)
+                     UNION
+                     SELECT 0) t1
+                        JOIN (((((((((SELECT 1 AS num
+                                      UNION
+                                      SELECT 2)
+                                     UNION
+                                     SELECT 3)
+                                    UNION
+                                    SELECT 4)
+                                   UNION
+                                   SELECT 5)
+                                  UNION
+                                  SELECT 6)
+                                 UNION
+                                 SELECT 7)
+                                UNION
+                                SELECT 8)
+                               UNION
+                               SELECT 9)
+                              UNION
+                              SELECT 0) t2 ON 1 = 1
+                        JOIN (((((((((SELECT 1 AS num
+                                      UNION
+                                      SELECT 2)
+                                     UNION
+                                     SELECT 3)
+                                    UNION
+                                    SELECT 4)
+                                   UNION
+                                   SELECT 5)
+                                  UNION
+                                  SELECT 6)
+                                 UNION
+                                 SELECT 7)
+                                UNION
+                                SELECT 8)
+                               UNION
+                               SELECT 9)
+                              UNION
+                              SELECT 0) t3 ON 1 = 1
+                        JOIN (((((((((SELECT 1 AS num
+                                      UNION
+                                      SELECT 2)
+                                     UNION
+                                     SELECT 3)
+                                    UNION
+                                    SELECT 4)
+                                   UNION
+                                   SELECT 5)
+                                  UNION
+                                  SELECT 6)
+                                 UNION
+                                 SELECT 7)
+                                UNION
+                                SELECT 8)
+                               UNION
+                               SELECT 9)
+                              UNION
+                              SELECT 0) t4 ON 1 = 1
+                        JOIN (((((((((SELECT 1 AS num
+                                      UNION
+                                      SELECT 2)
+                                     UNION
+                                     SELECT 3)
+                                    UNION
+                                    SELECT 4)
+                                   UNION
+                                   SELECT 5)
+                                  UNION
+                                  SELECT 6)
+                                 UNION
+                                 SELECT 7)
+                                UNION
+                                SELECT 8)
+                               UNION
+                               SELECT 9)
+                              UNION
+                              SELECT 0) t5 ON 1 = 1
+               WHERE (10000 * t1.num + 1000 * t2.num + 100 * t3.num + 10 * t4.num + t5.num) > 0
+               ORDER BY 10000 * t1.num + 1000 * t2.num + 100 * t3.num + 10 * t4.num + t5.num) g ON 1 = 1
+WHERE g.gen_num <= t.clicks;
+
+alter table v_social_metrics_clicks
+    owner to jabmo;
+
+grant select on v_social_metrics_clicks to public;
+
+grant select on v_social_metrics_clicks to jabmoro;
+
+create view v_social_metrics_impressions
+            (creative_id, campaign_id, advertiser_id, costinusd, start_date, end_date, impressions, shares, clicks,
+             likes, status, creative_type, time_granularity, gen_num, id)
+as
+SELECT t.creative_id,
+       t.campaign_id,
+       t.advertiser_id,
+       t.costinusd,
+       t.start_date,
+       t.end_date,
+       t.impressions,
+       t.shares,
+       t.clicks,
+       t.likes,
+       t.status,
+       t.creative_type,
+       t.time_granularity,
+       g.gen_num,
+       md5((((t.clicks::character varying::text || g.gen_num::character varying::text) ||
+             t.impressions::character varying::text) || t.start_date::character varying::text) ||
+           t.creative_id::character varying::text) AS id
+FROM new_linkedin.social_metrics t
+         JOIN (SELECT 10000 * t1.num + 1000 * t2.num + 100 * t3.num + 10 * t4.num + t5.num AS gen_num
+               FROM (((((((((SELECT 1 AS num
+                             UNION
+                             SELECT 2)
+                            UNION
+                            SELECT 3)
+                           UNION
+                           SELECT 4)
+                          UNION
+                          SELECT 5)
+                         UNION
+                         SELECT 6)
+                        UNION
+                        SELECT 7)
+                       UNION
+                       SELECT 8)
+                      UNION
+                      SELECT 9)
+                     UNION
+                     SELECT 0) t1
+                        JOIN (((((((((SELECT 1 AS num
+                                      UNION
+                                      SELECT 2)
+                                     UNION
+                                     SELECT 3)
+                                    UNION
+                                    SELECT 4)
+                                   UNION
+                                   SELECT 5)
+                                  UNION
+                                  SELECT 6)
+                                 UNION
+                                 SELECT 7)
+                                UNION
+                                SELECT 8)
+                               UNION
+                               SELECT 9)
+                              UNION
+                              SELECT 0) t2 ON 1 = 1
+                        JOIN (((((((((SELECT 1 AS num
+                                      UNION
+                                      SELECT 2)
+                                     UNION
+                                     SELECT 3)
+                                    UNION
+                                    SELECT 4)
+                                   UNION
+                                   SELECT 5)
+                                  UNION
+                                  SELECT 6)
+                                 UNION
+                                 SELECT 7)
+                                UNION
+                                SELECT 8)
+                               UNION
+                               SELECT 9)
+                              UNION
+                              SELECT 0) t3 ON 1 = 1
+                        JOIN (((((((((SELECT 1 AS num
+                                      UNION
+                                      SELECT 2)
+                                     UNION
+                                     SELECT 3)
+                                    UNION
+                                    SELECT 4)
+                                   UNION
+                                   SELECT 5)
+                                  UNION
+                                  SELECT 6)
+                                 UNION
+                                 SELECT 7)
+                                UNION
+                                SELECT 8)
+                               UNION
+                               SELECT 9)
+                              UNION
+                              SELECT 0) t4 ON 1 = 1
+                        JOIN (((((((((SELECT 1 AS num
+                                      UNION
+                                      SELECT 2)
+                                     UNION
+                                     SELECT 3)
+                                    UNION
+                                    SELECT 4)
+                                   UNION
+                                   SELECT 5)
+                                  UNION
+                                  SELECT 6)
+                                 UNION
+                                 SELECT 7)
+                                UNION
+                                SELECT 8)
+                               UNION
+                               SELECT 9)
+                              UNION
+                              SELECT 0) t5 ON 1 = 1
+               WHERE (10000 * t1.num + 1000 * t2.num + 100 * t3.num + 10 * t4.num + t5.num) > 0
+               ORDER BY 10000 * t1.num + 1000 * t2.num + 100 * t3.num + 10 * t4.num + t5.num) g ON 1 = 1
+WHERE g.gen_num <= t.impressions;
+
+alter table v_social_metrics_impressions
+    owner to jabmo;
+
+grant select on v_social_metrics_impressions to public;
+
+grant select on v_social_metrics_impressions to jabmoro;
+
+create view v_social_metrics_likes
+            (creative_id, campaign_id, advertiser_id, costinusd, start_date, end_date, impressions, shares, clicks,
+             likes, status, creative_type, time_granularity, gen_num, id)
+as
+SELECT t.creative_id,
+       t.campaign_id,
+       t.advertiser_id,
+       t.costinusd,
+       t.start_date,
+       t.end_date,
+       t.impressions,
+       t.shares,
+       t.clicks,
+       t.likes,
+       t.status,
+       t.creative_type,
+       t.time_granularity,
+       g.gen_num,
+       md5((((t.clicks::character varying::text || g.gen_num::character varying::text) ||
+             t.impressions::character varying::text) || t.start_date::character varying::text) ||
+           t.creative_id::character varying::text) AS id
+FROM new_linkedin.social_metrics t
+         JOIN (SELECT 10000 * t1.num + 1000 * t2.num + 100 * t3.num + 10 * t4.num + t5.num AS gen_num
+               FROM (((((((((SELECT 1 AS num
+                             UNION
+                             SELECT 2)
+                            UNION
+                            SELECT 3)
+                           UNION
+                           SELECT 4)
+                          UNION
+                          SELECT 5)
+                         UNION
+                         SELECT 6)
+                        UNION
+                        SELECT 7)
+                       UNION
+                       SELECT 8)
+                      UNION
+                      SELECT 9)
+                     UNION
+                     SELECT 0) t1
+                        JOIN (((((((((SELECT 1 AS num
+                                      UNION
+                                      SELECT 2)
+                                     UNION
+                                     SELECT 3)
+                                    UNION
+                                    SELECT 4)
+                                   UNION
+                                   SELECT 5)
+                                  UNION
+                                  SELECT 6)
+                                 UNION
+                                 SELECT 7)
+                                UNION
+                                SELECT 8)
+                               UNION
+                               SELECT 9)
+                              UNION
+                              SELECT 0) t2 ON 1 = 1
+                        JOIN (((((((((SELECT 1 AS num
+                                      UNION
+                                      SELECT 2)
+                                     UNION
+                                     SELECT 3)
+                                    UNION
+                                    SELECT 4)
+                                   UNION
+                                   SELECT 5)
+                                  UNION
+                                  SELECT 6)
+                                 UNION
+                                 SELECT 7)
+                                UNION
+                                SELECT 8)
+                               UNION
+                               SELECT 9)
+                              UNION
+                              SELECT 0) t3 ON 1 = 1
+                        JOIN (((((((((SELECT 1 AS num
+                                      UNION
+                                      SELECT 2)
+                                     UNION
+                                     SELECT 3)
+                                    UNION
+                                    SELECT 4)
+                                   UNION
+                                   SELECT 5)
+                                  UNION
+                                  SELECT 6)
+                                 UNION
+                                 SELECT 7)
+                                UNION
+                                SELECT 8)
+                               UNION
+                               SELECT 9)
+                              UNION
+                              SELECT 0) t4 ON 1 = 1
+                        JOIN (((((((((SELECT 1 AS num
+                                      UNION
+                                      SELECT 2)
+                                     UNION
+                                     SELECT 3)
+                                    UNION
+                                    SELECT 4)
+                                   UNION
+                                   SELECT 5)
+                                  UNION
+                                  SELECT 6)
+                                 UNION
+                                 SELECT 7)
+                                UNION
+                                SELECT 8)
+                               UNION
+                               SELECT 9)
+                              UNION
+                              SELECT 0) t5 ON 1 = 1
+               WHERE (10000 * t1.num + 1000 * t2.num + 100 * t3.num + 10 * t4.num + t5.num) > 0
+               ORDER BY 10000 * t1.num + 1000 * t2.num + 100 * t3.num + 10 * t4.num + t5.num) g ON 1 = 1
+WHERE g.gen_num <= t.likes;
+
+alter table v_social_metrics_likes
+    owner to jabmo;
+
+grant select on v_social_metrics_likes to public;
+
+grant select on v_social_metrics_likes to jabmoro;
+
+create view v_social_metrics_shares
+            (creative_id, campaign_id, advertiser_id, costinusd, start_date, end_date, impressions, shares, clicks,
+             likes, status, creative_type, time_granularity, gen_num, id)
+as
+SELECT t.creative_id,
+       t.campaign_id,
+       t.advertiser_id,
+       t.costinusd,
+       t.start_date,
+       t.end_date,
+       t.impressions,
+       t.shares,
+       t.clicks,
+       t.likes,
+       t.status,
+       t.creative_type,
+       t.time_granularity,
+       g.gen_num,
+       md5((((t.clicks::character varying::text || g.gen_num::character varying::text) ||
+             t.impressions::character varying::text) || t.start_date::character varying::text) ||
+           t.creative_id::character varying::text) AS id
+FROM new_linkedin.social_metrics t
+         JOIN (SELECT 10000 * t1.num + 1000 * t2.num + 100 * t3.num + 10 * t4.num + t5.num AS gen_num
+               FROM (((((((((SELECT 1 AS num
+                             UNION
+                             SELECT 2)
+                            UNION
+                            SELECT 3)
+                           UNION
+                           SELECT 4)
+                          UNION
+                          SELECT 5)
+                         UNION
+                         SELECT 6)
+                        UNION
+                        SELECT 7)
+                       UNION
+                       SELECT 8)
+                      UNION
+                      SELECT 9)
+                     UNION
+                     SELECT 0) t1
+                        JOIN (((((((((SELECT 1 AS num
+                                      UNION
+                                      SELECT 2)
+                                     UNION
+                                     SELECT 3)
+                                    UNION
+                                    SELECT 4)
+                                   UNION
+                                   SELECT 5)
+                                  UNION
+                                  SELECT 6)
+                                 UNION
+                                 SELECT 7)
+                                UNION
+                                SELECT 8)
+                               UNION
+                               SELECT 9)
+                              UNION
+                              SELECT 0) t2 ON 1 = 1
+                        JOIN (((((((((SELECT 1 AS num
+                                      UNION
+                                      SELECT 2)
+                                     UNION
+                                     SELECT 3)
+                                    UNION
+                                    SELECT 4)
+                                   UNION
+                                   SELECT 5)
+                                  UNION
+                                  SELECT 6)
+                                 UNION
+                                 SELECT 7)
+                                UNION
+                                SELECT 8)
+                               UNION
+                               SELECT 9)
+                              UNION
+                              SELECT 0) t3 ON 1 = 1
+                        JOIN (((((((((SELECT 1 AS num
+                                      UNION
+                                      SELECT 2)
+                                     UNION
+                                     SELECT 3)
+                                    UNION
+                                    SELECT 4)
+                                   UNION
+                                   SELECT 5)
+                                  UNION
+                                  SELECT 6)
+                                 UNION
+                                 SELECT 7)
+                                UNION
+                                SELECT 8)
+                               UNION
+                               SELECT 9)
+                              UNION
+                              SELECT 0) t4 ON 1 = 1
+                        JOIN (((((((((SELECT 1 AS num
+                                      UNION
+                                      SELECT 2)
+                                     UNION
+                                     SELECT 3)
+                                    UNION
+                                    SELECT 4)
+                                   UNION
+                                   SELECT 5)
+                                  UNION
+                                  SELECT 6)
+                                 UNION
+                                 SELECT 7)
+                                UNION
+                                SELECT 8)
+                               UNION
+                               SELECT 9)
+                              UNION
+                              SELECT 0) t5 ON 1 = 1
+               WHERE (10000 * t1.num + 1000 * t2.num + 100 * t3.num + 10 * t4.num + t5.num) > 0
+               ORDER BY 10000 * t1.num + 1000 * t2.num + 100 * t3.num + 10 * t4.num + t5.num) g ON 1 = 1
+WHERE g.gen_num <= t.shares;
+
+alter table v_social_metrics_shares
+    owner to jabmo;
+
+grant select on v_social_metrics_shares to public;
+
+grant select on v_social_metrics_shares to jabmoro;
+
+create view v_pivot_member_company_impressions
+            (organization_id, impressions, clicks, cost_in_usd, start_date, end_date, facet, facet_id, jab_created_at,
+             organization_name, time_granularity, gen_num, id)
+as
+SELECT t.organization_id,
+       t.impressions,
+       t.clicks,
+       t.cost_in_usd,
+       t.start_date,
+       t.end_date,
+       t.facet,
+       t.facet_id,
+       t.jab_created_at,
+       t.organization_name,
+       t.time_granularity,
+       g.gen_num,
+       md5((((((t.clicks::character varying::text || g.gen_num::character varying::text) ||
+               t.impressions::character varying::text) || t.organization_id::character varying::text) ||
+             t.facet_id::character varying::text) || t.start_date::character varying::text) ||
+           t.organization_id::character varying::text) AS id
+FROM new_linkedin.pivot_member_company t
+         JOIN (SELECT 10000 * t1.num + 1000 * t2.num + 100 * t3.num + 10 * t4.num + t5.num AS gen_num
+               FROM (((((((((SELECT 1 AS num
+                             UNION
+                             SELECT 2)
+                            UNION
+                            SELECT 3)
+                           UNION
+                           SELECT 4)
+                          UNION
+                          SELECT 5)
+                         UNION
+                         SELECT 6)
+                        UNION
+                        SELECT 7)
+                       UNION
+                       SELECT 8)
+                      UNION
+                      SELECT 9)
+                     UNION
+                     SELECT 0) t1
+                        JOIN (((((((((SELECT 1 AS num
+                                      UNION
+                                      SELECT 2)
+                                     UNION
+                                     SELECT 3)
+                                    UNION
+                                    SELECT 4)
+                                   UNION
+                                   SELECT 5)
+                                  UNION
+                                  SELECT 6)
+                                 UNION
+                                 SELECT 7)
+                                UNION
+                                SELECT 8)
+                               UNION
+                               SELECT 9)
+                              UNION
+                              SELECT 0) t2 ON 1 = 1
+                        JOIN (((((((((SELECT 1 AS num
+                                      UNION
+                                      SELECT 2)
+                                     UNION
+                                     SELECT 3)
+                                    UNION
+                                    SELECT 4)
+                                   UNION
+                                   SELECT 5)
+                                  UNION
+                                  SELECT 6)
+                                 UNION
+                                 SELECT 7)
+                                UNION
+                                SELECT 8)
+                               UNION
+                               SELECT 9)
+                              UNION
+                              SELECT 0) t3 ON 1 = 1
+                        JOIN (((((((((SELECT 1 AS num
+                                      UNION
+                                      SELECT 2)
+                                     UNION
+                                     SELECT 3)
+                                    UNION
+                                    SELECT 4)
+                                   UNION
+                                   SELECT 5)
+                                  UNION
+                                  SELECT 6)
+                                 UNION
+                                 SELECT 7)
+                                UNION
+                                SELECT 8)
+                               UNION
+                               SELECT 9)
+                              UNION
+                              SELECT 0) t4 ON 1 = 1
+                        JOIN (((((((((SELECT 1 AS num
+                                      UNION
+                                      SELECT 2)
+                                     UNION
+                                     SELECT 3)
+                                    UNION
+                                    SELECT 4)
+                                   UNION
+                                   SELECT 5)
+                                  UNION
+                                  SELECT 6)
+                                 UNION
+                                 SELECT 7)
+                                UNION
+                                SELECT 8)
+                               UNION
+                               SELECT 9)
+                              UNION
+                              SELECT 0) t5 ON 1 = 1
+               WHERE (10000 * t1.num + 1000 * t2.num + 100 * t3.num + 10 * t4.num + t5.num) > 0
+               ORDER BY 10000 * t1.num + 1000 * t2.num + 100 * t3.num + 10 * t4.num + t5.num) g ON 1 = 1
+WHERE g.gen_num <= t.impressions;
+
+alter table v_pivot_member_company_impressions
+    owner to jabmo;
+
+grant select on v_pivot_member_company_impressions to public;
+
+grant select on v_pivot_member_company_impressions to jabmoro;
+
+create view v_pivot_member_country_impressions
+            (geo_id, impressions, clicks, cost_in_usd, facet, facet_id, country, time_granularity, start_date, end_date,
+             jab_created_at, gen_num, id)
+as
+SELECT t.geo_id,
+       t.impressions,
+       t.clicks,
+       t.cost_in_usd,
+       t.facet,
+       t.facet_id,
+       t.country,
+       t.time_granularity,
+       t.start_date,
+       t.end_date,
+       t.jab_created_at,
+       g.gen_num,
+       md5((((((t.clicks::character varying::text || g.gen_num::character varying::text) ||
+               t.impressions::character varying::text) || t.geo_id::character varying::text) ||
+             t.facet_id::character varying::text) || t.start_date::character varying::text) ||
+           t.geo_id::character varying::text) AS id
+FROM new_linkedin.pivot_member_country t
+         JOIN (SELECT 10000 * t1.num + 1000 * t2.num + 100 * t3.num + 10 * t4.num + t5.num AS gen_num
+               FROM (((((((((SELECT 1 AS num
+                             UNION
+                             SELECT 2)
+                            UNION
+                            SELECT 3)
+                           UNION
+                           SELECT 4)
+                          UNION
+                          SELECT 5)
+                         UNION
+                         SELECT 6)
+                        UNION
+                        SELECT 7)
+                       UNION
+                       SELECT 8)
+                      UNION
+                      SELECT 9)
+                     UNION
+                     SELECT 0) t1
+                        JOIN (((((((((SELECT 1 AS num
+                                      UNION
+                                      SELECT 2)
+                                     UNION
+                                     SELECT 3)
+                                    UNION
+                                    SELECT 4)
+                                   UNION
+                                   SELECT 5)
+                                  UNION
+                                  SELECT 6)
+                                 UNION
+                                 SELECT 7)
+                                UNION
+                                SELECT 8)
+                               UNION
+                               SELECT 9)
+                              UNION
+                              SELECT 0) t2 ON 1 = 1
+                        JOIN (((((((((SELECT 1 AS num
+                                      UNION
+                                      SELECT 2)
+                                     UNION
+                                     SELECT 3)
+                                    UNION
+                                    SELECT 4)
+                                   UNION
+                                   SELECT 5)
+                                  UNION
+                                  SELECT 6)
+                                 UNION
+                                 SELECT 7)
+                                UNION
+                                SELECT 8)
+                               UNION
+                               SELECT 9)
+                              UNION
+                              SELECT 0) t3 ON 1 = 1
+                        JOIN (((((((((SELECT 1 AS num
+                                      UNION
+                                      SELECT 2)
+                                     UNION
+                                     SELECT 3)
+                                    UNION
+                                    SELECT 4)
+                                   UNION
+                                   SELECT 5)
+                                  UNION
+                                  SELECT 6)
+                                 UNION
+                                 SELECT 7)
+                                UNION
+                                SELECT 8)
+                               UNION
+                               SELECT 9)
+                              UNION
+                              SELECT 0) t4 ON 1 = 1
+                        JOIN (((((((((SELECT 1 AS num
+                                      UNION
+                                      SELECT 2)
+                                     UNION
+                                     SELECT 3)
+                                    UNION
+                                    SELECT 4)
+                                   UNION
+                                   SELECT 5)
+                                  UNION
+                                  SELECT 6)
+                                 UNION
+                                 SELECT 7)
+                                UNION
+                                SELECT 8)
+                               UNION
+                               SELECT 9)
+                              UNION
+                              SELECT 0) t5 ON 1 = 1
+               WHERE (10000 * t1.num + 1000 * t2.num + 100 * t3.num + 10 * t4.num + t5.num) > 0
+               ORDER BY 10000 * t1.num + 1000 * t2.num + 100 * t3.num + 10 * t4.num + t5.num) g ON 1 = 1
+WHERE g.gen_num <= t.impressions;
+
+alter table v_pivot_member_country_impressions
+    owner to jabmo;
+
+grant select on v_pivot_member_country_impressions to public;
+
+grant select on v_pivot_member_country_impressions to jabmoro;
+
+create view v_pivot_job_title_clicks
+            (impressions, clicks, cost_in_usd, start_date, end_date, facet, facet_id, jab_created_at, organization_name,
+             time_granularity, gen_num, id)
+as
+SELECT t.impressions,
+       t.clicks,
+       t.cost_in_usd,
+       t.start_date,
+       t.end_date,
+       t.facet,
+       t.facet_id,
+       t.jab_created_at,
+       t.job_title                                                       AS organization_name,
+       t.time_granularity,
+       g.gen_num,
+       md5(((((t.clicks::character varying::text || g.gen_num::character varying::text) ||
+              t.impressions::character varying::text) || t.facet_id::character varying::text) ||
+            t.start_date::character varying::text) || t.job_title::text) AS id
+FROM new_linkedin.pivot_job_title t
+         JOIN (SELECT 10000 * t1.num + 1000 * t2.num + 100 * t3.num + 10 * t4.num + t5.num AS gen_num
+               FROM (((((((((SELECT 1 AS num
+                             UNION
+                             SELECT 2)
+                            UNION
+                            SELECT 3)
+                           UNION
+                           SELECT 4)
+                          UNION
+                          SELECT 5)
+                         UNION
+                         SELECT 6)
+                        UNION
+                        SELECT 7)
+                       UNION
+                       SELECT 8)
+                      UNION
+                      SELECT 9)
+                     UNION
+                     SELECT 0) t1
+                        JOIN (((((((((SELECT 1 AS num
+                                      UNION
+                                      SELECT 2)
+                                     UNION
+                                     SELECT 3)
+                                    UNION
+                                    SELECT 4)
+                                   UNION
+                                   SELECT 5)
+                                  UNION
+                                  SELECT 6)
+                                 UNION
+                                 SELECT 7)
+                                UNION
+                                SELECT 8)
+                               UNION
+                               SELECT 9)
+                              UNION
+                              SELECT 0) t2 ON 1 = 1
+                        JOIN (((((((((SELECT 1 AS num
+                                      UNION
+                                      SELECT 2)
+                                     UNION
+                                     SELECT 3)
+                                    UNION
+                                    SELECT 4)
+                                   UNION
+                                   SELECT 5)
+                                  UNION
+                                  SELECT 6)
+                                 UNION
+                                 SELECT 7)
+                                UNION
+                                SELECT 8)
+                               UNION
+                               SELECT 9)
+                              UNION
+                              SELECT 0) t3 ON 1 = 1
+                        JOIN (((((((((SELECT 1 AS num
+                                      UNION
+                                      SELECT 2)
+                                     UNION
+                                     SELECT 3)
+                                    UNION
+                                    SELECT 4)
+                                   UNION
+                                   SELECT 5)
+                                  UNION
+                                  SELECT 6)
+                                 UNION
+                                 SELECT 7)
+                                UNION
+                                SELECT 8)
+                               UNION
+                               SELECT 9)
+                              UNION
+                              SELECT 0) t4 ON 1 = 1
+                        JOIN (((((((((SELECT 1 AS num
+                                      UNION
+                                      SELECT 2)
+                                     UNION
+                                     SELECT 3)
+                                    UNION
+                                    SELECT 4)
+                                   UNION
+                                   SELECT 5)
+                                  UNION
+                                  SELECT 6)
+                                 UNION
+                                 SELECT 7)
+                                UNION
+                                SELECT 8)
+                               UNION
+                               SELECT 9)
+                              UNION
+                              SELECT 0) t5 ON 1 = 1
+               WHERE (10000 * t1.num + 1000 * t2.num + 100 * t3.num + 10 * t4.num + t5.num) > 0
+               ORDER BY 10000 * t1.num + 1000 * t2.num + 100 * t3.num + 10 * t4.num + t5.num) g ON 1 = 1
+WHERE g.gen_num <= t.clicks;
+
+alter table v_pivot_job_title_clicks
+    owner to jabmo;
+
+grant select on v_pivot_job_title_clicks to public;
+
+grant select on v_pivot_job_title_clicks to jabmoro;
+
+create view v_pivot_job_title_impressions
+            (impressions, clicks, cost_in_usd, start_date, end_date, facet, facet_id, jab_created_at, organization_name,
+             time_granularity, gen_num, id)
+as
+SELECT t.impressions,
+       t.clicks,
+       t.cost_in_usd,
+       t.start_date,
+       t.end_date,
+       t.facet,
+       t.facet_id,
+       t.jab_created_at,
+       t.job_title                                                       AS organization_name,
+       t.time_granularity,
+       g.gen_num,
+       md5(((((t.clicks::character varying::text || g.gen_num::character varying::text) ||
+              t.impressions::character varying::text) || t.facet_id::character varying::text) ||
+            t.start_date::character varying::text) || t.job_title::text) AS id
+FROM new_linkedin.pivot_job_title t
+         JOIN (SELECT 10000 * t1.num + 1000 * t2.num + 100 * t3.num + 10 * t4.num + t5.num AS gen_num
+               FROM (((((((((SELECT 1 AS num
+                             UNION
+                             SELECT 2)
+                            UNION
+                            SELECT 3)
+                           UNION
+                           SELECT 4)
+                          UNION
+                          SELECT 5)
+                         UNION
+                         SELECT 6)
+                        UNION
+                        SELECT 7)
+                       UNION
+                       SELECT 8)
+                      UNION
+                      SELECT 9)
+                     UNION
+                     SELECT 0) t1
+                        JOIN (((((((((SELECT 1 AS num
+                                      UNION
+                                      SELECT 2)
+                                     UNION
+                                     SELECT 3)
+                                    UNION
+                                    SELECT 4)
+                                   UNION
+                                   SELECT 5)
+                                  UNION
+                                  SELECT 6)
+                                 UNION
+                                 SELECT 7)
+                                UNION
+                                SELECT 8)
+                               UNION
+                               SELECT 9)
+                              UNION
+                              SELECT 0) t2 ON 1 = 1
+                        JOIN (((((((((SELECT 1 AS num
+                                      UNION
+                                      SELECT 2)
+                                     UNION
+                                     SELECT 3)
+                                    UNION
+                                    SELECT 4)
+                                   UNION
+                                   SELECT 5)
+                                  UNION
+                                  SELECT 6)
+                                 UNION
+                                 SELECT 7)
+                                UNION
+                                SELECT 8)
+                               UNION
+                               SELECT 9)
+                              UNION
+                              SELECT 0) t3 ON 1 = 1
+                        JOIN (((((((((SELECT 1 AS num
+                                      UNION
+                                      SELECT 2)
+                                     UNION
+                                     SELECT 3)
+                                    UNION
+                                    SELECT 4)
+                                   UNION
+                                   SELECT 5)
+                                  UNION
+                                  SELECT 6)
+                                 UNION
+                                 SELECT 7)
+                                UNION
+                                SELECT 8)
+                               UNION
+                               SELECT 9)
+                              UNION
+                              SELECT 0) t4 ON 1 = 1
+                        JOIN (((((((((SELECT 1 AS num
+                                      UNION
+                                      SELECT 2)
+                                     UNION
+                                     SELECT 3)
+                                    UNION
+                                    SELECT 4)
+                                   UNION
+                                   SELECT 5)
+                                  UNION
+                                  SELECT 6)
+                                 UNION
+                                 SELECT 7)
+                                UNION
+                                SELECT 8)
+                               UNION
+                               SELECT 9)
+                              UNION
+                              SELECT 0) t5 ON 1 = 1
+               WHERE (10000 * t1.num + 1000 * t2.num + 100 * t3.num + 10 * t4.num + t5.num) > 0
+               ORDER BY 10000 * t1.num + 1000 * t2.num + 100 * t3.num + 10 * t4.num + t5.num) g ON 1 = 1
+WHERE g.gen_num <= t.impressions;
+
+alter table v_pivot_job_title_impressions
+    owner to jabmo;
+
+grant select on v_pivot_job_title_impressions to public;
+
+grant select on v_pivot_job_title_impressions to jabmoro;
+
