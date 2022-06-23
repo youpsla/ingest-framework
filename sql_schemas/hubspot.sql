@@ -88,3 +88,24 @@ CREATE TABLE IF NOT EXISTS hubspot_development.campaign_details
 )
 DISTSTYLE AUTO
 ;
+
+--DROP TABLE hubspot_development.email_events;
+CREATE TABLE IF NOT EXISTS hubspot_development.email_events
+(
+	jab_id INT IDENTITY(1,1)
+	,jab_created_at TIMESTAMP WITHOUT TIME ZONE   ENCODE az64 default sysdate
+	,id VARCHAR(255)   ENCODE lzo
+	,referer VARCHAR(255)   ENCODE lzo
+	,link_id BIGINT   ENCODE lzo
+	,url VARCHAR(2048)   ENCODE lzo
+	,created TIMESTAMP WITHOUT TIME ZONE   ENCODE az64
+	,app_id VARCHAR(255)   ENCODE lzo
+	,country VARCHAR(255)   ENCODE lzo
+	,state VARCHAR(255)   ENCODE lzo
+	,city VARCHAR(255)   ENCODE lzo
+	,portal_id BIGINT   ENCODE lzo
+	,type VARCHAR(255)   ENCODE lzo
+	,email_campaign_id VARCHAR(255)   ENCODE lzo
+)
+DISTSTYLE AUTO
+;

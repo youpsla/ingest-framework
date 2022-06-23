@@ -299,5 +299,87 @@
                 ]
             }
         }
+    },
+    {
+        "email_events": {
+            "id": {
+                "type": "raw",
+                "source_path": [
+                    "id"
+                ]
+            },
+            "referer": {
+                "type": "raw",
+                "source_path": [
+                    "referer"
+                ]
+            },
+            "link_id": {
+                "type": "raw",
+                "source_path": [
+                    "linkId"
+                ]
+            },
+            "url": {
+                "type": "raw",
+                "source_path": [
+                    "url"
+                ]
+            },
+            "created": {
+                "type": "function",
+                "source_path": [
+                    "created"
+                ],
+                "transform_function": {
+                    "type": "datetime_from_timestamp_in_milliseconds"
+                }
+            },
+            "app_id": {
+                "type": "raw",
+                "source_path": [
+                    "appId"
+                ]
+            },
+            "country": {
+                "type": "raw",
+                "source_path": [
+                    "location",
+                    "country"
+                ]
+            },
+            "state": {
+                "type": "raw",
+                "source_path": [
+                    "location",
+                    "state"
+                ]
+            },
+            "city": {
+                "type": "raw",
+                "source_path": [
+                    "location",
+                    "city"
+                ]
+            },
+            "portal_id": {
+                "type": "raw",
+                "source_path": [
+                    "portailId"
+                ]
+            },
+            "type": {
+                "type": "raw",
+                "source_path": [
+                    "type"
+                ]
+            },
+            "email_campaign_id": {
+                "type": "raw",
+                "source_path": [
+                    "emailCampaignId"
+                ]
+            }
+        }
     }
 ]

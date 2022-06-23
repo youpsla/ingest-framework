@@ -64,7 +64,7 @@ class HubspotClient(Client):
             # services.get_service("companies")
             result = self.api_client.crm.companies.get_all()
 
-        if self.task.name in ["campaign_details", "campaigns"]:
+        if self.task.name in ["campaign_details", "campaigns", "email_events"]:
             # endpoints_list = self.get_endpoints_list()
             url_params = task_params["url"]
             params = url_params.get("params", None)
@@ -75,6 +75,7 @@ class HubspotClient(Client):
                 dynamics_params = self.get_dynamics_params(params)
                 statics_params = self.get_statics_params(params)
                 kwargs = dynamics_params + statics_params
+                kwargs = []
                 endpoint_list = [
                     (
                         self.build_endpoint(
@@ -198,7 +199,8 @@ class HubspotClient(Client):
             kwargs_tuple = [(k, v) for f in kwargs for k, v in f.items()]
         endpoint = (
             f"{base}"
-            f"{str(args[0])+'?' if args else ''}"
+            f"{str(args[0]) if args else ''}"
+            f"{'?' if kwargs else ''}"
             f"{'&' + urlencode(kwargs_tuple) if kwargs else ''}"
         )
         return endpoint

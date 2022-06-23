@@ -156,5 +156,53 @@
                 }
             }
         }
+    },
+    {
+        "email_events": {
+            "actions": [
+                "insert",
+                "update"
+            ],
+            "exclude_existing_in_db": true,
+            "source": "hubspot",
+            "destination": "redshift",
+            "request_data_source": "redshift",
+            "destination_unique_keys": [
+                "id"
+            ],
+            "model": "email_events",
+            "update_key": "id",
+            "url": {
+                "response_datas_key": "events",
+                "base": "https://api.hubapi.com/email/public/v1/events",
+                "params": {
+                    "db": {
+                        "_": {
+                            "type": "db",
+                            "args_fields": [
+                            ],
+                            "kwargs_fields": [
+                                [
+                                    "id",
+                                    "{}",
+                                    "campaignId"
+                                ]
+                            ],
+                            "db_fields": [],
+                            "filter_model": "campaigns",
+                            "all_fields": [
+                                "id"
+                            ],
+                            "raw_sql": "select distinct(id) from {schema}.campaigns"
+
+                        }
+                    },
+                    "statics": {
+                        "hapikey": "eu1-fd74-6c90-4dc8-a93b-a1b33969e03c",
+                        "limit": 1000
+                    }
+                }
+            }
+        }
     }
 ]
