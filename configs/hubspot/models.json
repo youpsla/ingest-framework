@@ -206,13 +206,96 @@
             "app_name": {
                 "type": "raw",
                 "source_path": [
+                    "appName"
+                ]
+            },
+            "last_updated_time": {
+                "type": "function",
+                "source_path": [
+                    "lastUpdatedTime"
+                ],
+                "transform_function": {
+                    "type": "datetime_from_timestamp_in_milliseconds"
+                }
+            }
+        }
+    },
+    {
+        "campaign_details": {
+            "id": {
+                "type": "raw",
+                "source_path": [
+                    "id"
+                ]
+            },
+            "app_id": {
+                "type": "raw",
+                "source_path": [
                     "appId"
+                ]
+            },
+            "app_name": {
+                "type": "raw",
+                "source_path": [
+                    "appName"
+                ]
+            },
+            "content_id": {
+                "type": "raw",
+                "source_path": [
+                    "contentId"
                 ]
             },
             "subject": {
                 "type": "raw",
                 "source_path": [
-                    "subject"
+                    "sibject"
+                ]
+            },
+            "name": {
+                "type": "raw",
+                "source_path": [
+                    "name"
+                ]
+            },
+            "n_processed": {
+                "type": "raw",
+                "source_path": [
+                    "counters",
+                    "processed"
+                ]
+            },
+            "n_delivered": {
+                "type": "raw",
+                "source_path": [
+                    "counters",
+                    "delivered"
+                ]
+            },
+            "n_sent": {
+                "type": "raw",
+                "source_path": [
+                    "counters",
+                    "sent"
+                ]
+            },
+            "n_open": {
+                "type": "raw",
+                "source_path": [
+                    "counters",
+                    "open"
+                ]
+            },
+            "processing_state": {
+                "type": "raw",
+                "source_path": [
+                    "processingState"
+                ]
+            },
+            "type": {
+                "type": "raw",
+                "source_path": [
+                    "type"
                 ]
             }
         }
