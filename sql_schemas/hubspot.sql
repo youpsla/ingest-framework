@@ -83,7 +83,7 @@ CREATE TABLE IF NOT EXISTS hubspot_development.campaign_details
 	,n_delivered INT ENCODE lzo
 	,n_sent INT ENCODE lzo
 	,n_open INT ENCODE lzo
-	,processing_date VARCHAR(255)   ENCODE lzo
+	,processing_state VARCHAR(255)   ENCODE lzo
 	,type VARCHAR(255)   ENCODE lzo
 )
 DISTSTYLE AUTO
