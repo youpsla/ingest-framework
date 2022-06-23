@@ -85,13 +85,13 @@ class Client:
 
         return result
 
-    def get_kwargs_list(self, kwargs_fields=[], sql_datas=[]):
+    def get_kwargs_list(self, kwargs_fields=[], sql_datas=[], statics={}):
         result = []
         for d in sql_datas:
             tmp_result = []
             for f in kwargs_fields:
                 r = {f[2]: f[1].format(d[f[0]])}
-                tmp_result.append(r)
+                tmp_result.append({**r, **statics})
             result.append(tmp_result)
 
         return result
@@ -120,7 +120,9 @@ class Client:
 
         return result
 
-    def get_request_parameters_lists(self, params=None, db_connection=None):
+    def get_request_parameters_lists(
+        self, params=None, db_connection=None, static_params=None
+    ):
         if not params:
             return [], [], []
 
@@ -143,7 +145,9 @@ class Client:
             kwargs_list, args_list, sql_list = [], [], []
 
             if v.get("kwargs_fields", None):
-                kwargs_list = self.get_kwargs_list(v["kwargs_fields"], tmp)
+                kwargs_list = self.get_kwargs_list(
+                    v["kwargs_fields"], tmp, static_params
+                )
 
             if v.get("args_fields", None):
                 args_list = self.get_args_list(v["args_fields"], tmp)
@@ -331,6 +335,7 @@ class Client:
                 self.get_request_parameters_lists(
                     params=params.get("db", None),
                     db_connection=self.task.db_connection,
+                    static_params=params.get("statics", None),
                 )
                 if params
                 else ([], [], [])
@@ -340,7 +345,6 @@ class Client:
 
             date_range = params.get("date_range", None)
 
-            idx_to_del = []
             if date_range:
                 result = []
                 for idx, zd in enumerate(zip_data):

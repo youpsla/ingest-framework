@@ -39,18 +39,31 @@ def import_request(csv_filename, column_mapping):
 
 # api_client = HubSpot(api_key=api_key())
 api_client = HubSpot(api_key="eu1-fd74-6c90-4dc8-a93b-a1b33969e03c")
-result = api_client.crm.contacts.get_all()
+# result = api_client.crm.companies.get_all()
+result = api_client.crm.o
+for r in result:
+    print(r)
 
 
-# kwargs = vars(args)
-# filtered_kwargs = dict(
-#     (k, v)
-#     for k, v in kwargs.items()
-#     if v is not None and k != "method" and k != "column" and k != "properties"
-# )
-# if args.method == "create":
-#     import_request = import_request(csv_filename=args.files, column_mapping=args.column)
-#     filtered_kwargs["import_request"] = json.dumps(import_request)
+# from hubspot.crm.associations import BatchInputPublicObjectId, PublicObjectId
 
-# result = getattr(api, args.method)(**filtered_kwargs)
-print(result)
+# for r in result:
+#     # batch_input_public_object_id = BatchInputPublicObjectId(
+#     #     inputs=[PublicObjectId(id=r.id)]
+#     # )
+#     # api_response = api_client.crm.associations.batch_api.read(
+#     #     "CONTACTS",
+#     #     "ENGAGEMENTS",
+#     #     batch_input_public_object_id=batch_input_public_object_id,
+#     # )
+
+#     api_response = api_client.events.events_api.get_page(
+#         object_type="contacts", object_id=r.id
+#     )
+
+#     print(r.id)
+#     if api_response.results:
+#         for i in api_response.results:
+#             if len(i) > 1:
+#                 print("DADADADADADADADDADADADADADADA")
+#             print(i)
