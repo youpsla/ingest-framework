@@ -10,36 +10,209 @@
             "email": {
                 "type": "raw",
                 "source_path": [
-                    "properties"
+                    "properties",
                     "email"
                 ]
             },
             "firstname": {
                 "type": "raw",
                 "source_path": [
-                    "properties"
+                    "properties",
                     "firstname"
                 ]
             },
             "lastname": {
                 "type": "raw",
                 "source_path": [
-                    "properties"
+                    "properties",
                     "lastname"
                 ]
             },
             "created_date": {
                 "type": "raw",
                 "source_path": [
-                    "properties"
+                    "properties",
                     "createddate"
                 ]
             },
             "last_modified_date": {
                 "type": "raw",
                 "source_path": [
-                    "properties"
+                    "properties",
                     "lastmodifieddate"
+                ]
+            }
+        }
+    },
+    {
+        "companies": {
+            "id": {
+                "type": "raw",
+                "source_path": [
+                    "id"
+                ]
+            },
+            "createdate": {
+                "type": "raw",
+                "source_path": [
+                    "properties",
+                    "createdate"
+                ]
+            },
+            "domain": {
+                "type": "raw",
+                "source_path": [
+                    "properties",
+                    "domain"
+                ]
+            },
+            "name": {
+                "type": "raw",
+                "source_path": [
+                    "properties",
+                    "name"
+                ]
+            }
+        }
+    },
+    {
+        "associations": {
+            "_from": {
+                "type": "raw",
+                "source_path": [
+                    "id"
+                ]
+            },
+            "to": {
+                "type": "raw",
+                "source_path": [
+                    "properties",
+                    "createdate"
+                ]
+            },
+            "domain": {
+                "type": "raw",
+                "source_path": [
+                    "properties",
+                    "domain"
+                ]
+            },
+            "name": {
+                "type": "raw",
+                "source_path": [
+                    "properties",
+                    "name"
+                ]
+            }
+        }
+    },
+    {
+        "events": {
+            "id": {
+                "type": "raw",
+                "source_path": [
+                    "id"
+                ]
+            },
+            "object_id": {
+                "type": "raw",
+                "source_path": [
+                    "object_id"
+                ]
+            },
+            "object_type": {
+                "type": "raw",
+                "source_path": [
+                    "object_type"
+                ]
+            },
+            "event_type": {
+                "type": "raw",
+                "source_path": [
+                    "event_type"
+                ]
+            },
+            "occurred_at": {
+                "type": "raw",
+                "source_path": [
+                    "occurred_at"
+                ]
+            },
+            "hs_url": {
+                "type": "raw",
+                "source_path": [
+                    "properties",
+                    "hs_url"
+                ]
+            },
+            "hs_title": {
+                "type": "raw",
+                "source_path": [
+                    "properties",
+                    "hs_title"
+                ]
+            },
+            "hs_city": {
+                "type": "raw",
+                "source_path": [
+                    "properties",
+                    "hs_city"
+                ]
+            },
+            "hs_region": {
+                "type": "raw",
+                "source_path": [
+                    "properties",
+                    "hs_region"
+                ]
+            },
+            "hs_country": {
+                "type": "raw",
+                "source_path": [
+                    "properties",
+                    "hs_country"
+                ]
+            },
+            "hs_form_id": {
+                "type": "raw",
+                "source_path": [
+                    "properties",
+                    "hs_form_id"
+                ]
+            },
+            "hs_form_correlation_id": {
+                "type": "raw",
+                "source_path": [
+                    "properties",
+                    "hs_form_correlation_id"
+                ]
+            }
+        }
+    },
+    {
+        "campaigns": {
+            "id": {
+                "type": "raw",
+                "source_path": [
+                    "id"
+                ]
+            },
+            "app_id": {
+                "type": "raw",
+                "source_path": [
+                    "appId"
+                ]
+            },
+            "app_name": {
+                "type": "raw",
+                "source_path": [
+                    "appId"
+                ]
+            },
+            "subject": {
+                "type": "raw",
+                "source_path": [
+                    "subject"
                 ]
             }
         }

@@ -1,57 +1,48 @@
+from src.clients.hubspot import services
 from src.commons.client import Client
 
-import services
-
-services.get_service("contacts")
+from hubspot import HubSpot
 
 
 class HubspotClient(Client):
     def __init__(self, task=None, env=None):
         super().__init__(env)
+        self.task = task
+        self.api_client = HubSpot(api_key="eu1-fd74-6c90-4dc8-a93b-a1b33969e03c")
 
     def get(self, **_ignored):
 
-        params = self.task.params
-
-        db_params = self.get_request_params(self.task)
-
         result = []
-        if self.task.name in [
-            "daily_user_location_metrics_update",
-            "daily_demographic_metrics_update",
-            "daily_geographic_metrics_update",
-        ]:
-            request = ReportRequest(
-                authorization_data=self.authorization_data,
-                service_name=self.task.params["url"]["service_name"],
-                task=self.task,
-                kwargs=kwargs,
-            )
-        else:
-            request = ServiceRequest(
-                authorization_data=self.authorization_data,
-                service_name=self.task.params["url"]["service_name"],
-                task=self.task,
-                kwargs=kwargs,
-            )
-        if db_params:
-            for param in db_params:
-                request.param = param[0]
-                tmp = request.get()
-                if isinstance(self.task.destination, s3.s3_client.S3Client):
-                    result.append(tmp)
-                else:
+        if self.task.name == "contacts":
+            # services.get_service("contacts")
+            result = self.api_client.crm.contacts.get_all()
+
+        if self.task.name == "companies":
+            # services.get_service("companies")
+            result = self.api_client.crm.companies.get_all()
+
+        if self.task.name == "campaigns":
+            pass
+
+        if self.task.name == "events":
+            db_params = self.get_request_params(self.task)[0:20]
+            if db_params:
+                for param in db_params:
+                    tmp = self.api_client.events.events_api.get_page(
+                        **param[1][0]
+                    ).results
+
                     if tmp:
                         for t in tmp:
                             for i in param[0]:
                                 for k, v in i.items():
                                     t[k] = v
                             result.append(t)
-        else:
-            result = request.get()
+            else:
+                pass
 
         tmp = []
         for r in result:
-            tmp.append({"datas": r, "authorization_data": self.authorization_data})
+            tmp.append({"datas": r.to_dict()})
 
         return tmp

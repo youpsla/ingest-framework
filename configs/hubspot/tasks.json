@@ -1,6 +1,6 @@
 [
     {
-        "get_contacts": {
+        "contacts": {
             "actions": [
                 "insert",
                 "update"
@@ -15,14 +15,99 @@
             "request_data_source": "redshift",
             "update_key": "email",
             "model": "contacts",
-
-
             "url": {
                 "type": "service",
                 "service_name": "get_contacts",
                 "response_data_key": [
                     "results"
                 ]
+            }
+        }
+    },
+    {
+        "companies": {
+            "actions": [
+                "insert",
+                "update"
+            ],
+            "exclude_existing_in_db": true,
+            "exclude_key": "domain",
+            "source": "hubspot",
+            "destination": "redshift",
+            "destination_unique_keys": [
+                "domain"
+            ],
+            "request_data_source": "redshift",
+            "update_key": "domain",
+            "model": "companies",
+            "url": {
+                "type": "service",
+                "service_name": "get_ccompanies",
+                "response_data_key": [
+                    "results"
+                ]
+            }
+        }
+    },
+    {
+        "events": {
+            "actions": [
+                "insert"
+            ],
+            "exclude_existing_in_db": false,
+            "source": "hubspot",
+            "destination": "redshift",
+            "request_data_source": "redshift",
+            "model": "events",
+            "url": {
+                "type": "service",
+                "service_name": "get_companies",
+                "response_data_key": [
+                    "results"
+                ],
+                "params": {
+                    "db": {
+                        "_": {
+                            "type": "db",
+                            "args_fields": [],
+                            "kwargs_fields": [
+                                [
+                                    "id",
+                                    "{}",
+                                    "object_id"
+                                ]
+                            ],
+                            "db_fields": [],
+                            "filter_model": "contacts",
+                            "all_fields": [
+                                "id"
+                            ]
+                        }
+                    },
+                    "statics": {
+                        "object_type":"contacts"
+                    }
+                }
+            }
+        }
+    },
+    {
+        "campaigns": {
+            "actions": [
+                "insert"
+            ],
+            "exclude_existing_in_db": true,
+            "exclude_key": "id",
+            "source": "hubspot",
+            "destination": "redshift",
+            "destination_unique_keys": [
+                "id"
+            ],
+            "request_data_source": "redshift",
+            "model": "campaigns",
+            "url": {
+                "response_datas_key": "campaigns",
+                "base": "https://api.hubapi.com/email/public/v1/campaigns/"
             }
         }
     }
