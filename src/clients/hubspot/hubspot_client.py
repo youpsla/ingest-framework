@@ -3,6 +3,7 @@ from threading import current_thread, get_ident, get_native_id
 from urllib.parse import urlencode
 
 from requests.exceptions import ConnectionError, ConnectTimeout, RetryError
+from requests.structures import CaseInsensitiveDict
 from src.commons.client import Client
 from src.utils.http_utils import get_http_adapter
 
@@ -15,6 +16,8 @@ class HubspotClient(Client):
         self.task = task
         self.api_client = HubSpot(api_key="eu1-fd74-6c90-4dc8-a93b-a1b33969e03c")
         self.http_adapter = get_http_adapter()
+        self.access_token = "CMv-z42ZMBIMggMAUAAAACAAAABIGI_HrQwghercFSj5iTgyFC1hgW6vxv3ZSxb6HR-gpuakdUeYOjAAMWBB_wcAADwAtABg4HzOKIYAAGAAACA8ACAYAAAAwMN_NgEAAACBZxwY4AAAIAJCFJ0RIFl5Z6ljSNZIao0O9rO8m9qYSgNldTFSAFoA"
+        self.oauth_api_client = HubSpot(access_token=self.access_token)
 
     def get_endpoints_list(self):
         try:
@@ -58,13 +61,14 @@ class HubspotClient(Client):
         result = []
         if self.task.name == "contacts":
             # services.get_service("contacts")
-            result = self.api_client.crm.contacts.get_all()
+            result = self.oauth_api_client.crm.contacts.get_all()
 
         if self.task.name == "companies":
             # services.get_service("companies")
-            result = self.api_client.crm.companies.get_all()
+            result = self.oauth_api_client.crm.companies.get_all()
 
         if self.task.name in ["campaign_details", "campaigns", "email_events"]:
+            headers = self.build_headers(header=None)
             # endpoints_list = self.get_endpoints_list()
             url_params = task_params["url"]
             params = url_params.get("params", None)
@@ -119,7 +123,9 @@ class HubspotClient(Client):
                     for endpoint in lst:
                         threads.append(
                             (
-                                executor.submit(self.do_get_query, endpoint[0]),
+                                executor.submit(
+                                    self.do_get_query, endpoint[0], headers
+                                ),
                                 endpoint[1],
                             )
                         )
@@ -159,7 +165,7 @@ class HubspotClient(Client):
             db_params = self.get_request_params(self.task)[0:20]
             if db_params:
                 for param in db_params:
-                    tmp = self.api_client.events.events_api.get_page(
+                    tmp = self.oauth_api_client.events.events_api.get_page(
                         **param[1][0]
                     ).results
 
@@ -266,3 +272,25 @@ class HubspotClient(Client):
             return None
 
         return response
+
+    def build_headers(self, header=None):
+        """# noqa: E501
+        Build the header of the http request
+
+        Use the access_token and optionnal header defined in json.
+
+        Args:
+            header: dict
+
+        Returns:
+            A dict of the build header.
+        """
+        headers = CaseInsensitiveDict()
+        headers["Accept"] = "application/json"
+        headers["cache-control"] = "no-cache"
+        headers["Authorization"] = f"Bearer {self.access_token}"
+
+        if header:
+            headers.update(header)
+
+        return headers
