@@ -91,7 +91,8 @@ class Client:
             tmp_result = []
             for f in kwargs_fields:
                 r = {f[2]: f[1].format(d[f[0]])}
-                tmp_result.append({**r, **statics})
+                tmp_result.append({**r})
+            tmp_result.append({**statics})
             result.append(tmp_result)
 
         return result
