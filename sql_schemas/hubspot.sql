@@ -109,3 +109,15 @@ CREATE TABLE IF NOT EXISTS hubspot_development.email_events
 )
 DISTSTYLE AUTO
 ;
+
+--DROP TABLE hubspot_development.accounts;
+CREATE TABLE IF NOT EXISTS hubspot_development.accounts
+(
+	jab_id INT IDENTITY(1,1)
+	,jab_created_at TIMESTAMP WITHOUT TIME ZONE   ENCODE az64 default sysdate
+	,id VARCHAR(255)   ENCODE lzo
+	,name VARCHAR(255)   ENCODE lzo
+	,portal_id VARCHAR(255)   ENCODE lzo
+)
+DISTSTYLE AUTO
+;
