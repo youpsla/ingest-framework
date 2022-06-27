@@ -16,8 +16,12 @@ class HubspotClient(Client):
         self.task = task
         self.api_client = HubSpot(api_key="eu1-fd74-6c90-4dc8-a93b-a1b33969e03c")
         self.http_adapter = get_http_adapter()
-        self.access_token = "CMv-z42ZMBIMggMAUAAAACAAAABIGI_HrQwghercFSj5iTgyFC1hgW6vxv3ZSxb6HR-gpuakdUeYOjAAMWBB_wcAADwAtABg4HzOKIYAAGAAACA8ACAYAAAAwMN_NgEAAACBZxwY4AAAIAJCFJ0RIFl5Z6ljSNZIao0O9rO8m9qYSgNldTFSAFoA"
+        # self.access_token = "CMv-z42ZMBIMggMAUAAAACAAAABIGI_HrQwghercFSj5iTgyFC1hgW6vxv3ZSxb6HR-gpuakdUeYOjAAMWBB_wcAADwAtABg4HzOKIYAAGAAACA8ACAYAAAAwMN_NgEAAACBZxwY4AAAIAJCFJ0RIFl5Z6ljSNZIao0O9rO8m9qYSgNldTFSAFoA"
+        self.access_token = "CNbBuLKZMBIMggMAUAAAACAAAABIGKqcsAwgioLPDSj5iTgyFC1fxkyD1ysO9XeIsICcbic-rq4lOjAAMWBB_wcAADwAtABg4HzOKIYAAGAAACA8ACAYAAAAwMN_NgEAAACBZxwY4AAAIAJCFDU4vn7pyKX1r4a066Yj7sAz4J6VSgNldTFSAFoA"
         self.oauth_api_client = HubSpot(access_token=self.access_token)
+
+    def get_access_token(self):
+        pass
 
     def get_endpoints_list(self):
         try:

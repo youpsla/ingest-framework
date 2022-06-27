@@ -16,11 +16,36 @@
             "update_key": "email",
             "model": "contacts",
             "url": {
-                "type": "service",
-                "service_name": "get_contacts",
                 "response_data_key": [
                     "results"
-                ]
+                ],
+                "params": {
+                    "db": {
+                        "_": {
+                            "type": "aws_secret",
+                            "args_fields": [
+                            ],
+                            "kwargs_fields": [
+                                [
+                                    "access_token",
+                                    "{}",
+                                    "Bearer"
+                                ]
+                            ],
+                            "db_fields": [],
+                            "filter_model": "campaigns",
+                            "all_fields": [
+                                "id"
+                            ],
+                            "raw_sql": "select distinct(id) from {schema}.campaigns"
+
+                        }
+                    },
+                    "statics": {
+                        "hapikey": "eu1-fd74-6c90-4dc8-a93b-a1b33969e03c",
+                        "limit": 1000
+                    }
+                }
             }
         }
     },
@@ -83,6 +108,7 @@
                                 "id"
                             ]
                         }
+
                     },
                     "statics": {
                         "object_type":"contacts"
