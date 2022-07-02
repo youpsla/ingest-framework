@@ -19,38 +19,15 @@
                 "response_data_key": [
                     "results"
                 ],
-                "params": {
-                    "db": {
-                        "_": {
-                            "type": "aws_secret",
-                            "args_fields": [
-                            ],
-                            "kwargs_fields": [
-                                [
-                                    "access_token",
-                                    "{}",
-                                    "Bearer"
-                                ]
-                            ],
-                            "db_fields": [],
-                            "filter_model": "campaigns",
-                            "all_fields": [
-                                "id"
-                            ],
-                            "raw_sql": "select distinct(id) from {schema}.campaigns"
-
-                        }
-                    },
-                    "statics": {
-                        "hapikey": "eu1-fd74-6c90-4dc8-a93b-a1b33969e03c",
-                        "limit": 1000
-                    }
+                "params": {},
+                "statics": {
+                    "limit": "1000"
                 }
             }
         }
     },
     {
-        "companies": {
+        "companies_2": {
             "actions": [
                 "insert",
                 "update"
@@ -86,7 +63,6 @@
             "model": "events",
             "url": {
                 "type": "service",
-                "service_name": "get_companies",
                 "response_data_key": [
                     "results"
                 ],
@@ -102,16 +78,14 @@
                                     "object_id"
                                 ]
                             ],
-                            "db_fields": [],
                             "filter_model": "contacts",
                             "all_fields": [
                                 "id"
                             ]
                         }
-
                     },
                     "statics": {
-                        "object_type":"contacts"
+                        "object_type": "contacts"
                     }
                 }
             }
@@ -135,9 +109,31 @@
             "update_key": "id",
             "url": {
                 "response_datas_key": "campaigns",
-                "base": "https://api.hubapi.com/email/public/v1/campaigns?hapikey=eu1-fd74-6c90-4dc8-a93b-a1b33969e03c",
-                "params": {
-                }
+                "base": "https://api.hubapi.com/email/public/v1/campaigns",
+                "params": {}
+            }
+        }
+    },
+    {
+        "companies": {
+            "actions": [
+                "insert",
+                "update"
+            ],
+            "exclude_existing_in_db": true,
+            "exclude_key": "id",
+            "source": "hubspot",
+            "destination": "redshift",
+            "destination_unique_keys": [
+                "id"
+            ],
+            "request_data_source": "redshift",
+            "model": "companies",
+            "update_key": "id",
+            "url": {
+                "response_datas_key": "campaigns",
+                "base": "https://api.hubapi.com/email/public/v1/campaigns",
+                "params": {}
             }
         }
     },
@@ -165,20 +161,16 @@
                             "args_fields": [
                                 "id"
                             ],
-                            "kwargs_fields": [
-                            ],
+                            "kwargs_fields": [],
                             "db_fields": [],
                             "filter_model": "campaigns",
                             "all_fields": [
                                 "id"
                             ],
                             "raw_sql": "select distinct(id) from {schema}.campaigns"
-
                         }
                     },
-                    "statics": {
-                        "hapikey": "eu1-fd74-6c90-4dc8-a93b-a1b33969e03c"
-                    }
+                    "statics": {}
                 }
             }
         }
@@ -204,27 +196,25 @@
                 "params": {
                     "db": {
                         "_": {
-                            "type": "db",
-                            "args_fields": [
-                            ],
+                            "type": "rawsql",
+                            "args_fields": [],
                             "kwargs_fields": [
                                 [
                                     "id",
                                     "{}",
                                     "campaignId"
+                                ],
+                                [
+                                    "app_id",
+                                    "{}",
+                                    "appId"
                                 ]
                             ],
                             "db_fields": [],
-                            "filter_model": "campaigns",
-                            "all_fields": [
-                                "id"
-                            ],
-                            "raw_sql": "select distinct(id) from {schema}.campaigns"
-
+                            "raw_sql": "select id, app_id from {schema}.campaigns where portal_id = 25912207"
                         }
                     },
                     "statics": {
-                        "hapikey": "eu1-fd74-6c90-4dc8-a93b-a1b33969e03c",
                         "limit": 1000
                     }
                 }

@@ -36,7 +36,9 @@ class Task:
     def source(self):
         if not self._source:
             source_name = self.params["source"]
-            self._source = get_client(self.running_env, source_name, self)
+            self._source = get_client(
+                self.running_env, source_name, self, db_connection=self.db_connection
+            )
         return self._source
 
     @property

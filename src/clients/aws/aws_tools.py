@@ -5,19 +5,41 @@ import logging
 import boto3
 from botocore.exceptions import ClientError
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+
+
+class SecretManagerClient:
+    def __init__(self, region_name="eu-west-1"):
+        self.client = self.get_client(region_name)
+
+    def get_client(self, region_name):
+        # Create a Secrets Manager client
+        session = boto3.session.Session()
+        client = session.client(service_name="secretsmanager", region_name=region_name)
+        return client
+
+
+def search_secrets_by_prefix(prefix):
+    client = SecretManagerClient().client
+    response = client.list_secrets(
+        MaxResults=100,
+        Filters=[
+            {
+                "Key": "name",
+                "Values": [
+                    prefix,
+                ],
+            },
+        ],
+    )
+    return response
 
 
 class Secret:
     def __init__(self, name):
-        self.secretsmanager_client = self.get_secretsmanager_client()
+        self.secretsmanager_client = SecretManagerClient().client
         self.name = name
-
-    def get_secretsmanager_client(self):
-        # Create a Secrets Manager client
-        session = boto3.session.Session()
-        client = session.client(service_name="secretsmanager", region_name="eu-west-1")
-        return client
 
     def get_value(self):
 
@@ -117,3 +139,8 @@ class Secret:
             raise
         else:
             return response
+
+
+if __name__ == "__main__":
+    res = search_secrets_by_prefix("hubspot")
+    print(res)

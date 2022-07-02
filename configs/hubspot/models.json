@@ -1,5 +1,18 @@
 [
     {
+        "accounts": {
+            "id": {
+                "type": "raw"
+            },
+            "name": {
+                "type": "raw"
+            },
+            "portal_id": {
+                "type": "raw"
+            }
+        }
+    },
+    {
         "contacts": {
             "id": {
                 "type": "raw",
@@ -28,18 +41,143 @@
                     "lastname"
                 ]
             },
-            "created_date": {
+            "job_title": {
                 "type": "raw",
                 "source_path": [
                     "properties",
-                    "createddate"
+                    "job_title"
                 ]
             },
-            "last_modified_date": {
+            "company": {
                 "type": "raw",
                 "source_path": [
                     "properties",
-                    "lastmodifieddate"
+                    "company"
+                ]
+            },
+            "industry": {
+                "type": "raw",
+                "source_path": [
+                    "properties",
+                    "industry"
+                ]
+            },
+            "hs_analytics_average_page_views": {
+                "type": "raw",
+                "source_path": [
+                    "properties",
+                    "hs_analytics_average_page_views"
+                ]
+            },
+            "contact_owner": {
+                "type": "raw",
+                "source_path": [
+                    "properties",
+                    "contact_owner"
+                ]
+            },
+            "address": {
+                "type": "raw",
+                "source_path": [
+                    "properties",
+                    "address"
+                ]
+            },
+            "zip": {
+                "type": "raw",
+                "source_path": [
+                    "properties",
+                    "zip"
+                ]
+            },
+            "city": {
+                "type": "raw",
+                "source_path": [
+                    "properties",
+                    "city"
+                ]
+            },
+            "region": {
+                "type": "raw",
+                "source_path": [
+                    "properties",
+                    "region"
+                ]
+            },
+            "country": {
+                "type": "raw",
+                "source_path": [
+                    "properties",
+                    "country"
+                ]
+            },
+            "hs_email_domain": {
+                "type": "raw",
+                "source_path": [
+                    "properties",
+                    "hs_email_domain"
+                ]
+            },
+            "hs_analytics_num_event_completions": {
+                "type": "raw",
+                "source_path": [
+                    "properties",
+                    "hs_analytics_num_event_completions"
+                ]
+            },
+            "ip_city": {
+                "type": "raw",
+                "source_path": [
+                    "properties",
+                    "ip_city"
+                ]
+            },
+            "ip_country": {
+                "type": "raw",
+                "source_path": [
+                    "properties",
+                    "ip_country"
+                ]
+            },
+            "ip_country_code": {
+                "type": "raw",
+                "source_path": [
+                    "properties",
+                    "ip_country_code"
+                ]
+            },
+            "ip_state": {
+                "type": "raw",
+                "source_path": [
+                    "properties",
+                    "ip_state"
+                ]
+            },
+            "ip_state_code": {
+                "type": "raw",
+                "source_path": [
+                    "properties",
+                    "ip_state_code"
+                ]
+            },
+            "created_at": {
+                "type": "raw",
+                "source_path": [
+                    "properties",
+                    "createdAt"
+                ]
+            },
+            "updated_at": {
+                "type": "raw",
+                "source_path": [
+                    "properties",
+                    "updatedAt"
+                ]
+            },
+            "portal_id": {
+                "type": "raw",
+                "source_path": [
+                    "portal_id"
                 ]
             }
         }
@@ -52,11 +190,16 @@
                     "id"
                 ]
             },
-            "createdate": {
+            "created_at": {
                 "type": "raw",
                 "source_path": [
-                    "properties",
-                    "createdate"
+                    "createdAt"
+                ]
+            },
+            "updated_at": {
+                "type": "raw",
+                "source_path": [
+                    "updatedAt"
                 ]
             },
             "domain": {
@@ -71,6 +214,74 @@
                 "source_path": [
                     "properties",
                     "name"
+                ]
+            },
+            "hs_additional_domains": {
+                "type": "raw",
+                "source_path": [
+                    "properties",
+                    "hs_additional_domains"
+                ]
+            },
+            "hs_analytics_num_page_views": {
+                "type": "raw",
+                "source_path": [
+                    "properties",
+                    "hs_analytics_num_page_views"
+                ]
+            },
+            "hs_analytics_num_visits": {
+                "type": "raw",
+                "source_path": [
+                    "properties",
+                    "hs_analytics_num_visits"
+                ]
+            },
+            "hs_is_target_account": {
+                "type": "raw",
+                "source_path": [
+                    "properties",
+                    "hs_is_target_account"
+                ]
+            },
+            "hs_object_id": {
+                "type": "raw",
+                "source_path": [
+                    "properties",
+                    "hs_object_id"
+                ]
+            },
+            "num_associated_contacts": {
+                "type": "raw",
+                "source_path": [
+                    "properties",
+                    "num_associated_contacts"
+                ]
+            },
+            "website": {
+                "type": "raw",
+                "source_path": [
+                    "properties",
+                    "website"
+                ]
+            },
+            "hs_parent_company_id": {
+                "type": "raw",
+                "source_path": [
+                    "properties",
+                    "hs_parent_company_id"
+                ]
+            },
+            "archived": {
+                "type": "raw",
+                "source_path": [
+                    "archived"
+                ]
+            },
+            "portal_id": {
+                "type": "raw",
+                "source_path": [
+                    "portal_id"
                 ]
             }
         }
@@ -130,6 +341,12 @@
                 "type": "raw",
                 "source_path": [
                     "event_type"
+                ]
+            },
+            "portal_id": {
+                "type": "raw",
+                "source_path": [
+                    "portal_id"
                 ]
             },
             "occurred_at": {
@@ -217,6 +434,12 @@
                 "transform_function": {
                     "type": "datetime_from_timestamp_in_milliseconds"
                 }
+            },
+            "portal_id": {
+                "type": "raw",
+                "source_path": [
+                    "portal_id"
+                ]
             }
         }
     },
@@ -297,6 +520,12 @@
                 "source_path": [
                     "type"
                 ]
+            },
+            "portal_id": {
+                "type": "raw",
+                "source_path": [
+                    "portal_id"
+                ]
             }
         }
     },
@@ -362,12 +591,6 @@
                     "city"
                 ]
             },
-            "portal_id": {
-                "type": "raw",
-                "source_path": [
-                    "portailId"
-                ]
-            },
             "type": {
                 "type": "raw",
                 "source_path": [
@@ -378,6 +601,58 @@
                 "type": "raw",
                 "source_path": [
                     "emailCampaignId"
+                ]
+            },
+            "portal_id": {
+                "type": "raw",
+                "source_path": [
+                    "portal_id"
+                ]
+            }
+        }
+    },
+    {
+        "forms": {
+            "id": {
+                "type": "raw",
+                "source_path": [
+                    "id"
+                ]
+            },
+            "name": {
+                "type": "raw",
+                "source_path": [
+                    "name"
+                ]
+            },
+            "created_at": {
+                "type": "raw",
+                "source_path": [
+                    "createdAt"
+                ]
+            },
+            "updated_at": {
+                "type": "raw",
+                "source_path": [
+                    "updatedAt"
+                ]
+            },
+            "archived": {
+                "type": "raw",
+                "source_path": [
+                    "archived"
+                ]
+            },
+            "form_type": {
+                "type": "raw",
+                "source_path": [
+                    "formType"
+                ]
+            },
+            "portal_id": {
+                "type": "raw",
+                "source_path": [
+                    "portal_id"
                 ]
             }
         }
