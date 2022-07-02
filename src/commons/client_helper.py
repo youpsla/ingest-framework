@@ -5,7 +5,7 @@ from src.clients.redshift.redshift_client import RedshiftClient
 from src.clients.s3.s3_client import S3Client
 
 
-def get_client(env, client_name, task):
+def get_client(env, client_name, task, db_connection=None):
     if client_name == "s3":
         client = S3Client(task=task, env=env)
         client.name = client_name
@@ -23,7 +23,7 @@ def get_client(env, client_name, task):
         client.name = client_name
         return client
     elif client_name == "hubspot":
-        client = HubspotClient(task=task, env=env)
+        client = HubspotClient(task=task, env=env, db_connection=db_connection)
         client.name = client_name
         return client
     else:
