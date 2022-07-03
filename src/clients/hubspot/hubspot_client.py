@@ -89,6 +89,8 @@ class HubspotClient(Client):
 
         # ptl = [(25912207, 'CLWs0tybMBIMggMAUAAAACAAAABIGI_HrQwghercFSj5iTgyFAncLX84DUTpinSCszbkBvScEXT4OjAAMWBB_wcAADwAtABg4HzOKIYAAGAAACA8ACAYAAAAwMN_NgEAAACBZxwY4AAAIAJCFMz1adgaAs5ngxV6JC62tGxh1YwMSgNldTFSAFoA'), ('25955882', 'CKi709ybMBIMggMAUAAAACAAAABIGKqcsAwgioLPDSj5iTgyFL8KPuPP69akxB2E6Rb-7K2WVw5TOjAAMWBB_wcAADwAtABg4HzOKIYAAGAAACA8ACAYAAAAwMN_NgEAAACBZxwY4AAAIAJCFFqrVj3APiWCbyvmw05zSi_EhpQySgNldTFSAFoA'), (1838475, 'CIab1dybMBIMggMAUAAAACAAAABIGIubcCDywqgNKPmJODIUWaoWClovooFugJn6lz4EhyJzb986MAAxYEH_BwAAHAC0AGDgfMYohgAAIAAAABwAIBgAAADAw382AQAAAIFnHBjAAAAgAkIU-PYny8M0Zbo9XURWCQr5O9lJ3MlKA25hMVIAWgA')]
         # portal_token_list = ptl[0:2]
+
+        # for ptd in [portal_token_list[0]]:
         for ptd in portal_token_list:
             access_token = ptd[1]
             portal_id = ptd[0]
@@ -98,38 +100,54 @@ class HubspotClient(Client):
             tmp = None
 
             if self.task.name == "contacts":
-                tmp = oauth_api_client.crm.contacts.get_all()
+                result = oauth_api_client.crm.contacts.get_all()
 
             if self.task.name == "companies":
-                tmp = oauth_api_client.crm.companies.get_all(
+                result = oauth_api_client.crm.companies.get_all(
                     properties=[
-                        "hs_analytics_num_page_views",
-                        "hs_additional_domains",
+                        "createdAt",
+                        "updatedAt",
+                        "domain",
                         "name",
-                        "industry",
+                        "hs_additional_domains",
+                        "hs_analytics_num_page_views",
+                        "hs_analytics_num_visits",
+                        "hs_is_target_account",
+                        "hs_object_id",
+                        "num_associated_contacts",
+                        "website",
+                        "hs_parent_company_id",
+                        "archived",
                     ]
                 )
 
             if self.task.name == "events":
                 tmp = []
                 db_params = self.get_request_params(self.task)
+                jobs = []
+                rr = []
                 if db_params:
                     for param in db_params:
 
-                        tmp = oauth_api_client.events.events_api.get_page()
+                        # tmp = oauth_api_client.events.events_api.get_page()
                         _tmp_result = oauth_api_client.events.events_api.get_page(
-                            **param[1][0], **param[1][1]
-                        ).results
+                            async_req=True, **param[1][0], **param[1][1]
+                        )
 
-                        result.append(_tmp_result)
-                        # tmp.append(_tmp_result)
+                        jobs.append(_tmp_result)
 
-                        # if tmp:
-                        #     for t in tmp:
-                        #         for i in param[0]:
-                        #             for k, v in i.items():
-                        #                 t[k] = v
-                        #         result.append(t)
+                    for j in jobs:
+                        rr.append(j.get().results)
+
+                    result.append(_tmp_result)
+                    # tmp.append(_tmp_result)
+
+                    # if tmp:
+                    #     for t in tmp:
+                    #         for i in param[0]:
+                    #             for k, v in i.items():
+                    #                 t[k] = v
+                    #         result.append(t)
                 else:
                     pass
 
