@@ -190,18 +190,6 @@
                     "id"
                 ]
             },
-            "created_at": {
-                "type": "raw",
-                "source_path": [
-                    "createdAt"
-                ]
-            },
-            "updated_at": {
-                "type": "raw",
-                "source_path": [
-                    "updatedAt"
-                ]
-            },
             "domain": {
                 "type": "raw",
                 "source_path": [

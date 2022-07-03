@@ -1,10 +1,7 @@
 {
     "name": "hubspot",
     "daily_tasks_list" : [
-        "contacts",
-        "campaigns",
-        "campaign_details",
-        "email_events"
+        "companies"
     ],
     "bck_daily_tasks_list" : [
         "contacts",

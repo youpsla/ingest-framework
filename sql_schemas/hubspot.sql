@@ -42,19 +42,17 @@ CREATE TABLE IF NOT EXISTS hubspot_development.companies
 	jab_id INT IDENTITY(1,1)
 	,jab_created_at TIMESTAMP WITHOUT TIME ZONE   ENCODE az64 default sysdate
 	,id VARCHAR(255)   ENCODE lzo
-	,created_at TIMESTAMP WITHOUT TIME ZONE   ENCODE az64
-	,updated_at TIMESTAMP WITHOUT TIME ZONE   ENCODE az64
 	,domain VARCHAR(255)   ENCODE lzo
 	,name VARCHAR(255)   ENCODE lzo
 	,hs_additional_domains VARCHAR(255)   ENCODE lzo
-	,hs_analytics_num_page_views BIGINT ENCODE lzo
-	,hs_analytics_num_visits BIGINT ENCODE lzo
+	,hs_analytics_num_page_views VARCHAR(255) ENCODE lzo
+	,hs_analytics_num_visits VARCHAR(255) ENCODE lzo
 	,hs_is_target_account VARCHAR(255)   ENCODE lzo
 	,hs_object_id VARCHAR(255)   ENCODE lzo
 	,num_associated_contacts BIGINT ENCODE lzo
 	,website VARCHAR(255)   ENCODE lzo
 	,hs_parent_company_id VARCHAR(255)   ENCODE lzo
-	,archived VARCHAR(255)   ENCODE lzo
+	,archived BOOLEAN NOT NULL
 	,portal_id VARCHAR(255)   ENCODE lzo
 	
 )
