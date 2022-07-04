@@ -1,6 +1,7 @@
 import concurrent.futures
 import json
 import time
+from gc import callbacks
 from threading import current_thread, get_ident, get_native_id
 from urllib.parse import urlencode
 
@@ -11,12 +12,22 @@ from src.commons.client import Client
 from src.utils.http_utils import get_http_adapter
 
 from hubspot import HubSpot
+from hubspot.auth.oauth.api.tokens_api import TokensApi
 from hubspot.crm.companies.models.simple_public_object_with_associations import (
     SimplePublicObjectWithAssociations as companies_public_object,
 )
 from hubspot.crm.contacts.models.simple_public_object_with_associations import (
     SimplePublicObjectWithAssociations as contacts_public_object,
 )
+from hubspot.events.models.external_unified_event import ExternalUnifiedEvent
+
+refresh_token_params = {
+    "grant_type": "refresh_token",
+    "client_id": "fa6040db-72c2-4cca-b529-34d951716062",
+    "client_secret": "f5d8dedb-7d18-4c19-a2a7-d25053d9c6cb",
+    "redirect_uri": "https://connect.jabmo.app",
+    "refresh_token": "eu1-e86f-fc6e-4e94-8ff2-43870c0d1b4f",
+}
 
 
 class HubspotClient(Client):
@@ -67,6 +78,9 @@ class HubspotClient(Client):
         else:
             return [lst]
 
+    def print_result(result):
+        print(result)
+
     def get(self, task_params, **_ignored):
 
         final_result = []
@@ -84,13 +98,17 @@ class HubspotClient(Client):
         for secret in secrets_list.get("SecretList", []):
             tmp_secret_value = Secret(secret["Name"]).get_value()
             portal_token_list.append(
-                (tmp_secret_value["portal_id"], tmp_secret_value["access_token"])
+                (
+                    tmp_secret_value["portal_id"],
+                    tmp_secret_value["access_token"],
+                    tmp_secret_value["refresh_token"],
+                )
             )
 
         # ptl = [(25912207, 'CLWs0tybMBIMggMAUAAAACAAAABIGI_HrQwghercFSj5iTgyFAncLX84DUTpinSCszbkBvScEXT4OjAAMWBB_wcAADwAtABg4HzOKIYAAGAAACA8ACAYAAAAwMN_NgEAAACBZxwY4AAAIAJCFMz1adgaAs5ngxV6JC62tGxh1YwMSgNldTFSAFoA'), ('25955882', 'CKi709ybMBIMggMAUAAAACAAAABIGKqcsAwgioLPDSj5iTgyFL8KPuPP69akxB2E6Rb-7K2WVw5TOjAAMWBB_wcAADwAtABg4HzOKIYAAGAAACA8ACAYAAAAwMN_NgEAAACBZxwY4AAAIAJCFFqrVj3APiWCbyvmw05zSi_EhpQySgNldTFSAFoA'), (1838475, 'CIab1dybMBIMggMAUAAAACAAAABIGIubcCDywqgNKPmJODIUWaoWClovooFugJn6lz4EhyJzb986MAAxYEH_BwAAHAC0AGDgfMYohgAAIAAAABwAIBgAAADAw382AQAAAIFnHBjAAAAgAkIU-PYny8M0Zbo9XURWCQr5O9lJ3MlKA25hMVIAWgA')]
         # portal_token_list = ptl[0:2]
 
-        # for ptd in [portal_token_list[0]]:
+        # for ptd in [portal_token_list[2]]:
         for ptd in portal_token_list:
             access_token = ptd[1]
             portal_id = ptd[0]
@@ -103,8 +121,8 @@ class HubspotClient(Client):
                 result = oauth_api_client.crm.contacts.get_all()
 
             if self.task.name == "companies":
-                result = oauth_api_client.crm.companies.get_all(
-                    properties=[
+                properties = (
+                    [
                         "createdAt",
                         "updatedAt",
                         "domain",
@@ -118,28 +136,144 @@ class HubspotClient(Client):
                         "website",
                         "hs_parent_company_id",
                         "archived",
-                    ]
+                    ],
                 )
+                has_to_continue = True
+                result = []
+                after = 0
+                while has_to_continue:
 
-            if self.task.name == "events":
-                tmp = []
+                    r = oauth_api_client.crm.companies.basic_api.get_page(
+                        properties=properties, limit=100, after=after
+                    )
+                    result.extend(r.results)
+                    if r.paging is None:
+                        has_to_continue = False
+                    else:
+                        print(len(result))
+                        after = r.paging.next.after
+                        continue
+
+            # if self.task.name == "email_events":
+            #     properties = (
+            #         [
+            #             "createdAt",
+            #             "updatedAt",
+            #             "domain",
+            #             "name",
+            #             "hs_additional_domains",
+            #             "hs_analytics_num_page_views",
+            #             "hs_analytics_num_visits",
+            #             "hs_is_target_account",
+            #             "hs_object_id",
+            #             "num_associated_contacts",
+            #             "website",
+            #             "hs_parent_company_id",
+            #             "archived",
+            #         ],
+            #     )
+            #     has_to_continue = True
+            #     result = []
+            #     after = 0
+            #     while has_to_continue:
+            #         r = oauth_api_client.crm.objects.emails.basic_api.get_page(
+            #             limit=100,
+            #             **param[1][0],
+            #             **param[1][1],
+            #         )
+            #         r = oauth_api_client.crm.companies.basic_api.get_page(
+            #             properties=properties, limit=100, after=after
+            #         )
+            #         result.extend(r.results)
+            #         if r.paging is None:
+            #             has_to_continue = False
+            #         else:
+            #             print(len(result))
+            #             after = r.paging.next.after
+            #             continue
+
+            # print(len(r))
+            # result = oauth_api_client.crm.companies.get_all(
+            #     properties=[
+            #         "createdAt",
+            #         "updatedAt",
+            #         "domain",
+            #         "name",
+            #         "hs_additional_domains",
+            #         "hs_analytics_num_page_views",
+            #         "hs_analytics_num_visits",
+            #         "hs_is_target_account",
+            #         "hs_object_id",
+            #         "num_associated_contacts",
+            #         "website",
+            #         "hs_parent_company_id",
+            #         "archived",
+            #     ]
+            # )
+            # print(len(result))
+
+            if self.task.name in ["events"]:
                 db_params = self.get_request_params(self.task)
-                jobs = []
-                rr = []
+                cpt = 0
                 if db_params:
                     for param in db_params:
+                        try:
+                            if self.task.name == "events":
+                                _tmp_result = (
+                                    oauth_api_client.events.events_api.get_page(
+                                        **param[1][0],
+                                        **param[1][1],
+                                        limit=10000000,
+                                    )
+                                )
+                            if self.task.name == "email_events":
+                                _tmp_result = (
+                                    oauth_api_client.crm.objects.emails.basic_api.get_page()
+                                )
+                        except:
+                            refresh_token_params["refresh_token"] = ptd[2]
+                            access_token = (
+                                TokensApi()
+                                .create_token(**refresh_token_params)
+                                .access_token
+                            )
+                            oauth_api_client = HubSpot(access_token=access_token)
+                            if self.task.name == "events":
+                                _tmp_result = (
+                                    oauth_api_client.events.events_api.get_page(
+                                        **param[1][0],
+                                        **param[1][1],
+                                        limit=10000000,
+                                    )
+                                )
+                            if self.task.name == "email_events":
+                                _tmp_result = oauth_api_client.crm.objects.emails.basic_api.get_page(
+                                    **param[1][0],
+                                    **param[1][1],
+                                    limit=10000000,
+                                )
 
-                        # tmp = oauth_api_client.events.events_api.get_page()
-                        _tmp_result = oauth_api_client.events.events_api.get_page(
-                            async_req=True, **param[1][0], **param[1][1]
-                        )
+                        # try:
+                        r = _tmp_result.results
+                        # except:
+                        #     refresh_token_params["refresh_token"] = ptd[2]
+                        #     access_token = (
+                        #         TokensApi()
+                        #         .create_token(**refresh_token_params)
+                        #         .access_token
+                        #     )
+                        #     oauth_api_client = HubSpot(access_token=access_token)
+                        #     _tmp_result = oauth_api_client.events.events_api.get_page(
+                        #         **param[1][0],
+                        #         **param[1][1],
+                        #         limit=10000000,
+                        #     )
+                        #     r = _tmp_result.results
 
-                        jobs.append(_tmp_result)
-
-                    for j in jobs:
-                        rr.append(j.get().results)
-
-                    result.append(_tmp_result)
+                        cpt += 1
+                        print(cpt)
+                        result.extend(r)
+                        print(len(result))
                     # tmp.append(_tmp_result)
 
                     # if tmp:
@@ -245,7 +379,14 @@ class HubspotClient(Client):
 
             if result:
                 for r in result:
-                    if isinstance(r, (companies_public_object, contacts_public_object)):
+                    if isinstance(
+                        r,
+                        (
+                            companies_public_object,
+                            contacts_public_object,
+                            ExternalUnifiedEvent,
+                        ),
+                    ):
                         r = r.to_dict()
                     r["portal_id"] = portal_id
                     final_result.append(r)

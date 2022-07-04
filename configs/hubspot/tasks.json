@@ -202,7 +202,7 @@
                                 [
                                     "id",
                                     "{}",
-                                    "campaignId"
+                                    "emailCampaignId"
                                 ],
                                 [
                                     "app_id",
@@ -211,7 +211,7 @@
                                 ]
                             ],
                             "db_fields": [],
-                            "raw_sql": "select id, app_id from {schema}.campaigns where portal_id = 25912207"
+                            "raw_sql": "select id, app_id from {schema}.campaigns"
                         }
                     },
                     "statics": {

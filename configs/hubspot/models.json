@@ -525,6 +525,12 @@
                     "id"
                 ]
             },
+            "recipient": {
+                "type": "raw",
+                "source_path": [
+                    "recipient"
+                ]
+            },
             "referer": {
                 "type": "raw",
                 "source_path": [
