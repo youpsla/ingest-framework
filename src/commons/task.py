@@ -228,6 +228,17 @@ class Task:
         return data_objs
 
     def insert(self, data):
+        # import pickle
+
+        # input_f = open("/Users/alain/Projects/jabmo/ingest/mypickle.pickle", "rb")
+        # source_data = pickle.load(input_f)
+        # # print(len(source_data))
+        # data = []
+        # for e in source_data:
+        #     data.append(e)
+
+        # print(len(data))
+
         sql_query = SqlQuery(
             self.db_connection,
             "insert",
