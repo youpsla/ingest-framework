@@ -27,24 +27,23 @@
         }
     },
     {
-        "companies_2": {
+        "companies": {
             "actions": [
                 "insert",
                 "update"
             ],
             "exclude_existing_in_db": true,
-            "exclude_key": "domain",
+            "exclude_key": "id",
             "source": "hubspot",
             "destination": "redshift",
             "destination_unique_keys": [
-                "domain"
+                "id"
             ],
             "request_data_source": "redshift",
-            "update_key": "domain",
+            "update_key": "id",
             "model": "companies",
             "url": {
                 "type": "service",
-                "service_name": "get_ccompanies",
                 "response_data_key": [
                     "results"
                 ]
@@ -115,7 +114,7 @@
         }
     },
     {
-        "companies": {
+        "companies_2": {
             "actions": [
                 "insert",
                 "update"
@@ -216,6 +215,46 @@
                     },
                     "statics": {
                         "limit": 1000
+                    }
+                }
+            }
+        }
+    },
+    {
+        "company_contact_associations": {
+            "actions": [
+                "insert"
+            ],
+            "source": "hubspot",
+            "destination": "redshift",
+            "request_data_source": "redshift",
+            "model": "company_contact_associations",
+            "url": {
+                "base": "https://api.hubapi.com/crm-associations/v1/associations/",
+                "response_datas_key": "results",
+                "params": {
+                    "db": {
+                        "_": {
+                            "type": "db",
+                            "args_fields": [
+                                "id"
+                            ],
+                            "kwargs_fields": [],
+                            "db_fields": [
+                                {
+                                    "origin_key": "id",
+                                    "destination_key": "company_id"
+                                }
+                            ],
+                            "filter_model": "companies",
+                            "all_fields": [
+                                "id"
+                            ],
+                            "raw_sql": "select distinct(id) from {schema}.companies"
+                        }
+                    },
+                    "statics": {
+                        "limit":100
                     }
                 }
             }

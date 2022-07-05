@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS hubspot_development.contacts
 	,id VARCHAR(255)   ENCODE lzo
 	,email VARCHAR(255)   ENCODE lzo
 	,firstname VARCHAR(255)   ENCODE lzo
-	,last_name VARCHAR(255)   ENCODE lzo
+	,lastname VARCHAR(255)   ENCODE lzo
 	,job_title VARCHAR(255)   ENCODE lzo
 	,company VARCHAR(255)   ENCODE lzo
 	,industry VARCHAR(255)   ENCODE lzo
@@ -153,3 +153,16 @@ CREATE TABLE IF NOT EXISTS hubspot_development.accounts
 )
 DISTSTYLE AUTO
 ;
+
+--DROP TABLE hubspot_development.company_contact_associations;
+CREATE TABLE IF NOT EXISTS hubspot_development.company_contact_associations
+(
+	jab_id INT IDENTITY(1,1)
+	,jab_created_at TIMESTAMP WITHOUT TIME ZONE   ENCODE az64 default sysdate
+	,company_id VARCHAR(255)   ENCODE lzo
+	,contact_id VARCHAR(255)   ENCODE lzo
+	,portal_id VARCHAR(255)   ENCODE lzo
+)
+DISTSTYLE AUTO
+;
+

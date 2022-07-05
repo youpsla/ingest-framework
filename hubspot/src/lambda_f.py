@@ -85,7 +85,6 @@ def main():
         if monthly_tasks_list:
             for task_name in monthly_tasks_list:
                 result, _ = run_task(channel_params["name"], task_name, db_connection)
-
     with db_connection.cursor() as cursor:
         cursor.execute("COMMIT;")
     logger.info("All tasks have runned successfully. Daily Worflow ended with success.")

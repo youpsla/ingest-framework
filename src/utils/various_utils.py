@@ -43,5 +43,70 @@ def get_running_env():
 
 def get_schema_name(channel):
     schema_name = channel + "_" + get_running_env()
-    return schema_name
-    # return "new_linkedin"
+    # return schema_name
+    return "hubspot_development"
+
+
+def get_chunks(source_list, chunk_size=500):
+    """
+    Split a list in n list of chunk_size elements
+
+    Args:
+        source_list: The list to be split. Default to 500.
+        chunk_size: Max size of each chunk
+
+    Returns:
+        A list of list(s).
+
+    """
+    if len(source_list) > chunk_size:
+        chunks_lists = [
+            source_list[offs : offs + chunk_size]
+            for offs in range(0, len(source_list), chunk_size)
+        ]
+        return chunks_lists
+    else:
+        return [source_list]
+
+
+from concurrent import futures
+
+
+def run_in_threads_pool(request_params_list=None, source_function=None, nb_workers=40):
+    """
+    Runs a function in a thread pool.
+
+    Args:
+        request_params_list: List of list of args passed to source_function
+        source_function: The function to run in each thread of the pool
+
+    Returns:
+        A list of results. Result is the result property of the Future.
+
+    """
+    threads_list = []
+    with futures.ThreadPoolExecutor(nb_workers=40) as executor:
+        for endpoint in request_params_list:
+            threads_list.append(
+                (
+                    executor.submit(source_function, endpoint[0], headers),
+                    endpoint[1],
+                )
+            )
+
+            for task in threads_list:
+                tmp_task_result = task[0].result()
+                if tmp_task_result is not None:
+                    if response_key:
+                        response_elements = tmp_task_result[response_key]
+                    else:
+                        response_elements = [tmp_task_result]
+
+                    local_result = []
+                    if task[1]:
+                        for r in response_elements:
+                            for f in task[1]:
+                                for k, v in f.items():
+                                    local_result.append({k: v, "contact_id": r})
+                    if len(local_result) > 0:
+                        futures_results.append(local_result)
