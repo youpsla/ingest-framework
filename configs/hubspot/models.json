@@ -275,32 +275,23 @@
         }
     },
     {
-        "associations": {
-            "_from": {
+        "company_contact_associations": {
+            "company_id": {
                 "type": "raw",
                 "source_path": [
-                    "id"
+                    "company_id"
                 ]
             },
-            "to": {
+            "contact_id": {
                 "type": "raw",
                 "source_path": [
-                    "properties",
-                    "createdate"
+                    "contact_id"
                 ]
             },
-            "domain": {
+            "portal_id": {
                 "type": "raw",
                 "source_path": [
-                    "properties",
-                    "domain"
-                ]
-            },
-            "name": {
-                "type": "raw",
-                "source_path": [
-                    "properties",
-                    "name"
+                    "portal_id"
                 ]
             }
         }

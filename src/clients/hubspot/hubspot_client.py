@@ -10,9 +10,11 @@ from requests.structures import CaseInsensitiveDict
 from src.clients.aws.aws_tools import Secret, search_secrets_by_prefix
 from src.commons.client import Client
 from src.utils.http_utils import get_http_adapter
+from src.utils.various_utils import get_chunks
 
 from hubspot import HubSpot
 from hubspot.auth.oauth.api.tokens_api import TokensApi
+from hubspot.crm.associations import BatchInputPublicObjectId, PublicObjectId
 from hubspot.crm.companies.models.simple_public_object_with_associations import (
     SimplePublicObjectWithAssociations as companies_public_object,
 )
@@ -26,7 +28,7 @@ refresh_token_params = {
     "client_id": "fa6040db-72c2-4cca-b529-34d951716062",
     "client_secret": "f5d8dedb-7d18-4c19-a2a7-d25053d9c6cb",
     "redirect_uri": "https://connect.jabmo.app",
-    "refresh_token": "eu1-e86f-fc6e-4e94-8ff2-43870c0d1b4f",
+    "refresh_token": "9c2cb2f5-b460-4bea-b1a1-b1df862bc3c1",
 }
 
 
@@ -68,16 +70,6 @@ class HubspotClient(Client):
             ]
         return endpoints_list
 
-    def get_chunks(self, lst):
-        chunk_size = 500
-        if len(lst) > chunk_size:
-            results_lists = [
-                lst[offs : offs + chunk_size] for offs in range(0, len(lst), chunk_size)
-            ]
-            return results_lists
-        else:
-            return [lst]
-
     def print_result(result):
         print(result)
 
@@ -108,8 +100,8 @@ class HubspotClient(Client):
         # ptl = [(25912207, 'CLWs0tybMBIMggMAUAAAACAAAABIGI_HrQwghercFSj5iTgyFAncLX84DUTpinSCszbkBvScEXT4OjAAMWBB_wcAADwAtABg4HzOKIYAAGAAACA8ACAYAAAAwMN_NgEAAACBZxwY4AAAIAJCFMz1adgaAs5ngxV6JC62tGxh1YwMSgNldTFSAFoA'), ('25955882', 'CKi709ybMBIMggMAUAAAACAAAABIGKqcsAwgioLPDSj5iTgyFL8KPuPP69akxB2E6Rb-7K2WVw5TOjAAMWBB_wcAADwAtABg4HzOKIYAAGAAACA8ACAYAAAAwMN_NgEAAACBZxwY4AAAIAJCFFqrVj3APiWCbyvmw05zSi_EhpQySgNldTFSAFoA'), (1838475, 'CIab1dybMBIMggMAUAAAACAAAABIGIubcCDywqgNKPmJODIUWaoWClovooFugJn6lz4EhyJzb986MAAxYEH_BwAAHAC0AGDgfMYohgAAIAAAABwAIBgAAADAw382AQAAAIFnHBjAAAAgAkIU-PYny8M0Zbo9XURWCQr5O9lJ3MlKA25hMVIAWgA')]
         # portal_token_list = ptl[0:2]
 
-        # for ptd in [portal_token_list[2]]:
-        for ptd in portal_token_list:
+        for ptd in [portal_token_list[2]]:
+            # for ptd in portal_token_list:
             access_token = ptd[1]
             portal_id = ptd[0]
             oauth_api_client = HubSpot(access_token=access_token)
@@ -117,27 +109,96 @@ class HubspotClient(Client):
 
             tmp = None
 
-            if self.task.name == "contacts":
-                result = oauth_api_client.crm.contacts.get_all()
-
-            if self.task.name == "companies":
+            if self.task.name == "ccccccccontacts":
                 properties = (
                     [
+                        "email",
+                        "firstname",
+                        "lastname",
+                        "job_title",
+                        "company",
+                        "industry",
+                        "hs_analytics_average_page_views",
+                        "contact_owner",
+                        "address",
+                        "zip",
+                        "city",
+                        "region",
+                        "country",
+                        "hs_email_domain",
+                        "hs_analytics_num_event_completions",
+                        "ip_city",
+                        "ip_country",
+                        "ip_country_code",
+                        "ip_state",
+                        "ip_state_code",
                         "createdAt",
-                        "updatedAt",
-                        "domain",
-                        "name",
-                        "hs_additional_domains",
-                        "hs_analytics_num_page_views",
-                        "hs_analytics_num_visits",
-                        "hs_is_target_account",
-                        "hs_object_id",
-                        "num_associated_contacts",
-                        "website",
-                        "hs_parent_company_id",
-                        "archived",
+                        "updated_at",
+                        "portal_id",
                     ],
                 )
+                result = oauth_api_client.crm.contacts.get_all(properties=properties)
+
+            if self.task.name == "contacts":
+                properties = [
+                    "email",
+                    "firstname",
+                    "lastname",
+                    "job_title",
+                    "company",
+                    "industry",
+                    "hs_analytics_average_page_views",
+                    "contact_owner",
+                    "address",
+                    "zip",
+                    "city",
+                    "region",
+                    "country",
+                    "hs_email_domain",
+                    "hs_analytics_num_event_completions",
+                    "ip_city",
+                    "ip_country",
+                    "ip_country_code",
+                    "ip_state",
+                    "ip_state_code",
+                    "createdAt",
+                    "updated_at",
+                    "portal_id",
+                ]
+
+                has_to_continue = True
+                result = []
+                after = 0
+                while has_to_continue:
+
+                    r = oauth_api_client.crm.contacts.basic_api.get_page(
+                        properties=properties, limit=100, after=after
+                    )
+                    result.extend(r.results)
+                    if r.paging is None:
+                        has_to_continue = False
+                    else:
+                        print(len(result))
+                        after = r.paging.next.after
+                        continue
+                print(f"#contacts for portal_id {portal_id}: {len(result)}")
+
+            if self.task.name == "companies":
+                properties = [
+                    "createdAt",
+                    "updatedAt",
+                    "domain",
+                    "name",
+                    "hs_additional_domains",
+                    "hs_analytics_num_page_views",
+                    "hs_analytics_num_visits",
+                    "hs_is_target_account",
+                    "hs_object_id",
+                    "num_associated_contacts",
+                    "website",
+                    "hs_parent_company_id",
+                    "archived",
+                ]
                 has_to_continue = True
                 result = []
                 after = 0
@@ -253,38 +314,14 @@ class HubspotClient(Client):
                                     limit=10000000,
                                 )
 
-                        # try:
                         r = _tmp_result.results
-                        # except:
-                        #     refresh_token_params["refresh_token"] = ptd[2]
-                        #     access_token = (
-                        #         TokensApi()
-                        #         .create_token(**refresh_token_params)
-                        #         .access_token
-                        #     )
-                        #     oauth_api_client = HubSpot(access_token=access_token)
-                        #     _tmp_result = oauth_api_client.events.events_api.get_page(
-                        #         **param[1][0],
-                        #         **param[1][1],
-                        #         limit=10000000,
-                        #     )
-                        #     r = _tmp_result.results
 
                         cpt += 1
                         print(cpt)
                         result.extend(r)
                         print(len(result))
-                    # tmp.append(_tmp_result)
-
-                    # if tmp:
-                    #     for t in tmp:
-                    #         for i in param[0]:
-                    #             for k, v in i.items():
-                    #                 t[k] = v
-                    #         result.append(t)
                 else:
                     pass
-
             # if tmp:
             #     for t in tmp:
             #         if isinstance(t, (companies_public_object, contacts_public_object)):
@@ -294,7 +331,139 @@ class HubspotClient(Client):
             # else:
             #     pass
 
-            if self.task.name in ["campaign_details", "campaigns", "email_events"]:
+            # if self.task.name == "company_contact_associations":
+
+            #     db_params = self.get_request_params(self.task)
+            #     total_requests_number = len(db_params)
+            #     # dede = oauth_api_client.crm.associations.types_api.get_all(from_object_type="deals", to_object_type="companies")
+            #     big_result = []
+            #     for params in db_params:
+            #         batch_input_public_object_id = BatchInputPublicObjectId(
+            #             inputs=[PublicObjectId(id=params[0][0]["company_id"])]
+            #         )
+            #         has_to_continue = True
+            #         result = []
+            #         offset = 0
+            #         while has_to_continue:
+
+            #             r = oauth_api_client.crm.associations.batch_api.read(
+            #                 from_object_type="COMPANIES",
+            #                 to_object_type="CONTACTS",
+            #                 batch_input_public_object_id=batch_input_public_object_id,
+            #             )
+            #             result.extend(r.results)
+            #             # if r.hasMore is False:
+            #             #     has_to_continue = False
+            #             # else:
+            #             #     print(len(result))
+            #             #     offset = r.offset
+            #             #     continue
+
+            if self.task.name in ["company_contact_associations"]:
+
+                # endpoints_list = self.get_endpoints_list()
+                url_params = task_params["url"]
+                params = url_params.get("params", None)
+
+                if params:
+                    db_params = self.get_request_params(self.task)
+                    total_requests_number = len(db_params)
+                    dynamics_params = self.get_dynamics_params(params)
+                    statics_params = self.get_statics_params(params)
+                    kwargs = dynamics_params + statics_params
+                    kwargs = []
+                    endpoint_list = [
+                        (
+                            self.build_endpoint(
+                                base=url_params["base"],
+                                kwargs=zd[1] + kwargs,
+                                args=zd[2],
+                            ),
+                            zd[0],
+                        )
+                        for zd in db_params
+                    ]
+                else:
+                    total_requests_number = 1
+                    endpoint_list = [
+                        (
+                            self.build_endpoint(
+                                base=url_params["base"],
+                            ),
+                            [],
+                        )
+                    ]
+                print(f"Number of requests to run: {total_requests_number}")
+
+                ### Method 1. not sure to rpeserver order for adding avalues later
+                # with concurrent.futures.ThreadPoolExecutor(max_workers=40) as executor:
+                #     futures = [
+                #         executor.submit(self.do_get_query, endpoint, headers)
+                #         for endpoint in endpoint_list
+                #     ]
+                # futures_result = [f.result() for f in futures]
+
+                futures_results = []
+                response_key = url_params.get("response_datas_key", None)
+                endpoint_list_list = get_chunks(endpoint_list)
+                # endpoint_list_list = [
+                #     [
+                #         (
+                #             "https://api.hubapi.com/crm-associations/v1/associations/817666151/HUBSPOT_DEFINED/2",
+                #             [{"company_id": "817666151"}],
+                #         )
+                #     ]
+                # ]
+
+                for lst in endpoint_list_list:
+                    access_token = (
+                        TokensApi().create_token(**refresh_token_params).access_token
+                    )
+                    headers = self.build_headers(header=None, access_token=access_token)
+                    threads = []
+                    print(f"Chunck with {len(lst)} queries")
+                    with concurrent.futures.ThreadPoolExecutor(
+                        max_workers=40
+                    ) as executor:
+                        for endpoint in lst:
+                            threads.append(
+                                (
+                                    executor.submit(
+                                        self.do_get_query, endpoint[0], headers
+                                    ),
+                                    endpoint[1],
+                                )
+                            )
+
+                        for task in threads:
+                            tmp_task_result = task[0].result()
+                            if tmp_task_result is not None:
+                                if response_key:
+                                    response_elements = tmp_task_result[response_key]
+                                else:
+                                    response_elements = [tmp_task_result]
+
+                                local_result = []
+                                if task[1]:
+                                    for r in response_elements:
+                                        for f in task[1]:
+                                            for k, v in f.items():
+                                                local_result.append(
+                                                    {k: v, "contact_id": r}
+                                                )
+                                if len(local_result) > 0:
+                                    futures_results.append(local_result)
+
+                for r in futures_results:
+                    if r:
+                        result.extend(r)
+
+            if self.task.name in [
+                "campaign_details",
+                "campaigns",
+                "email_events",
+                # "company_contact_associations",
+            ]:
 
                 headers = self.build_headers(header=None, access_token=access_token)
                 # endpoints_list = self.get_endpoints_list()
@@ -341,7 +510,7 @@ class HubspotClient(Client):
 
                 futures_results = []
                 response_key = url_params.get("response_datas_key", None)
-                endpoint_list_list = self.get_chunks(endpoint_list)
+                endpoint_list_list = get_chunks(endpoint_list)
                 for lst in endpoint_list_list:
                     threads = []
                     print(f"Chunck with {len(lst)} queries")
@@ -436,11 +605,13 @@ class HubspotClient(Client):
         Returns:
             A str representing an url
         """
+
         if kwargs:
             kwargs_tuple = [(k, v) for f in kwargs for k, v in f.items()]
         endpoint = (
             f"{base}"
             f"{str(args[0]) if args else ''}"
+            f"/HUBSPOT_DEFINED/2"
             f"{'?' if kwargs else ''}"
             f"{'&' + urlencode(kwargs_tuple) if kwargs else ''}"
         )
@@ -478,11 +649,11 @@ class HubspotClient(Client):
             print("Too many retries. 429.")
             print(e)
 
-            print("429 limit reached. Wait 5 minutes.")
+            print("429 limit reached. Wait 100 seconds.")
             time.sleep(300)
             c_thread = current_thread()
             print(
-                f"{cpt} attemp(s) failed. Restarting thread after 300 seconds of pause: name={c_thread.name}, idnet={get_ident()}, id={get_native_id()}"
+                f"{cpt} attemp(s) failed. Restarting thread after 100 seconds of pause: name={c_thread.name}, idnet={get_ident()}, id={get_native_id()}"
             )
             response = self.do_get_query(endpoint=endpoint, headers=headers)
             if cpt == 5:
@@ -501,6 +672,9 @@ class HubspotClient(Client):
                 and "Unknown email campaign id" in json.loads(response.text)["message"]
             ):
                 return None
+            elif response.status_code == 401:
+                pass
+
             else:
                 print(f"Endpoint: {endpoint}")
                 print(f"{response.reason} - {response.text}")
