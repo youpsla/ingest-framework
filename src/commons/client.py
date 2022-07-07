@@ -1,5 +1,6 @@
 import calendar
 import copy
+import uuid
 from datetime import date, datetime, timedelta
 from itertools import zip_longest
 
@@ -345,25 +346,23 @@ class Client:
             zip_data = list(zip_longest(sql_list, kwargs_list, args_list, fillvalue=[]))
 
             date_range = params.get("date_range", None)
-
-            if date_range:
+            if not date_range:
+                result = zip_data
+            else:
                 result = []
                 for idx, zd in enumerate(zip_data):
                     date_range_list = self.get_date_ranges_list(params["date_range"])
-                    # Check if date_range parameters are consistent.
-                    # if len(date_range_list) == 0:
-                    #     idx_to_del.append(idx)
-                    #     continue
                     for dr in date_range_list:
                         tmp = copy.deepcopy(zd)
                         for d in dr:
                             tmp[1].extend(d)
                         result.append(tmp)
 
-                # for ele in sorted(idx_to_del, reverse=True):
-                #     del result[ele]
+                # return result
 
-                return result
-
-            return zip_data
+            # Add uuid to each record
+            final_result = {}
+            for r in result:
+                final_result[uuid.uuid4()] = r
+            return final_result
         return None

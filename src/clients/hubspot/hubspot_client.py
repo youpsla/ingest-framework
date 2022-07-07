@@ -376,12 +376,12 @@ class HubspotClient(Client):
                         (
                             self.build_endpoint(
                                 base=url_params["base"],
-                                kwargs=zd[1] + kwargs,
-                                args=zd[2],
+                                kwargs=v[1] + kwargs,
+                                args=v[2],
                             ),
-                            zd[0],
+                            k,
                         )
-                        for zd in db_params
+                        for k, v in db_params.items()
                     ]
                 else:
                     total_requests_number = 1
@@ -394,14 +394,6 @@ class HubspotClient(Client):
                         )
                     ]
                 print(f"Number of requests to run: {total_requests_number}")
-
-                ### Method 1. not sure to rpeserver order for adding avalues later
-                # with concurrent.futures.ThreadPoolExecutor(max_workers=40) as executor:
-                #     futures = [
-                #         executor.submit(self.do_get_query, endpoint, headers)
-                #         for endpoint in endpoint_list
-                #     ]
-                # futures_result = [f.result() for f in futures]
 
                 futures_results = []
                 response_key = url_params.get("response_datas_key", None)
@@ -420,39 +412,39 @@ class HubspotClient(Client):
                         TokensApi().create_token(**refresh_token_params).access_token
                     )
                     headers = self.build_headers(header=None, access_token=access_token)
-                    threads = []
+
                     print(f"Chunck with {len(lst)} queries")
-                    with concurrent.futures.ThreadPoolExecutor(
-                        max_workers=40
-                    ) as executor:
-                        for endpoint in lst:
-                            threads.append(
-                                (
-                                    executor.submit(
-                                        self.do_get_query, endpoint[0], headers
-                                    ),
-                                    endpoint[1],
-                                )
-                            )
 
-                        for task in threads:
-                            tmp_task_result = task[0].result()
-                            if tmp_task_result is not None:
-                                if response_key:
-                                    response_elements = tmp_task_result[response_key]
-                                else:
-                                    response_elements = [tmp_task_result]
+                    from src.utils.various_utils import run_in_threads_pool
 
-                                local_result = []
-                                if task[1]:
-                                    for r in response_elements:
-                                        for f in task[1]:
-                                            for k, v in f.items():
-                                                local_result.append(
-                                                    {k: v, "contact_id": r}
-                                                )
-                                if len(local_result) > 0:
-                                    futures_results.append(local_result)
+                    chunks_result_list = run_in_threads_pool(
+                        request_params_list=lst,
+                        source_function=self.do_get_query,
+                        headers=headers,
+                    )
+
+                    def add_source_params_to_result(db_params=None, chunk=None):
+                        result = {}
+                        for chunk_result in chunks_result_list:
+                            for k, v in chunk_result.items():
+                                result[k] = v + db_params[k]
+                            return result
+
+                    # Adding source params to the result
+                    for chunk in chunks_result_list:
+                        dudu = add_source_params_to_result(
+                            db_params=db_params, chunk=chunk
+                        )
+                        print(dudu)
+
+                    local_result = []
+                    if task[1]:
+                        for r in response_elements:
+                            for f in task[1]:
+                                for k, v in f.items():
+                                    local_result.append({k: v, "contact_id": r})
+                    if len(local_result) > 0:
+                        futures_results.append(local_result)
 
                 for r in futures_results:
                     if r:

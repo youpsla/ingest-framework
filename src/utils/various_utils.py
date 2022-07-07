@@ -72,41 +72,35 @@ def get_chunks(source_list, chunk_size=500):
 from concurrent import futures
 
 
-def run_in_threads_pool(request_params_list=None, source_function=None, nb_workers=40):
+def run_in_threads_pool(
+    request_params_list=None, source_function=None, max_workers=40, headers=None
+):
     """
     Runs a function in a thread pool.
 
     Args:
         request_params_list: List of list of args passed to source_function
         source_function: The function to run in each thread of the pool
+        nb_workers: Number of threads int he pool. Default to 40.
+        headers: In
 
     Returns:
         A list of results. Result is the result property of the Future.
 
     """
     threads_list = []
-    with futures.ThreadPoolExecutor(nb_workers=40) as executor:
-        for endpoint in request_params_list:
+    result = []
+    with futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
+        for request_params in request_params_list:
             threads_list.append(
                 (
-                    executor.submit(source_function, endpoint[0], headers),
-                    endpoint[1],
+                    executor.submit(source_function, request_params[0], headers),
+                    request_params[1],
                 )
             )
 
             for task in threads_list:
-                tmp_task_result = task[0].result()
-                if tmp_task_result is not None:
-                    if response_key:
-                        response_elements = tmp_task_result[response_key]
-                    else:
-                        response_elements = [tmp_task_result]
-
-                    local_result = []
-                    if task[1]:
-                        for r in response_elements:
-                            for f in task[1]:
-                                for k, v in f.items():
-                                    local_result.append({k: v, "contact_id": r})
-                    if len(local_result) > 0:
-                        futures_results.append(local_result)
+                task_result = task[0].result()
+                if task_result is not None:
+                    result.append({task[1]: task_result})
+    return result
