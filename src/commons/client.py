@@ -1,13 +1,14 @@
 import calendar
-import copy
 import uuid
+from collections import ChainMap
 from datetime import date, datetime, timedelta
-from itertools import zip_longest
+from typing import OrderedDict
 
 import dateutil
 from dateutil.relativedelta import relativedelta
 from src.commons.model import Model
 from src.constants import ENVS_LIST
+from src.utils.various_utils import zip_longest_repeat_value
 
 
 class Client:
@@ -25,10 +26,6 @@ class Client:
             )
         else:
             return True
-
-    def get_months_list(self, start_month_params, end_month_params):
-        start_month = self.get_first_month_of_range(start_month_params)
-        end_month = ""
 
     def get_month_from_offset(self, date):
         pass
@@ -122,42 +119,43 @@ class Client:
 
         return result
 
-    def get_request_parameters_lists(
-        self, params=None, db_connection=None, static_params=None
-    ):
-        if not params:
-            return [], [], []
+    def get_request_parameters_lists(self):
+        result = [], [], []
+        query = self.task.params.get("query", None)
+        if not query:
+            return result
 
-        for v in params.values():
-            if "rawsql" in v["type"]:
-                tmp = Model.get_from_raw_sql(db_connection, v["raw_sql"])
-            else:
-                model = Model(
-                    v["filter_model"],
-                    db_connection=db_connection,
-                    channel=self.task.channel,
-                )
-                if self.task.params.get("retrieve_history", False):
-                    tmp = model.get_all(
-                        fields=v["all_fields"], filter_field=v["filter_field"]
+        query_params = query.get("params", None)
+
+        result_lists = []
+        if query_params:
+            for param in query_params:
+                tmp_result = []
+                if param["type"] == "constant":
+                    tmp_result = [{param["name"]: param["value"]}]
+                if param["type"] == "db":
+                    tmp_result = Model.get_from_raw_sql(
+                        self.task.db_connection,
+                        self.task.params["data_source"]["raw_sql"],
                     )
-                else:
-                    tmp = model.get_all(fields=v["all_fields"])
+                    tmp_result = [dict(r) for r in tmp_result]
+                    tmp_result = [
+                        {param["name"]: tr[param["source_key"]]} for tr in tmp_result
+                    ]
+                    # for tr in tmp_result:
+                    #     final_result.append({param["name"]: tr[param["source_key"]]})
 
-            kwargs_list, args_list, sql_list = [], [], []
+                result_lists.append(tmp_result)
 
-            if v.get("kwargs_fields", None):
-                kwargs_list = self.get_kwargs_list(
-                    v["kwargs_fields"], tmp, static_params
-                )
+        tmp_result = zip_longest_repeat_value(*result_lists)
+        tmp_result = [list(a) for a in tmp_result]
 
-            if v.get("args_fields", None):
-                args_list = self.get_args_list(v["args_fields"], tmp)
+        final_result = []
 
-            if v.get("db_fields", None):
-                sql_list = self.get_sql_list(v["db_fields"], tmp)
+        for tmp in tmp_result:
+            final_result.append(dict(ChainMap(*tmp)))
 
-        return kwargs_list, args_list, sql_list
+        return final_result
 
     def get_date_params(self, url_params, value):
         result = []
@@ -328,41 +326,32 @@ class Client:
             result = [{k: v} for k, v in params.get("statics", {}).items()]
         return result
 
-    def get_request_params(self, task):
-        params = task.params
-        params = params.get("url", None)
-        params = params.get("params", None)
-        if params:
-            kwargs_list, args_list, sql_list = (
-                self.get_request_parameters_lists(
-                    params=params.get("db", None),
-                    db_connection=self.task.db_connection,
-                    static_params=params.get("statics", None),
-                )
-                if params
-                else ([], [], [])
-            )
+    def get_request_params(self):
+        query_params = self.task.params.get("query", None)
+        if not query_params:
+            return []
 
-            zip_data = list(zip_longest(sql_list, kwargs_list, args_list, fillvalue=[]))
+        zip_data = (
+            self.get_request_parameters_lists() if self.task.params else ([], [], [])
+        )
 
-            date_range = params.get("date_range", None)
-            if not date_range:
-                result = zip_data
-            else:
-                result = []
-                for idx, zd in enumerate(zip_data):
-                    date_range_list = self.get_date_ranges_list(params["date_range"])
-                    for dr in date_range_list:
-                        tmp = copy.deepcopy(zd)
-                        for d in dr:
-                            tmp[1].extend(d)
-                        result.append(tmp)
+        # date_range = params.get("date_range", None)
+        # if not date_range:
+        #     result = zip_data
+        # else:
+        #     result = []
+        #     for idx, zd in enumerate(zip_data):
+        #         date_range_list = self.get_date_ranges_list(params["date_range"])
+        #         for dr in date_range_list:
+        #             tmp = copy.deepcopy(zd)
+        #             for d in dr:
+        #                 tmp[1].extend(d)
+        #             result.append(tmp)
 
-                # return result
+        # return result
 
-            # Add uuid to each record
-            final_result = {}
-            for r in result:
-                final_result[uuid.uuid4()] = r
-            return final_result
-        return None
+        # Add uuid to each record
+        final_result = {}
+        for z in zip_data:
+            final_result[uuid.uuid4()] = z
+        return final_result

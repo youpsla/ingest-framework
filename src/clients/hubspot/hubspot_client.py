@@ -1,7 +1,7 @@
 import concurrent.futures
 import json
 import time
-from gc import callbacks
+from collections import ChainMap
 from threading import current_thread, get_ident, get_native_id
 from urllib.parse import urlencode
 
@@ -9,12 +9,12 @@ from requests.exceptions import ConnectionError, ConnectTimeout, RetryError
 from requests.structures import CaseInsensitiveDict
 from src.clients.aws.aws_tools import Secret, search_secrets_by_prefix
 from src.commons.client import Client
+from src.utils.endpoint_utils import Endpoint
 from src.utils.http_utils import get_http_adapter
-from src.utils.various_utils import get_chunks
+from src.utils.various_utils import get_chunks, run_in_threads_pool
 
 from hubspot import HubSpot
 from hubspot.auth.oauth.api.tokens_api import TokensApi
-from hubspot.crm.associations import BatchInputPublicObjectId, PublicObjectId
 from hubspot.crm.companies.models.simple_public_object_with_associations import (
     SimplePublicObjectWithAssociations as companies_public_object,
 )
@@ -184,6 +184,12 @@ class HubspotClient(Client):
                 print(f"#contacts for portal_id {portal_id}: {len(result)}")
 
             if self.task.name == "companies":
+
+                access_token = (
+                    TokensApi().create_token(**refresh_token_params).access_token
+                )
+                oauth_api_client = HubSpot(access_token=access_token)
+
                 properties = [
                     "createdAt",
                     "updatedAt",
@@ -322,138 +328,100 @@ class HubspotClient(Client):
                         print(len(result))
                 else:
                     pass
-            # if tmp:
-            #     for t in tmp:
-            #         if isinstance(t, (companies_public_object, contacts_public_object)):
-            #             t = t.to_dict()
-            #         t["portal_id"] = portal_id
-            #         result.append(t)
-            # else:
-            #     pass
 
-            # if self.task.name == "company_contact_associations":
+            if self.task.name in [
+                "company_contact_associations",
+                "email_events",
+                "campaigns",
+            ]:
 
-            #     db_params = self.get_request_params(self.task)
-            #     total_requests_number = len(db_params)
-            #     # dede = oauth_api_client.crm.associations.types_api.get_all(from_object_type="deals", to_object_type="companies")
-            #     big_result = []
-            #     for params in db_params:
-            #         batch_input_public_object_id = BatchInputPublicObjectId(
-            #             inputs=[PublicObjectId(id=params[0][0]["company_id"])]
-            #         )
-            #         has_to_continue = True
-            #         result = []
-            #         offset = 0
-            #         while has_to_continue:
-
-            #             r = oauth_api_client.crm.associations.batch_api.read(
-            #                 from_object_type="COMPANIES",
-            #                 to_object_type="CONTACTS",
-            #                 batch_input_public_object_id=batch_input_public_object_id,
-            #             )
-            #             result.extend(r.results)
-            #             # if r.hasMore is False:
-            #             #     has_to_continue = False
-            #             # else:
-            #             #     print(len(result))
-            #             #     offset = r.offset
-            #             #     continue
-
-            if self.task.name in ["company_contact_associations"]:
-
-                # endpoints_list = self.get_endpoints_list()
-                url_params = task_params["url"]
-                params = url_params.get("params", None)
-
-                if params:
-                    db_params = self.get_request_params(self.task)
-                    total_requests_number = len(db_params)
-                    dynamics_params = self.get_dynamics_params(params)
-                    statics_params = self.get_statics_params(params)
-                    kwargs = dynamics_params + statics_params
-                    kwargs = []
-                    endpoint_list = [
-                        (
-                            self.build_endpoint(
-                                base=url_params["base"],
-                                kwargs=v[1] + kwargs,
-                                args=v[2],
-                            ),
-                            k,
-                        )
-                        for k, v in db_params.items()
-                    ]
-                else:
-                    total_requests_number = 1
-                    endpoint_list = [
-                        (
-                            self.build_endpoint(
-                                base=url_params["base"],
-                            ),
-                            [],
-                        )
-                    ]
+                db_params = self.get_request_params()
+                total_requests_number = len(db_params)
+                endpoint_list = [
+                    (
+                        Endpoint(
+                            params=v,
+                            url_template=task_params["query"]["template"],
+                            query_params=task_params["query"]["params"],
+                        ),
+                        k,
+                    )
+                    for k, v in db_params.items()
+                ]
                 print(f"Number of requests to run: {total_requests_number}")
 
-                futures_results = []
-                response_key = url_params.get("response_datas_key", None)
-                endpoint_list_list = get_chunks(endpoint_list)
+                ## Testing data. Only for trendminer account. ##
                 # endpoint_list_list = [
                 #     [
                 #         (
                 #             "https://api.hubapi.com/crm-associations/v1/associations/817666151/HUBSPOT_DEFINED/2",
-                #             [{"company_id": "817666151"}],
+                #             "47392129-3563-4be7-a0ac-ff31d25d26cc",
                 #         )
                 #     ]
                 # ]
+                # db_params = {
+                #     "47392129-3563-4be7-a0ac-ff31d25d26cc": (
+                #         [{"company_id": "817666151"}],
+                #         [],
+                #         ["817666151"],
+                #     )
+                # }
 
-                for lst in endpoint_list_list:
+                futures_results = []
+
+                endpoint_list_list = get_chunks(endpoint_list)
+                # for lst in endpoint_list_list:
+                for lst in [endpoint_list_list[0]]:
+                    # for lst in endpoint_list_list[0]:
                     access_token = (
                         TokensApi().create_token(**refresh_token_params).access_token
                     )
                     headers = self.build_headers(header=None, access_token=access_token)
 
-                    print(f"Chunck with {len(lst)} queries")
+                    for l in lst:
+                        l[0].access_token = access_token
 
-                    from src.utils.various_utils import run_in_threads_pool
+                    print(f"Chunck with {len(lst)} queries")
 
                     chunks_result_list = run_in_threads_pool(
                         request_params_list=lst,
                         source_function=self.do_get_query,
                         headers=headers,
+                        result_key=task_params["query"]["response_datas_key"],
                     )
+                    futures_results.extend(chunks_result_list)
 
-                    def add_source_params_to_result(db_params=None, chunk=None):
-                        result = {}
-                        for chunk_result in chunks_result_list:
-                            for k, v in chunk_result.items():
-                                result[k] = v + db_params[k]
-                            return result
+                # Remove empty results
+                # no_empty_futures_results = [
+                #     i for i in futures_results if list(i.values())[0]["results"]
+                # ]
 
-                    # Adding source params to the result
-                    for chunk in chunks_result_list:
-                        dudu = add_source_params_to_result(
-                            db_params=db_params, chunk=chunk
-                        )
-                        print(dudu)
-
+                # Construct results
+                # Here the "contact_id" field name is hardcoded. Should be in task.json
+                for fr in futures_results:
                     local_result = []
-                    if task[1]:
-                        for r in response_elements:
-                            for f in task[1]:
-                                for k, v in f.items():
-                                    local_result.append({k: v, "contact_id": r})
-                    if len(local_result) > 0:
-                        futures_results.append(local_result)
-
-                for r in futures_results:
-                    if r:
-                        result.extend(r)
+                    for k, v in fr.items():
+                        for r in v:
+                            data_to_add_to_results = []
+                            if task_params.get("fields_to_add_to_api_result", None):
+                                data_to_add_to_results = [
+                                    {e["destination_key"]: db_params[k]["origin_key"]}
+                                    for e in task_params["fields_to_add_to_api_result"]
+                                ]
+                            local_result.append(
+                                dict(
+                                    ChainMap(
+                                        *data_to_add_to_results,
+                                        ## Only for company contact associations
+                                        # {"contact_id": r},
+                                        r,
+                                    )
+                                )
+                            )
+                    result.extend(local_result)
 
             if self.task.name in [
-                "campaign_details",
-                "campaigns",
-                "email_events",
+                "campaign_details"
                 # "company_contact_associations",
             ]:
 
@@ -463,7 +431,7 @@ class HubspotClient(Client):
                 params = url_params.get("params", None)
 
                 if params:
-                    db_params = self.get_request_params(self.task)
+                    db_params = self.get_request_params()
                     total_requests_number = len(db_params)
                     dynamics_params = self.get_dynamics_params(params)
                     statics_params = self.get_statics_params(params)
@@ -628,7 +596,9 @@ class HubspotClient(Client):
         """
         cpt = 1
         try:
-            response = self.http_adapter.get(url=endpoint, headers=headers)
+            response = self.http_adapter.get(
+                url=endpoint.get_endpoint_as_string(), headers=headers
+            )
         except ConnectionError as e:
             print("Error while connecting to db")
             print(e)
@@ -677,7 +647,7 @@ class HubspotClient(Client):
             print(f'ServiceErrorCode: {response["ServiceErrorCode"]}')
             return None
 
-        return response
+        return (response, endpoint)
 
     def build_headers(self, header=None, access_token=None):
         """# noqa: E501
