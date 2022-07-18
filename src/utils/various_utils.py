@@ -73,7 +73,13 @@ from concurrent import futures
 
 
 def run_in_threads_pool(
-    request_params_list=None, source_function=None, max_workers=40, headers=None
+    request_params_list=None,
+    source_function=None,
+    max_workers=40,
+    headers=None,
+    result_key=None,
+    check_has_more_result_function=None,
+    build_get_more_function=None,
 ):
     """
     Runs a function in a thread pool.
@@ -91,16 +97,66 @@ def run_in_threads_pool(
     threads_list = []
     result = []
     with futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
-        for request_params in request_params_list:
+        for request_params in request_params_list[0:10]:
             threads_list.append(
                 (
-                    executor.submit(source_function, request_params[0], headers),
+                    executor.submit(
+                        source_function,
+                        endpoint=request_params[0],
+                        headers=headers,
+                    ),
                     request_params[1],
                 )
             )
+        for task in threads_list:
+            if task[0].result():
+                task_result, endpoint = task[0].result()
+                has_more = task_result["hasMore"]
+                tmp_result = []
+                tmp_result.extend(task_result[result_key])
+                while has_more:
+                    pagination_param = endpoint.get_param_by_name("offset")
+                    pagination_param.value = task_result["offset"]
+                    int_task = executor.submit(
+                        source_function,
+                        endpoint=endpoint,
+                        headers=headers,
+                    )
+                    task_result, endpoint = int_task.result()
+                    if task_result:
+                        if task_result[result_key]:
+                            tmp_result.extend(task_result[result_key])
+                    has_more = task_result["hasMore"]
 
-            for task in threads_list:
-                task_result = task[0].result()
-                if task_result is not None:
-                    result.append({task[1]: task_result})
+                result.append({task[1]: tmp_result})
+                print(len(result))
     return result
+
+
+import itertools as it
+
+
+def zip_longest_repeat_value(*iterables):
+    iterators = [iter(i) for i in iterables]  # make sure we're operating on iterators
+    heads = [
+        next(i) for i in iterators
+    ]  # requires each of the iterables to be non-empty
+    sentinel = object()
+    iterators = [
+        it.chain((head,), iterator, (sentinel,), it.repeat(head))
+        for iterator, head in zip(iterators, heads)
+    ]
+    # Create a dedicated iterator object that will be consumed each time a 'sentinel' object is found.
+    # For the sentinel corresponding to the last iterator in 'iterators' this will leak a StopIteration.
+    running = it.repeat(None, len(iterators) - 1)
+    iterators = [
+        map(
+            lambda x, h: next(running) or h
+            if x is sentinel
+            else x,  # StopIteration causes the map to stop iterating
+            iterator,
+            it.repeat(head),
+        )
+        for iterator, head in zip(iterators, heads)
+    ]
+    return zip(*iterators)

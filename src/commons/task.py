@@ -141,7 +141,8 @@ class Task:
             data_objs = self.get_data_objs(source_data)
             datas_values = []
             # Search for new records and insert them.
-            if getattr(self.params, "exclude_existing_in_db", None):
+            if self.params.get("exclude_existing_in_db"):
+                # if getattr(self.params, "exclude_existing_in_db", None):
                 existing_ids = [
                     "".join(
                         str(r[e])
