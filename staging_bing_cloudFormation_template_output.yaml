@@ -7,7 +7,7 @@ Resources:
     Properties:
       Description: STAGING - Bing API Ingest Microservice V2a
       Handler: bing.src.lambda_f.lambda_handler
-      CodeUri: s3://jabmo-linkedin-ingest-lambda/cbf29e6000ae47548ffd4f7e859f3271
+      CodeUri: s3://jabmo-linkedin-ingest-lambda/e36ed5ec197ca8ea2deb8c2641fbb5ff
       Runtime: python3.8
       Layers:
       - arn:aws:lambda:eu-west-1:467882466042:layer:python-aws-psycopg2:1
@@ -15,7 +15,7 @@ Resources:
       - arn:aws:lambda:eu-west-1:467882466042:layer:python-bingads:1
       Role: arn:aws:iam::467882466042:role/Linkedin-lambda-dev-staging-rw
       Timeout: 900
-      MemorySize: 256
+      MemorySize: 1024
       Environment:
         Variables:
           SENTRY_DNS: https://47e2fc82fc674f428f2b3e931eddace7@o1035237.ingest.sentry.io/6094713

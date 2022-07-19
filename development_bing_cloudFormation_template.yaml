@@ -5,7 +5,7 @@ Resources:
   Function:
     Type: AWS::Serverless::Function
     Properties:
-      Description: DEVELOPMENT - Bing API Ingest Microservice V2a
+      Description: DEVELOPMENT 2 - Bing API Ingest Microservice V2a
       Handler: bing.src.lambda_f.lambda_handler
       CodeUri: .
       Runtime: python3.8

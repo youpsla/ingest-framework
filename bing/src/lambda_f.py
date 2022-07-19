@@ -2,6 +2,7 @@
 
 
 import json
+import logging
 import os
 import time
 
@@ -13,6 +14,10 @@ from configs.globals import CHANNEL
 from src.clients.redshift.redshift_client import RedshiftClient
 from src.commons.task import Task
 from src.utils.custom_logger import logger
+
+# logging.basicConfig(level=logging.INFO)
+# logging.getLogger("suds.client").setLevel(logging.DEBUG)
+# logging.getLogger("suds.transport.http").setLevel(logging.DEBUG)
 
 
 def get_params_json_file_path():

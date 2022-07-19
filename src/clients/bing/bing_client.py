@@ -105,7 +105,6 @@ class ServiceRequest:
     def __init__(
         self,
         authorization_data=None,
-        aggregation=None,
         service_name=None,
         task=None,
         param=None,

@@ -166,9 +166,9 @@ DISTSTYLE AUTO
 
 
 --  Replace <schema_name> with the newly created
- GRANT USAGE ON SCHEMA bing_development TO GROUP dev_ro;
- GRANT SELECT ON ALL TABLES IN SCHEMA bing_development TO GROUP dev_ro;
- ALTER DEFAULT PRIVILEGES IN SCHEMA bing_development GRANT SELECT ON TABLES TO GROUP dev_ro;
+ GRANT USAGE ON SCHEMA bing_development TO GROUP jabmoro;
+ GRANT SELECT ON ALL TABLES IN SCHEMA bing_development TO GROUP jabmoro;
+ ALTER DEFAULT PRIVILEGES IN SCHEMA bing_development GRANT SELECT ON TABLES TO GROUP jabmoro;
 
  GRANT CREATE ON SCHEMA bing_development TO GROUP dev_rw;
  GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA bing_development TO GROUP dev_rw;
