@@ -5,7 +5,7 @@ Resources:
   Function:
     Type: AWS::Serverless::Function
     Properties:
-      Description: STAGING - Bing API Ingest Microservice V2a
+      Description: DEVELOPMENT - Bing API Ingest Microservice V2a
       Handler: bing.src.lambda_f.lambda_handler
       CodeUri: .
       Runtime: python3.8
@@ -15,7 +15,7 @@ Resources:
         - arn:aws:lambda:eu-west-1:467882466042:layer:python-bingads:1
       Role: arn:aws:iam::467882466042:role/Linkedin-lambda-dev-staging-rw
       Timeout: 900
-      MemorySize: 256
+      MemorySize: 2048
       Environment:
         Variables:
           SENTRY_DNS: https://47e2fc82fc674f428f2b3e931eddace7@o1035237.ingest.sentry.io/6094713

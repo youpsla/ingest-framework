@@ -535,13 +535,11 @@ class ReportRequest:
         start_date.Day = date_range[0]["dateRange.start.day"]
         start_date.Month = date_range[1]["dateRange.start.month"]
         start_date.Year = date_range[2]["dateRange.start.year"]
-        time.CustomDateRangeStart = start_date
 
         end_date = self.service.factory.create("Date")
         end_date.Day = date_range[3]["dateRange.end.day"]
         end_date.Month = date_range[4]["dateRange.end.month"]
         end_date.Year = date_range[5]["dateRange.end.year"]
-        time.CustomDateRangeEnd = end_date
 
         # You can either use a custom date range or predefined time.
         # time.PredefinedTime = "Yesterday"

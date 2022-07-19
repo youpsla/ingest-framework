@@ -284,7 +284,7 @@
                             "type": "group",
                             "offset_type": "from_today",
                             "offset_unity": "days",
-                            "offset_value": "1",
+                            "offset_value": "46",
                             "offset_range_position": "start_day",
                             "url_params": {
                                 "dateRange.start.day": {
@@ -379,7 +379,7 @@
                             "type": "group",
                             "offset_type": "from_today",
                             "offset_unity": "days",
-                            "offset_value": "1",
+                            "offset_value": "46",
                             "offset_range_position": "start_day",
                             "url_params": {
                                 "dateRange.start.day": {
@@ -474,7 +474,7 @@
                             "type": "group",
                             "offset_type": "from_today",
                             "offset_unity": "days",
-                            "offset_value": "1",
+                            "offset_value": "46",
                             "offset_range_position": "start_day",
                             "url_params": {
                                 "dateRange.start.day": {
