@@ -1,8 +1,14 @@
 {
     "name": "hubspot",
     "daily_tasks_list" : [
-        "email_events"
-
+        "contacts",
+        "companies",
+        "events",
+        "campaigns",
+        "campaign_details",
+        "email_events_open_daily",
+        "email_events_click_daily",
+        "email_events_forward_daily"
     ],
     "bck_daily_tasks_list" : [
         "contacts",
@@ -10,8 +16,13 @@
         "events",
         "campaigns",
         "campaign_details",
-        "email_events",
-        "company_contact_associations"
+        "company_contact_associations",
+        "email_events_open_daily",
+        "email_events_click_daily",
+        "email_events_forward_daily",
+        "email_events_click_since_2022",
+        "email_events_open_since_2022",
+        "email_events_forward_since_2022"
     ]
 }
 

@@ -141,32 +141,33 @@ class Task:
             data_objs = self.get_data_objs(source_data)
             datas_values = []
             # Search for new records and insert them.
-            if self.params.get("exclude_existing_in_db"):
-                # if getattr(self.params, "exclude_existing_in_db", None):
-                existing_ids = [
-                    "".join(
-                        str(r[e])
-                        for e in [d for d in self.params["destination_unique_keys"]]
-                    )
-                    for r in self.model.get_all()
-                ]
-                data_objs = [
-                    r
-                    for r in data_objs
-                    if r.get_fields_value_as_string(
-                        self.params["destination_unique_keys"]
-                    )
-                    not in existing_ids
-                ]
-                datas_values = [r.get_db_values_tuple() for r in data_objs]
-            else:
-                datas_values = [r.get_db_values_tuple() for r in data_objs]
+            if data_objs:
+                if self.params.get("exclude_existing_in_db"):
+                    # if getattr(self.params, "exclude_existing_in_db", None):
+                    existing_ids = [
+                        "".join(
+                            str(r[e])
+                            for e in [d for d in self.params["destination_unique_keys"]]
+                        )
+                        for r in self.model.get_all()
+                    ]
+                    data_objs = [
+                        r
+                        for r in data_objs
+                        if r.get_fields_value_as_string(
+                            self.params["destination_unique_keys"]
+                        )
+                        not in existing_ids
+                    ]
+                    datas_values = [r.get_db_values_tuple() for r in data_objs]
+                else:
+                    datas_values = [r.get_db_values_tuple() for r in data_objs]
 
-            logger.info(
-                f"{self.name} - {self.model.model_name}:"
-                f" {len(datas_values)} record(s) will be inserted"
-            )
-            self.insert(datas_values)
+                logger.info(
+                    f"{self.name} - {self.model.model_name}:"
+                    f" {len(datas_values)} record(s) will be inserted"
+                )
+                self.insert(datas_values)
 
         if "update" in self.actions:
             data_objs = self.get_data_objs(source_data)
