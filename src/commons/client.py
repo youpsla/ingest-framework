@@ -2,9 +2,9 @@ import calendar
 import uuid
 from collections import ChainMap
 from datetime import date, datetime, timedelta
-from typing import OrderedDict
 
 import dateutil
+import pytz
 from dateutil.relativedelta import relativedelta
 from src.commons.model import Model
 from src.constants import ENVS_LIST
@@ -145,6 +145,33 @@ class Client:
                     # for tr in tmp_result:
                     #     final_result.append({param["name"]: tr[param["source_key"]]})
 
+                if param["type"] == "timestamp_from_epoch":
+                    target_day = self.get_day_relative_to_today_from_params(
+                        day_params=param,
+                        offset_unity=param["offset_unity"],
+                    )
+                    target_datetime = datetime.fromordinal(target_day.toordinal())
+                    print(target_day)
+                    if param["position"] == "start":
+                        target_datetime = target_datetime.replace(
+                            hour=0, minute=0, second=0, tzinfo=pytz.UTC
+                        )
+                        target_timestamp = (
+                            int(datetime.timestamp(target_datetime)) * 1000
+                        )
+
+                        tmp_result = [{param["name"]: target_timestamp}]
+
+                    if param["position"] == "end":
+                        target_datetime = target_datetime.replace(
+                            hour=23, minute=59, second=59, tzinfo=pytz.UTC
+                        )
+                        target_timestamp = (
+                            int(datetime.timestamp(target_datetime)) * 1000
+                        )
+
+                        tmp_result = [{param["name"]: target_timestamp}]
+
                 result_lists.append(tmp_result)
 
         tmp_result = zip_longest_repeat_value(*result_lists)
@@ -178,10 +205,11 @@ class Client:
         return None
 
     def get_day_relative_to_today_from_params(self, day_params, offset_unity):
+
         today = datetime.date(datetime.now())
         tmp = {offset_unity: int(day_params["offset_value"])}
-        day = today - relativedelta(**tmp)
-        # day = today - timedelta(**tmp)
+        # day = today - relativedelta(**tmp)
+        day = today - timedelta(**tmp)
         return day
 
     def get_start_date(self, start_date_params=None, offset_unity=None):

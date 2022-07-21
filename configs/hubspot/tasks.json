@@ -27,6 +27,86 @@
         }
     },
     {
+        "contacts_recently_updated": {
+            "actions": [
+                "insert",
+                "update"
+            ],
+            "exclude_existing_in_db": true,
+            "source": "hubspot",
+            "destination": "redshift",
+            "request_data_source": "redshift",
+            "destination_unique_keys": [
+                "id"
+            ],
+            "model": "contacts",
+            "update_key": "id",
+            "query": {
+                "template": "{base}?{limit}&{offset}",
+                "response_datas_key": "events",
+                "base": "https://api.hubapi.com/contacts/v1/lists/recently_updated/contacts/recent",
+                "params": [
+                    {
+                        "name": "base",
+                        "type": "constant",
+                        "output_type": "arg",
+                        "value": "https://api.hubapi.com/email/public/v1/events"
+                    },
+                    {
+                        "name": "emailCampaignId",
+                        "type": "db",
+                        "data_source_name": "campaigns",
+                        "source_key": "id",
+                        "output_type": "kwarg"
+                    },
+                    {
+                        "name": "appId",
+                        "type": "db",
+                        "data_source_name": "campaigns",
+                        "source_key": "app_id",
+                        "output_type": "kwarg"
+                    },
+                    {
+                        "name": "limit",
+                        "type": "constant",
+                        "output_type": "kwarg",
+                        "value": 1000
+                    },
+                    {
+                        "name": "offset",
+                        "type": "constant",
+                        "output_type": "kwarg",
+                        "value": ""
+                    },
+                    {
+                        "name": "eventType",
+                        "type": "constant",
+                        "output_type": "kwarg",
+                        "value": "FORWARD"
+                    },
+                    {
+                        "name": "startTimestamp",
+                        "type": "timestamp_from_epoch",
+                        "offset_type": "from_today",
+                        "offset_value": "1",
+                        "offset_unity": "days",
+                        "position": "start",
+                        "output_type": "kwarg"
+                    },
+                    {
+                        "name": "endTimestamp",
+                        "type": "timestamp_from_epoch",
+                        "offset_type": "from_today",
+                        "offset_value": "1",
+                        "offset_unity": "days",
+                        "position": "end",
+                        "output_type": "kwarg"
+                    }
+                ]
+            }
+        }
+    },
+    {
         "companies": {
             "actions": [
                 "insert",
@@ -195,7 +275,7 @@
         }
     },
     {
-        "email_events": {
+        "email_events_click_since_2022": {
             "actions": [
                 "insert"
             ],
@@ -213,7 +293,7 @@
             "model": "email_events",
             "update_key": "id",
             "query": {
-                "template": "{base}?{emailCampaignId}&{appId}&{limit}&{offset}",
+                "template": "{base}?{emailCampaignId}&{appId}&{limit}&{offset}&{startTimestamp}&{endTimestamp}&{eventType}",
                 "response_datas_key": "events",
                 "base": "https://api.hubapi.com/email/public/v1/events",
                 "params": [
@@ -248,6 +328,187 @@
                         "type": "constant",
                         "output_type": "kwarg",
                         "value": ""
+                    },
+                    {
+                        "name": "eventType",
+                        "type": "constant",
+                        "output_type": "kwarg",
+                        "value": "CLICK"
+                    },
+                    {
+                        "name": "startTimestamp",
+                        "type": "constant",
+                        "output_type": "kwarg",
+                        "value": 1640995200000
+                    },
+                    {
+                        "name": "endTimestamp",
+                        "type": "timestamp_from_epoch",
+                        "offset_type": "from_today",
+                        "offset_value": "1",
+                        "offset_unity": "days",
+                        "position": "end",
+                        "output_type": "kwarg"
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "email_events_open_since_2022": {
+            "actions": [
+                "insert"
+            ],
+            "exclude_existing_in_db": true,
+            "source": "hubspot",
+            "destination": "redshift",
+            "request_data_source": "redshift",
+            "destination_unique_keys": [
+                "id"
+            ],
+            "data_source": {
+                "name": "campaigns",
+                "raw_sql": "select id, app_id from {schema}.campaigns"
+            },
+            "model": "email_events",
+            "update_key": "id",
+            "query": {
+                "template": "{base}?{emailCampaignId}&{appId}&{limit}&{offset}&{startTimestamp}&{endTimestamp}&{eventType}",
+                "response_datas_key": "events",
+                "base": "https://api.hubapi.com/email/public/v1/events",
+                "params": [
+                    {
+                        "name": "base",
+                        "type": "constant",
+                        "output_type": "arg",
+                        "value": "https://api.hubapi.com/email/public/v1/events"
+                    },
+                    {
+                        "name": "emailCampaignId",
+                        "type": "db",
+                        "data_source_name": "campaigns",
+                        "source_key": "id",
+                        "output_type": "kwarg"
+                    },
+                    {
+                        "name": "appId",
+                        "type": "db",
+                        "data_source_name": "campaigns",
+                        "source_key": "app_id",
+                        "output_type": "kwarg"
+                    },
+                    {
+                        "name": "limit",
+                        "type": "constant",
+                        "output_type": "kwarg",
+                        "value": 1000
+                    },
+                    {
+                        "name": "offset",
+                        "type": "constant",
+                        "output_type": "kwarg",
+                        "value": ""
+                    },
+                    {
+                        "name": "eventType",
+                        "type": "constant",
+                        "output_type": "kwarg",
+                        "value": "OPEN"
+                    },
+                    {
+                        "name": "startTimestamp",
+                        "type": "constant",
+                        "output_type": "kwarg",
+                        "value": 1640995200000
+                    },
+                    {
+                        "name": "endTimestamp",
+                        "type": "timestamp_from_epoch",
+                        "offset_type": "from_today",
+                        "offset_value": "1",
+                        "offset_unity": "days",
+                        "position": "end",
+                        "output_type": "kwarg"
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "email_events_forward_since_2022": {
+            "actions": [
+                "insert"
+            ],
+            "exclude_existing_in_db": true,
+            "source": "hubspot",
+            "destination": "redshift",
+            "request_data_source": "redshift",
+            "destination_unique_keys": [
+                "id"
+            ],
+            "data_source": {
+                "name": "campaigns",
+                "raw_sql": "select id, app_id from {schema}.campaigns"
+            },
+            "model": "email_events",
+            "update_key": "id",
+            "query": {
+                "template": "{base}?{emailCampaignId}&{appId}&{limit}&{offset}&{startTimestamp}&{endTimestamp}&{eventType}",
+                "response_datas_key": "events",
+                "base": "https://api.hubapi.com/email/public/v1/events",
+                "params": [
+                    {
+                        "name": "base",
+                        "type": "constant",
+                        "output_type": "arg",
+                        "value": "https://api.hubapi.com/email/public/v1/events"
+                    },
+                    {
+                        "name": "emailCampaignId",
+                        "type": "db",
+                        "data_source_name": "campaigns",
+                        "source_key": "id",
+                        "output_type": "kwarg"
+                    },
+                    {
+                        "name": "appId",
+                        "type": "db",
+                        "data_source_name": "campaigns",
+                        "source_key": "app_id",
+                        "output_type": "kwarg"
+                    },
+                    {
+                        "name": "limit",
+                        "type": "constant",
+                        "output_type": "kwarg",
+                        "value": 1000
+                    },
+                    {
+                        "name": "offset",
+                        "type": "constant",
+                        "output_type": "kwarg",
+                        "value": ""
+                    },
+                    {
+                        "name": "eventType",
+                        "type": "constant",
+                        "output_type": "kwarg",
+                        "value": "FORWARD"
+                    },
+                    {
+                        "name": "startTimestamp",
+                        "type": "constant",
+                        "output_type": "kwarg",
+                        "value": 1640995200000
+                    },
+                    {
+                        "name": "endTimestamp",
+                        "type": "timestamp_from_epoch",
+                        "offset_type": "from_today",
+                        "offset_value": "1",
+                        "offset_unity": "days",
+                        "position": "end",
+                        "output_type": "kwarg"
                     }
                 ]
             }
@@ -273,6 +534,7 @@
                     "destination_key": "company_id"
                 }
             ],
+            "key_for_values": "contact_id",
             "query": {
                 "e_type": "rest",
                 "template": "{base}/{company_id}/{association_type}?{limit}&{offset}",
@@ -308,6 +570,255 @@
                         "type": "constant",
                         "output_type": "kwarg",
                         "value": 0
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "email_events_click_daily": {
+            "actions": [
+                "insert"
+            ],
+            "exclude_existing_in_db": true,
+            "source": "hubspot",
+            "destination": "redshift",
+            "request_data_source": "redshift",
+            "destination_unique_keys": [
+                "id"
+            ],
+            "data_source": {
+                "name": "campaigns",
+                "raw_sql": "select id, app_id from {schema}.campaigns"
+            },
+            "model": "email_events",
+            "update_key": "id",
+            "query": {
+                "template": "{base}?{emailCampaignId}&{appId}&{limit}&{offset}&{startTimestamp}&{endTimestamp}&{eventType}",
+                "response_datas_key": "events",
+                "base": "https://api.hubapi.com/email/public/v1/events",
+                "params": [
+                    {
+                        "name": "base",
+                        "type": "constant",
+                        "output_type": "arg",
+                        "value": "https://api.hubapi.com/email/public/v1/events"
+                    },
+                    {
+                        "name": "emailCampaignId",
+                        "type": "db",
+                        "data_source_name": "campaigns",
+                        "source_key": "id",
+                        "output_type": "kwarg"
+                    },
+                    {
+                        "name": "appId",
+                        "type": "db",
+                        "data_source_name": "campaigns",
+                        "source_key": "app_id",
+                        "output_type": "kwarg"
+                    },
+                    {
+                        "name": "limit",
+                        "type": "constant",
+                        "output_type": "kwarg",
+                        "value": 1000
+                    },
+                    {
+                        "name": "offset",
+                        "type": "constant",
+                        "output_type": "kwarg",
+                        "value": ""
+                    },
+                    {
+                        "name": "eventType",
+                        "type": "constant",
+                        "output_type": "kwarg",
+                        "value": "CLICK"
+                    },
+                    {
+                        "name": "startTimestamp",
+                        "type": "timestamp_from_epoch",
+                        "offset_type": "from_today",
+                        "offset_value": "1",
+                        "offset_unity": "days",
+                        "position": "start",
+                        "output_type": "kwarg"
+                    },
+                    {
+                        "name": "endTimestamp",
+                        "type": "timestamp_from_epoch",
+                        "offset_type": "from_today",
+                        "offset_value": "1",
+                        "offset_unity": "days",
+                        "position": "end",
+                        "output_type": "kwarg"
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "email_events_open_daily": {
+            "actions": [
+                "insert"
+            ],
+            "exclude_existing_in_db": true,
+            "source": "hubspot",
+            "destination": "redshift",
+            "request_data_source": "redshift",
+            "destination_unique_keys": [
+                "id"
+            ],
+            "data_source": {
+                "name": "campaigns",
+                "raw_sql": "select id, app_id from {schema}.campaigns"
+            },
+            "model": "email_events",
+            "update_key": "id",
+            "query": {
+                "template": "{base}?{emailCampaignId}&{appId}&{limit}&{offset}&{startTimestamp}&{endTimestamp}&{eventType}",
+                "response_datas_key": "events",
+                "base": "https://api.hubapi.com/email/public/v1/events",
+                "params": [
+                    {
+                        "name": "base",
+                        "type": "constant",
+                        "output_type": "arg",
+                        "value": "https://api.hubapi.com/email/public/v1/events"
+                    },
+                    {
+                        "name": "emailCampaignId",
+                        "type": "db",
+                        "data_source_name": "campaigns",
+                        "source_key": "id",
+                        "output_type": "kwarg"
+                    },
+                    {
+                        "name": "appId",
+                        "type": "db",
+                        "data_source_name": "campaigns",
+                        "source_key": "app_id",
+                        "output_type": "kwarg"
+                    },
+                    {
+                        "name": "limit",
+                        "type": "constant",
+                        "output_type": "kwarg",
+                        "value": 1000
+                    },
+                    {
+                        "name": "offset",
+                        "type": "constant",
+                        "output_type": "kwarg",
+                        "value": ""
+                    },
+                    {
+                        "name": "eventType",
+                        "type": "constant",
+                        "output_type": "kwarg",
+                        "value": "OPEN"
+                    },
+                    {
+                        "name": "startTimestamp",
+                        "type": "timestamp_from_epoch",
+                        "offset_type": "from_today",
+                        "offset_value": "1",
+                        "offset_unity": "days",
+                        "position": "start",
+                        "output_type": "kwarg"
+                    },
+                    {
+                        "name": "endTimestamp",
+                        "type": "timestamp_from_epoch",
+                        "offset_type": "from_today",
+                        "offset_value": "1",
+                        "offset_unity": "days",
+                        "position": "end",
+                        "output_type": "kwarg"
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "email_events_forward_daily": {
+            "actions": [
+                "insert"
+            ],
+            "exclude_existing_in_db": true,
+            "source": "hubspot",
+            "destination": "redshift",
+            "request_data_source": "redshift",
+            "destination_unique_keys": [
+                "id"
+            ],
+            "data_source": {
+                "name": "campaigns",
+                "raw_sql": "select id, app_id from {schema}.campaigns"
+            },
+            "model": "email_events",
+            "update_key": "id",
+            "query": {
+                "template": "{base}?{emailCampaignId}&{appId}&{limit}&{offset}&{startTimestamp}&{endTimestamp}&{eventType}",
+                "response_datas_key": "events",
+                "base": "https://api.hubapi.com/email/public/v1/events",
+                "params": [
+                    {
+                        "name": "base",
+                        "type": "constant",
+                        "output_type": "arg",
+                        "value": "https://api.hubapi.com/email/public/v1/events"
+                    },
+                    {
+                        "name": "emailCampaignId",
+                        "type": "db",
+                        "data_source_name": "campaigns",
+                        "source_key": "id",
+                        "output_type": "kwarg"
+                    },
+                    {
+                        "name": "appId",
+                        "type": "db",
+                        "data_source_name": "campaigns",
+                        "source_key": "app_id",
+                        "output_type": "kwarg"
+                    },
+                    {
+                        "name": "limit",
+                        "type": "constant",
+                        "output_type": "kwarg",
+                        "value": 1000
+                    },
+                    {
+                        "name": "offset",
+                        "type": "constant",
+                        "output_type": "kwarg",
+                        "value": ""
+                    },
+                    {
+                        "name": "eventType",
+                        "type": "constant",
+                        "output_type": "kwarg",
+                        "value": "FORWARD"
+                    },
+                    {
+                        "name": "startTimestamp",
+                        "type": "timestamp_from_epoch",
+                        "offset_type": "from_today",
+                        "offset_value": "1",
+                        "offset_unity": "days",
+                        "position": "start",
+                        "output_type": "kwarg"
+                    },
+                    {
+                        "name": "endTimestamp",
+                        "type": "timestamp_from_epoch",
+                        "offset_type": "from_today",
+                        "offset_value": "1",
+                        "offset_unity": "days",
+                        "position": "end",
+                        "output_type": "kwarg"
                     }
                 ]
             }

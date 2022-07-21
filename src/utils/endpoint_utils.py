@@ -71,35 +71,6 @@ class Endpoint:
 
         return headers
 
-    def build_endpoint(self):
-        """# noqa: E501
-        Build the enpoint url with all args, kwargs.
-
-        Use the access_token and optionnal header defined in json.
-
-        Args:
-            base: str
-                Base url as retrieved from json definition
-            category: str
-                The type of API call.
-            q: str
-                The type of the query. Can be "search" or "analytics" for linkedin
-
-        Returns:
-            A str representing an url
-        """
-
-        if self.kwargs:
-            kwargs_tuple = [(k, v) for f in self.kwargs for k, v in f.items()]
-        endpoint = (
-            f"{self.base}"
-            f"{str(self.args[0]) if self.args else ''}"
-            f"/HUBSPOT_DEFINED/2"
-            f"{'?' if self.kwargs else ''}"
-            f"{'&' + urlencode(kwargs_tuple) if self.kwargs else ''}"
-        )
-        return endpoint
-
 
 class EndpointParam:
     def __init__(self, endpoint_params=None, query_params=None):
@@ -125,6 +96,9 @@ class EndpointParam:
         if hasattr(self, "template"):
             return self.template.format(self.value)
         return self.value
+
+    def __repr__(self):
+        return f"EndpointParam {self.name}/{self.value}"
 
     def get_as_dict_url_formatted(self):
         if self.output_type == "arg":
@@ -167,51 +141,77 @@ if __name__ == "__main__":
                     "destination_key": "company_id"
                 }
             ],
-            "endpoint": {
+            "query": {
                 "e_type": "rest",
-                "template": "{base}/{company_id}/{association_type}?{limit}&{offset}",
+                "template": "{base}?&{limit}&{offset}&{startTimestamp}&{endTimestamp}",
                 "response_datas_key": "results",
                 "base": "https://api.hubapi.com/crm-associations/v1/associations/",
                 "params": [
                     {
                         "name": "base",
-                        "type": "arg",
+                        "output_type": "arg",
                         "value": "https://api.hubapi.com/crm-associations/v1/associations/"
                     },
                     {
                         "data_source": "campaigns",
                         "name": "company_id",
                         "source_key": "id",
-                        "type": "arg"
+                        "output_type": "arg"
                     },
                     {
                         "name": "limit",
-                        "type": "kwarg",
+                        "output_type": "kwarg",
                         "value": 100
                     },
                     {
-                        "name": "association_type",
-                        "type": "arg",
-                        "value": "/HUBSPOT_DEFINED/2"
+                        "name": "appId",
+                        "output_type": "kwarg",
+                        "value": ""
                     },
                     {
                         "name": "offset",
-                        "type": "kwarg",
+                        "output_type": "kwarg",
                         "value": 0
+                    },
+                    {
+                        "name": "startTimestamp",
+                        "type": "timestamp_from_epoch",
+                        "offset_type": "from_today",
+                        "offset_value": "1",
+                        "offset_unity": "days",
+                        "position": "start",
+                        "output_type": "kwarg"
+                    },
+                    {
+                        "name": "endTimestamp",
+                        "type": "timestamp_from_epoch",
+                        "offset_type": "from_today",
+                        "offset_value": "1",
+                        "offset_unity": "days",
+                        "position": "end",
+                        "output_type": "kwarg"
                     }
                 ]
             }
         }
         }
         """
+
+    db_params_1 = {
+        "endTimestamp": 1658267999,
+        "startTimestamp": 1658181600,
+        "offset": "",
+        "limit": 1000,
+        "base": "https://api.hubapi.com/email/public/v1/events",
+    }
+
     task = json.loads(task)
-    endpoint = task["company_contact_associations"]["endpoint"]
+    query = task["company_contact_associations"]["query"]
 
     edp = Endpoint(
-        params=endpoint["params"],
-        url_template=endpoint["template"],
-        e_type=endpoint["e_type"],
-        access_token=None,
+        params=db_params_1,
+        url_template=query["template"],
+        query_params=query["params"],
     )
 
     print(edp)

@@ -97,7 +97,7 @@ def run_in_threads_pool(
     threads_list = []
     result = []
     with futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
-        for request_params in request_params_list[0:10]:
+        for request_params in request_params_list:
             threads_list.append(
                 (
                     executor.submit(
@@ -122,6 +122,8 @@ def run_in_threads_pool(
                         endpoint=endpoint,
                         headers=headers,
                     )
+                    # tmpr = int_task.result()
+                    # if tmpr:
                     task_result, endpoint = int_task.result()
                     if task_result:
                         if task_result[result_key]:
@@ -129,7 +131,7 @@ def run_in_threads_pool(
                     has_more = task_result["hasMore"]
 
                 result.append({task[1]: tmp_result})
-                print(len(result))
+                print(f"# requests run so far: {len(result)}")
     return result
 
 

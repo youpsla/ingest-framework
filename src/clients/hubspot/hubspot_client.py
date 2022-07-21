@@ -104,6 +104,7 @@ class HubspotClient(Client):
             # for ptd in portal_token_list:
             access_token = ptd[1]
             portal_id = ptd[0]
+            access_token = TokensApi().create_token(**refresh_token_params).access_token
             oauth_api_client = HubSpot(access_token=access_token)
             result = []
 
@@ -170,7 +171,6 @@ class HubspotClient(Client):
                 result = []
                 after = 0
                 while has_to_continue:
-
                     r = oauth_api_client.crm.contacts.basic_api.get_page(
                         properties=properties, limit=100, after=after
                     )
@@ -280,7 +280,7 @@ class HubspotClient(Client):
             # print(len(result))
 
             if self.task.name in ["events"]:
-                db_params = self.get_request_params(self.task)
+                db_params = self.get_request_params()
                 cpt = 0
                 if db_params:
                     for param in db_params:
@@ -331,7 +331,12 @@ class HubspotClient(Client):
 
             if self.task.name in [
                 "company_contact_associations",
-                "email_events",
+                "email_events_click_since_2022",
+                "email_events_open_since_2022",
+                "email_events_forward_since_2022",
+                "email_events_click_daily",
+                "email_events_open_daily",
+                "email_events_forward_daily",
                 "campaigns",
             ]:
 
@@ -369,10 +374,9 @@ class HubspotClient(Client):
 
                 futures_results = []
 
-                endpoint_list_list = get_chunks(endpoint_list)
-                # for lst in endpoint_list_list:
-                for lst in [endpoint_list_list[0]]:
-                    # for lst in endpoint_list_list[0]:
+                endpoint_list_list = get_chunks(endpoint_list, chunk_size=100)
+                for lst in endpoint_list_list:
+                    # for lst in [endpoint_list_list[0]]:
                     access_token = (
                         TokensApi().create_token(**refresh_token_params).access_token
                     )
@@ -405,16 +409,25 @@ class HubspotClient(Client):
                             data_to_add_to_results = []
                             if task_params.get("fields_to_add_to_api_result", None):
                                 data_to_add_to_results = [
-                                    {e["destination_key"]: db_params[k]["origin_key"]}
+                                    {
+                                        e["destination_key"]: db_params[k][
+                                            e["origin_key"]
+                                        ]
+                                    }
                                     for e in task_params["fields_to_add_to_api_result"]
                                 ]
+                            api_data = (
+                                r
+                                if isinstance(r, dict)
+                                else {task_params["key_for_values"]: r}
+                            )
                             local_result.append(
                                 dict(
                                     ChainMap(
                                         *data_to_add_to_results,
                                         ## Only for company contact associations
                                         # {"contact_id": r},
-                                        r,
+                                        api_data,
                                     )
                                 )
                             )
