@@ -2,13 +2,15 @@
 
 
 import json
-import logging
 import os
 import time
+
+import sentry_sdk
 
 # Temporary solution. This import allow init of some envs variables
 # TODO: Envs management needs better system.
 from configs.globals import CHANNEL
+from sentry_sdk.integrations.aws_lambda import AwsLambdaIntegration
 
 # Import redshift here for being able to rollback()/commit() transaction.
 from src.clients.redshift.redshift_client import RedshiftClient
@@ -18,6 +20,12 @@ from src.utils.custom_logger import logger
 # logging.basicConfig(level=logging.INFO)
 # logging.getLogger("suds.client").setLevel(logging.DEBUG)
 # logging.getLogger("suds.transport.http").setLevel(logging.DEBUG)
+
+sentry_sdk.init(
+    dsn=os.environ["SENTRY_DNS"],
+    integrations=[AwsLambdaIntegration(timeout_warning=True)],
+    traces_sample_rate=1.0,
+)
 
 
 def get_params_json_file_path():
