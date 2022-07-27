@@ -338,6 +338,7 @@ class HubspotClient(Client):
                 "email_events_open_daily",
                 "email_events_forward_daily",
                 "campaigns",
+                "campaign_details",
             ]:
 
                 db_params = self.get_request_params()
@@ -354,23 +355,6 @@ class HubspotClient(Client):
                     for k, v in db_params.items()
                 ]
                 print(f"Number of requests to run: {total_requests_number}")
-
-                ## Testing data. Only for trendminer account. ##
-                # endpoint_list_list = [
-                #     [
-                #         (
-                #             "https://api.hubapi.com/crm-associations/v1/associations/817666151/HUBSPOT_DEFINED/2",
-                #             "47392129-3563-4be7-a0ac-ff31d25d26cc",
-                #         )
-                #     ]
-                # ]
-                # db_params = {
-                #     "47392129-3563-4be7-a0ac-ff31d25d26cc": (
-                #         [{"company_id": "817666151"}],
-                #         [],
-                #         ["817666151"],
-                #     )
-                # }
 
                 futures_results = []
 
@@ -432,92 +416,6 @@ class HubspotClient(Client):
                                 )
                             )
                     result.extend(local_result)
-
-            if self.task.name in [
-                "campaign_details"
-                # "company_contact_associations",
-            ]:
-
-                headers = self.build_headers(header=None, access_token=access_token)
-                # endpoints_list = self.get_endpoints_list()
-                url_params = task_params["url"]
-                params = url_params.get("params", None)
-
-                if params:
-                    db_params = self.get_request_params()
-                    total_requests_number = len(db_params)
-                    dynamics_params = self.get_dynamics_params(params)
-                    statics_params = self.get_statics_params(params)
-                    kwargs = dynamics_params + statics_params
-                    kwargs = []
-                    endpoint_list = [
-                        (
-                            self.build_endpoint(
-                                base=url_params["base"],
-                                kwargs=zd[1] + kwargs,
-                                args=zd[2],
-                            ),
-                            zd[0],
-                        )
-                        for zd in db_params
-                    ]
-                else:
-                    total_requests_number = 1
-                    endpoint_list = [
-                        (
-                            self.build_endpoint(
-                                base=url_params["base"],
-                            ),
-                            [],
-                        )
-                    ]
-                print(f"Number of requests to run: {total_requests_number}")
-
-                ### Method 1. not sure to rpeserver order for adding avalues later
-                # with concurrent.futures.ThreadPoolExecutor(max_workers=40) as executor:
-                #     futures = [
-                #         executor.submit(self.do_get_query, endpoint, headers)
-                #         for endpoint in endpoint_list
-                #     ]
-                # futures_result = [f.result() for f in futures]
-
-                futures_results = []
-                response_key = url_params.get("response_datas_key", None)
-                endpoint_list_list = get_chunks(endpoint_list)
-                for lst in endpoint_list_list:
-                    threads = []
-                    print(f"Chunck with {len(lst)} queries")
-                    with concurrent.futures.ThreadPoolExecutor(
-                        max_workers=40
-                    ) as executor:
-                        for endpoint in lst:
-                            threads.append(
-                                (
-                                    executor.submit(
-                                        self.do_get_query, endpoint[0], headers
-                                    ),
-                                    endpoint[1],
-                                )
-                            )
-
-                        for task in threads:
-                            tmp_task_result = task[0].result()
-                            if tmp_task_result is not None:
-                                if response_key:
-                                    response_elements = tmp_task_result[response_key]
-                                else:
-                                    response_elements = [tmp_task_result]
-                                if task[1]:
-                                    for r in response_elements:
-                                        for f in task[1]:
-                                            for k, v in f.items():
-                                                r[k] = v
-
-                                futures_results.append(response_elements)
-
-                for r in futures_results:
-                    if r:
-                        result.extend(r)
 
             if result:
                 for r in result:
