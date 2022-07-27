@@ -251,26 +251,28 @@
             ],
             "model": "campaign_details",
             "update_key": "id",
-            "url": {
-                "base": "https://api.hubapi.com/email/public/v1/campaigns/",
-                "params": {
-                    "db": {
-                        "_": {
-                            "type": "db",
-                            "args_fields": [
-                                "id"
-                            ],
-                            "kwargs_fields": [],
-                            "db_fields": [],
-                            "filter_model": "campaigns",
-                            "all_fields": [
-                                "id"
-                            ],
-                            "raw_sql": "select distinct(id) from {schema}.campaigns"
-                        }
+            "data_source": {
+                "name": "campaigns",
+                "raw_sql": "select distinct(id) from {schema}.campaigns"
+            },
+            "query": {
+                "response_datas_key": null,
+                "template": "{base}/{id}",
+                "params": [
+                    {
+                        "name": "base",
+                        "type": "constant",
+                        "output_type": "arg",
+                        "value": "https://api.hubapi.com/email/public/v1/campaigns"
                     },
-                    "statics": {}
-                }
+                    {
+                        "name": "id",
+                        "type": "db",
+                        "data_source_name": "campaigns",
+                        "source_key": "id",
+                        "output_type": "arg"
+                    }
+                ]
             }
         }
     },
