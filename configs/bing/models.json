@@ -173,6 +173,18 @@
                     "TimePeriod"
                 ]
             },
+            "account_id": {
+                "type": "raw",
+                "source_path": [
+                    "AccountId"
+                ]
+            },
+            "campaign_id": {
+                "type": "raw",
+                "source_path": [
+                    "CampaignId"
+                ]
+            },
             "adgroup_id": {
                 "type": "raw",
                 "source_path": [
@@ -221,6 +233,18 @@
                 "type": "raw",
                 "source_path": [
                     "TimePeriod"
+                ]
+            },
+            "account_id": {
+                "type": "raw",
+                "source_path": [
+                    "AccountId"
+                ]
+            },
+            "campaign_id": {
+                "type": "raw",
+                "source_path": [
+                    "CampaignId"
                 ]
             },
             "adgroup_id": {
@@ -289,6 +313,18 @@
                 "type": "raw",
                 "source_path": [
                     "TimePeriod"
+                ]
+            },
+            "account_id": {
+                "type": "raw",
+                "source_path": [
+                    "AccountId"
+                ]
+            },
+            "campaign_id": {
+                "type": "raw",
+                "source_path": [
+                    "CampaignId"
                 ]
             },
             "adgroup_id": {
