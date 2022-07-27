@@ -1,3 +1,4 @@
+import csv
 import json
 import os
 import time
@@ -135,10 +136,15 @@ class Task:
         if "download" in self.actions:
             for d in source_data:
                 elem = d["datas"]
-                ReportManager(
+                result_file_path = ReportManager(
                     authorization_data=d["authorization_data"],
                     report_request=elem,
                 ).submit_and_download()
+            source_data = []
+            with open(result_file_path, newline="", encoding="utf-8-sig") as csv_file:
+                tmp = csv.DictReader(csv_file)
+                for t in tmp:
+                    source_data.append({"datas": t})
 
         if "transfer" in self.actions:
             self.destination.upload_and_delete_source()

@@ -167,52 +167,190 @@
             }
         },
         "demographic_metrics": {
-            "time_period": null,
-            "account_id": null,
-            "account_name": null,
-            "campaign_id": null,
-            "adgroup_id": null,
-            "adgroup_name": null,
-            "company_name": null,
-            "industry_name": null,
-            "job_function": null,
-            "impressions": null,
-            "clicks": null,
-            "spend": null
+            "time_period": {
+                "type": "raw",
+                "source_path": [
+                    "TimePeriod"
+                ]
+            },
+            "adgroup_id": {
+                "type": "raw",
+                "source_path": [
+                    "AdGroupId"
+                ]
+            },
+            "company_name": {
+                "type": "raw",
+                "source_path": [
+                    "CompanyName"
+                ]
+            },
+            "industry_name": {
+                "type": "raw",
+                "source_path": [
+                    "IndustryName"
+                ]
+            },
+            "job_function": {
+                "type": "raw",
+                "source_path": [
+                    "JobFunctionName"
+                ]
+            },
+            "impressions": {
+                "type": "raw",
+                "source_path": [
+                    "Impressions"
+                ]
+            },
+            "clicks": {
+                "type": "raw",
+                "source_path": [
+                    "Clicks"
+                ]
+            },
+            "spend": {
+                "type": "raw",
+                "source_path": [
+                    "Spend"
+                ]
+            }
         },
         "user_location_metrics": {
-            "time_period": null,
-            "account_id": null,
-            "account_name": null,
-            "adgroup_id": null,
-            "adgroup_name": null,
-            "campaign_id": null,
-            "country": null,
-            "county": null,
-            "state": null,
-            "city": null,
-            "postal_code": null,
-            "metro_area": null,
-            "impressions": null,
-            "clicks": null,
-            "spend": null
+            "time_period": {
+                "type": "raw",
+                "source_path": [
+                    "TimePeriod"
+                ]
+            },
+            "adgroup_id": {
+                "type": "raw",
+                "source_path": [
+                    "AdGroupId"
+                ]
+            },
+            "country": {
+                "type": "raw",
+                "source_path": [
+                    "Country"
+                ]
+            },
+            "state": {
+                "type": "raw",
+                "source_path": [
+                    "State"
+                ]
+            },
+            "county": {
+                "type": "raw",
+                "source_path": [
+                    "County"
+                ]
+            },
+            "city": {
+                "type": "raw",
+                "source_path": [
+                    "City"
+                ]
+            },
+            "postal_code": {
+                "type": "raw",
+                "source_path": [
+                    "PostalCode"
+                ]
+            },
+            "metro_area": {
+                "type": "raw",
+                "source_path": [
+                    "MetroArea"
+                ]
+            },
+            "impressions": {
+                "type": "raw",
+                "source_path": [
+                    "Impressions"
+                ]
+            },
+            "clicks": {
+                "type": "raw",
+                "source_path": [
+                    "Clicks"
+                ]
+            },
+            "spend": {
+                "type": "raw",
+                "source_path": [
+                    "Spend"
+                ]
+            }
         },
         "geographic_metrics": {
-            "time_period": null,
-            "account_id": null,
-            "account_name": null,
-            "adgroup_id": null,
-            "adgroup_name": null,
-            "campaign_id": null,
-            "country": null,
-            "state": null,
-            "county": null,
-            "city": null,
-            "postal_code": null,
-            "metro_area": null,
-            "impressions": null,
-            "clicks": null,
-            "spend": null
+            "time_period": {
+                "type": "raw",
+                "source_path": [
+                    "TimePeriod"
+                ]
+            },
+            "adgroup_id": {
+                "type": "raw",
+                "source_path": [
+                    "AdGroupId"
+                ]
+            },
+            "country": {
+                "type": "raw",
+                "source_path": [
+                    "Country"
+                ]
+            },
+            "state": {
+                "type": "raw",
+                "source_path": [
+                    "State"
+                ]
+            },
+            "county": {
+                "type": "raw",
+                "source_path": [
+                    "County"
+                ]
+            },
+            "city": {
+                "type": "raw",
+                "source_path": [
+                    "City"
+                ]
+            },
+            "postal_code": {
+                "type": "raw",
+                "source_path": [
+                    "PostalCode"
+                ]
+            },
+            "metro_area": {
+                "type": "raw",
+                "source_path": [
+                    "MetroArea"
+                ]
+            },
+            "impressions": {
+                "type": "raw",
+                "source_path": [
+                    "Impressions"
+                ]
+            },
+            "clicks": {
+                "type": "raw",
+                "source_path": [
+                    "Clicks"
+                ]
+            },
+            "spend": {
+                "type": "raw",
+                "source_path": [
+                    "Spend"
+                ]
+            }
         }
     }
 ]

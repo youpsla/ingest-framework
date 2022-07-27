@@ -244,11 +244,13 @@
         "daily_user_location_metrics_update": {
             "actions": [
                 "download",
-                "transfer"
+                "insert"
             ],
             "source": "bing",
             "destination": "s3",
             "request_data_source": "redshift",
+            "model": "user_location_metrics",
+            "exclude_existing_in_db":false,
             "url": {
                 "type": "service",
                 "service_name": "ReportingService",
@@ -339,11 +341,13 @@
         "daily_demographic_metrics_update": {
             "actions": [
                 "download",
-                "transfer"
+                "insert"
             ],
             "source": "bing",
             "destination": "s3",
             "request_data_source": "redshift",
+            "model": "demographic_metrics",
+            "exclude_existing_in_db":false,
             "url": {
                 "type": "service",
                 "service_name": "ReportingService",
@@ -434,11 +438,13 @@
         "daily_geographic_metrics_update": {
             "actions": [
                 "download",
-                "transfer"
+                "insert"
             ],
             "source": "bing",
             "destination": "s3",
             "request_data_source": "redshift",
+            "model": "geographic_metrics",
+            "exclude_existing_in_db":false,
             "url": {
                 "type": "service",
                 "service_name": "ReportingService",
