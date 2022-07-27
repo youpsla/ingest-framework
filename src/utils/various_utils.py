@@ -111,9 +111,12 @@ def run_in_threads_pool(
         for task in threads_list:
             if task[0].result():
                 task_result, endpoint = task[0].result()
-                has_more = task_result["hasMore"]
+                has_more = task_result.get("hasMore", None)
                 tmp_result = []
-                tmp_result.extend(task_result[result_key])
+                if result_key:
+                    tmp_result.extend(task_result[result_key])
+                else:
+                    tmp_result.append(task_result)
                 while has_more:
                     pagination_param = endpoint.get_param_by_name("offset")
                     pagination_param.value = task_result["offset"]
