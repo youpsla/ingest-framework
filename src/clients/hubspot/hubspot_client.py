@@ -221,64 +221,6 @@ class HubspotClient(Client):
                         after = r.paging.next.after
                         continue
 
-            # if self.task.name == "email_events":
-            #     properties = (
-            #         [
-            #             "createdAt",
-            #             "updatedAt",
-            #             "domain",
-            #             "name",
-            #             "hs_additional_domains",
-            #             "hs_analytics_num_page_views",
-            #             "hs_analytics_num_visits",
-            #             "hs_is_target_account",
-            #             "hs_object_id",
-            #             "num_associated_contacts",
-            #             "website",
-            #             "hs_parent_company_id",
-            #             "archived",
-            #         ],
-            #     )
-            #     has_to_continue = True
-            #     result = []
-            #     after = 0
-            #     while has_to_continue:
-            #         r = oauth_api_client.crm.objects.emails.basic_api.get_page(
-            #             limit=100,
-            #             **param[1][0],
-            #             **param[1][1],
-            #         )
-            #         r = oauth_api_client.crm.companies.basic_api.get_page(
-            #             properties=properties, limit=100, after=after
-            #         )
-            #         result.extend(r.results)
-            #         if r.paging is None:
-            #             has_to_continue = False
-            #         else:
-            #             print(len(result))
-            #             after = r.paging.next.after
-            #             continue
-
-            # print(len(r))
-            # result = oauth_api_client.crm.companies.get_all(
-            #     properties=[
-            #         "createdAt",
-            #         "updatedAt",
-            #         "domain",
-            #         "name",
-            #         "hs_additional_domains",
-            #         "hs_analytics_num_page_views",
-            #         "hs_analytics_num_visits",
-            #         "hs_is_target_account",
-            #         "hs_object_id",
-            #         "num_associated_contacts",
-            #         "website",
-            #         "hs_parent_company_id",
-            #         "archived",
-            #     ]
-            # )
-            # print(len(result))
-
             if self.task.name in ["events"]:
                 db_params = self.get_request_params()
                 cpt = 0
