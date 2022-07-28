@@ -64,6 +64,7 @@ class BingAdsClient(Client):
             "daily_user_location_metrics_update",
             "daily_demographic_metrics_update",
             "daily_geographic_metrics_update",
+            "daily_ad_metrics_update",
         ]:
             request = ReportRequest(
                 authorization_data=self.authorization_data,
@@ -504,6 +505,41 @@ class ReportRequest:
 
         return report_request
 
+    def get_ad_performance_report_request(
+        self,
+    ):
+
+        report_request = self.service.factory.create("AdPerformanceReportRequest")
+        report_request.Aggregation = self.aggregation
+        report_request.ExcludeColumnHeaders = self.exclude_column_headers
+        report_request.ExcludeReportFooter = self.exclude_report_footer
+        report_request.ExcludeReportHeader = self.exclude_report_header
+        report_request.Format = self.report_file_format
+        report_request.ReturnOnlyCompleteData = self.return_only_complete_data
+        report_request.Time = self.get_custom_date_range()
+        report_request.ReportName = "Ad Performance Report"
+        scope = self.service.factory.create("AccountThroughAdGroupReportScope")
+        for p in self.param:
+            setattr(scope, list(p.keys())[0], {"long": [list(p.values())[0]]})
+        report_request.Scope = scope
+
+        report_columns = self.service.factory.create("ArrayOfAdPerformanceReportColumn")
+        report_columns.AdPerformanceReportColumn.append(
+            [
+                "TimePeriod",
+                "AccountId",
+                "CampaignId",
+                "AdGroupId",
+                "AdId",
+                "Impressions",
+                "Clicks",
+                "Spend",
+            ]
+        )
+        report_request.Columns = report_columns
+
+        return report_request
+
     def get(self):
         if self.task.name == "daily_user_location_metrics_update":
             return self.get_user_location_performance_report_request()
@@ -511,17 +547,8 @@ class ReportRequest:
             return self.professional_demographics_audience_report_request()
         if self.task.name == "daily_geographic_metrics_update":
             return self.get_geographic_performance_report_request()
-
-        # if self.task.name == "daily_campaigns_update":
-
-        #     result = self.service.GetCampaignsByAccountId(
-        #         **self.kwargs[0],
-        #         **self.param[0],
-        #     )
-
-        #     result = recursive_asdict(result)
-        #     result = nested_get(result, self.task.params["url"]["response_data_key"])
-        #     return result
+        if self.task.name == "daily_ad_metrics_update":
+            return self.get_ad_performance_report_request()
 
         raise ValueError("Unknown task name")
 

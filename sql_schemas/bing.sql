@@ -71,6 +71,8 @@ CREATE TABLE IF NOT EXISTS bing_development.demographic_metrics
 	jab_id INT IDENTITY(1,1)
 	,jab_created_at TIMESTAMP WITHOUT TIME ZONE   ENCODE az64 default sysdate
 	,time_period  DATE    ENCODE az64
+    ,account_id BIGINT   ENCODE az64
+    ,campaign_id BIGINT   ENCODE az64
 	,adgroup_id BIGINT   ENCODE az64
 	,company_name VARCHAR(255)   ENCODE lzo
 	,industry_name VARCHAR(255)   ENCODE lzo
@@ -88,6 +90,8 @@ CREATE TABLE IF NOT EXISTS bing_staging.user_location_metrics
 	jab_id INT IDENTITY(1,1)
 	,jab_created_at TIMESTAMP WITHOUT TIME ZONE   ENCODE az64 default sysdate
 	,time_period  DATE    ENCODE az64
+    ,account_id BIGINT   ENCODE az64
+    ,campaign_id BIGINT   ENCODE az64
 	,adgroup_id BIGINT   ENCODE az64
 	,country VARCHAR(255)   ENCODE lzo
 	,state VARCHAR(255)   ENCODE lzo
@@ -134,6 +138,8 @@ CREATE TABLE IF NOT EXISTS bing_development.geographic_metrics
 	jab_id INT IDENTITY(1,1)
 	,jab_created_at TIMESTAMP WITHOUT TIME ZONE   ENCODE az64 default sysdate
 	,time_period  DATE    ENCODE az64
+    ,account_id BIGINT   ENCODE az64
+    ,campaign_id BIGINT   ENCODE az64
 	,adgroup_id BIGINT   ENCODE az64
 	,country VARCHAR(255)   ENCODE lzo
 	,state VARCHAR(255)   ENCODE lzo
@@ -149,6 +155,23 @@ DISTSTYLE AUTO
 ;
 -- ALTER TABLE bing_development.geographic_metrics owner to jabmo;
 
+
+CREATE TABLE IF NOT EXISTS bing_development.ad_metrics
+(
+	jab_id INT IDENTITY(1,1)
+	,jab_created_at TIMESTAMP WITHOUT TIME ZONE   ENCODE az64 default sysdate
+	,time_period  DATE    ENCODE az64
+    ,account_id BIGINT   ENCODE az64
+    ,campaign_id BIGINT   ENCODE az64
+	,adgroup_id BIGINT   ENCODE az64
+	,ad_id BIGINT   ENCODE az64
+	,impressions INT ENCODE az64
+	,clicks INT ENCODE az64
+	,spend DECIMAL ENCODE az64
+)
+DISTSTYLE AUTO
+;
+-- ALTER TABLE bing_development.ad_metrics owner to jabmo;
 
 
 
