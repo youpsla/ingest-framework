@@ -163,15 +163,13 @@
             "created_at": {
                 "type": "raw",
                 "source_path": [
-                    "properties",
-                    "createdAt"
+                    "created_at"
                 ]
             },
             "updated_at": {
                 "type": "raw",
                 "source_path": [
-                    "properties",
-                    "updatedAt"
+                    "updated_at"
                 ]
             },
             "portal_id": {
