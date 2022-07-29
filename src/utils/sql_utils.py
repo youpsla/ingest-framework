@@ -196,6 +196,32 @@ class SqlQuery:
                     for f in comparaison_fields
                 ]
             )
+
+            ## SOlutino managing ca se of null value in redshift.
+            # where_data = " or ".join(
+            #     [
+            #         "("
+            #         + "("
+            #         + " != ".join(
+            #             (
+            #                 "{}.{}".format(self.model.model_name, str(f)),
+            #                 "{}.{}".format(self.stage_table_name, str(f)),
+            #             )
+            #         )
+            #         + ")"
+            #         + " or "
+            #         + "("
+            #         + "{}.{}".format(self.stage_table_name, str(f))
+            #         + " is not null "
+            #         + " and "
+            #         + "{}.{}".format(self.model.model_name, str(f))
+            #         + " is null "
+            #         + ")"
+            #         + ")"
+            #         for f in comparaison_fields
+            #     ]
+            # )
+
             return where_data
 
         target = self.model.model_name
