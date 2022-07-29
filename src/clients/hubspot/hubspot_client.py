@@ -178,6 +178,8 @@ class HubspotClient(Client):
                     if r.paging is None:
                         has_to_continue = False
                     else:
+                        ## Usefull for testing.
+                        # has_to_continue = False
                         print(len(result))
                         after = r.paging.next.after
                         continue
