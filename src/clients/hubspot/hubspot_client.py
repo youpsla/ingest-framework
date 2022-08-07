@@ -110,37 +110,38 @@ class HubspotClient(Client):
 
             tmp = None
 
-            if self.task.name == "ccccccccontacts":
-                properties = (
-                    [
-                        "email",
-                        "firstname",
-                        "lastname",
-                        "job_title",
-                        "company",
-                        "industry",
-                        "hs_analytics_average_page_views",
-                        "contact_owner",
-                        "address",
-                        "zip",
-                        "city",
-                        "region",
-                        "country",
-                        "hs_email_domain",
-                        "hs_analytics_num_event_completions",
-                        "ip_city",
-                        "ip_country",
-                        "ip_country_code",
-                        "ip_state",
-                        "ip_state_code",
-                        "createdAt",
-                        "updated_at",
-                        "portal_id",
-                    ],
-                )
-                result = oauth_api_client.crm.contacts.get_all(properties=properties)
+            ##  Use get all.
+            # if self.task.name == "contacts":
+            #     properties = (
+            #         [
+            #             "email",
+            #             "firstname",
+            #             "lastname",
+            #             "job_title",
+            #             "company",
+            #             "industry",
+            #             "hs_analytics_average_page_views",
+            #             "contact_owner",
+            #             "address",
+            #             "zip",
+            #             "city",
+            #             "region",
+            #             "country",
+            #             "hs_email_domain",
+            #             "hs_analytics_num_event_completions",
+            #             "ip_city",
+            #             "ip_country",
+            #             "ip_country_code",
+            #             "ip_state",
+            #             "ip_state_code",
+            #             "createdAt",
+            #             "updated_at",
+            #             "portal_id",
+            #         ],
+            #     )
+            #     result = oauth_api_client.crm.contacts.get_all(properties=properties)
 
-            if self.task.name == "contacts":
+            if self.task.name == "contacts_sdk":
                 properties = [
                     "email",
                     "firstname",
@@ -274,7 +275,11 @@ class HubspotClient(Client):
                     pass
 
             if self.task.name in [
+                "contacts",
+                "contacts_recently_created",
+                "companies_recently_updated",
                 "company_contact_associations",
+                "contact_company_associations",
                 "email_events_click_since_2022",
                 "email_events_open_since_2022",
                 "email_events_forward_since_2022",
@@ -282,6 +287,7 @@ class HubspotClient(Client):
                 "email_events_open_daily",
                 "email_events_forward_daily",
                 "campaigns",
+                "contacts_recently_updated",
                 "campaign_details",
             ]:
 

@@ -1,6 +1,6 @@
 [
     {
-        "contacts": {
+        "contacts_sdk": {
             "actions": [
                 "insert",
                 "update"
@@ -27,6 +27,340 @@
         }
     },
     {
+        "contacts": {
+            "actions": [
+                "insert",
+                "update"
+            ],
+            "exclude_existing_in_db": true,
+            "source": "hubspot",
+            "destination": "redshift",
+            "request_data_source": "redshift",
+            "destination_unique_keys": [
+                "id"
+            ],
+            "model": "contacts",
+            "update_key": "id",
+            "query": {
+                "template": "{base}?{count}&{vidOffset}&{email}&{firstname}&{lastname}&{job_title}&{company}&{industry}&{hs_analytics_average_page_views}&{contact_owner}&{address}&{zip}&{city}&{region}&{country}&{hs_email_domain}&{hs_analytics_num_event_completions}&{ip_city}&{ip_country}&{ip_country_code}&{ip_state}&{ip_state_code}",
+                "response_datas_key": "contacts",
+                "params": [
+                    {
+                        "name": "base",
+                        "type": "constant",
+                        "output_type": "arg",
+                        "value": "https://api.hubapi.com/contacts/v1/lists/all/contacts/all"
+                    },
+                    {
+                        "name": "count",
+                        "type": "constant",
+                        "output_type": "kwarg",
+                        "value": 100
+                    },
+                    {
+                        "name": "vidOffset",
+                        "type": "constant",
+                        "output_type": "kwarg",
+                        "value": ""
+                    },
+                    {
+                        "name": "email",
+                        "type": "constant",
+                        "output_type": "arg",
+                        "value": "property=email"
+                    },
+                    {
+                        "name": "firstname",
+                        "type": "constant",
+                        "output_type": "arg",
+                        "value": "property=firstname"
+                    },
+                    {
+                        "name": "lastname",
+                        "type": "constant",
+                        "output_type": "arg",
+                        "value": "property=lastname"
+                    },
+                    {
+                        "name": "job_title",
+                        "type": "constant",
+                        "output_type": "arg",
+                        "value": "property=job_title"
+                    },
+                    {
+                        "name": "company",
+                        "type": "constant",
+                        "output_type": "arg",
+                        "value": "property=company"
+                    },
+                    {
+                        "name": "industry",
+                        "type": "constant",
+                        "output_type": "arg",
+                        "value": "property=industry"
+                    },
+                    {
+                        "name": "hs_analytics_average_page_views",
+                        "type": "constant",
+                        "output_type": "arg",
+                        "value": "property=hs_analytics_average_page_views"
+                    },
+                    {
+                        "name": "contact_owner",
+                        "type": "constant",
+                        "output_type": "arg",
+                        "value": "property=contact_owner"
+                    },
+                    {
+                        "name": "address",
+                        "type": "constant",
+                        "output_type": "arg",
+                        "value": "property=address"
+                    },
+                    {
+                        "name": "zip",
+                        "type": "constant",
+                        "output_type": "arg",
+                        "value": "property=zip"
+                    },
+                    {
+                        "name": "city",
+                        "type": "constant",
+                        "output_type": "arg",
+                        "value": "property=city"
+                    },
+                    {
+                        "name": "region",
+                        "type": "constant",
+                        "output_type": "arg",
+                        "value": "property=region"
+                    },
+                    {
+                        "name": "country",
+                        "type": "constant",
+                        "output_type": "arg",
+                        "value": "property=country"
+                    },
+                    {
+                        "name": "hs_email_domain",
+                        "type": "constant",
+                        "output_type": "arg",
+                        "value": "property=hs_email_domain"
+                    },
+                    {
+                        "name": "hs_analytics_num_event_completions",
+                        "type": "constant",
+                        "output_type": "arg",
+                        "value": "property=hs_analytics_num_event_completions"
+                    },
+                    {
+                        "name": "ip_city",
+                        "type": "constant",
+                        "output_type": "arg",
+                        "value": "property=ip_city"
+                    },
+                    {
+                        "name": "ip_country",
+                        "type": "constant",
+                        "output_type": "arg",
+                        "value": "property=ip_country"
+                    },
+                    {
+                        "name": "ip_country_code",
+                        "type": "constant",
+                        "output_type": "arg",
+                        "value": "property=ip_country_code"
+                    },
+                    {
+                        "name": "ip_state",
+                        "type": "constant",
+                        "output_type": "arg",
+                        "value": "property=ip_state"
+                    },
+                    {
+                        "name": "ip_state_code",
+                        "type": "constant",
+                        "output_type": "arg",
+                        "value": "property=ip_state_code"
+                    },
+                    {
+                        "name": "portal_id",
+                        "type": "constant",
+                        "output_type": "arg",
+                        "value": "property=portal_id"
+                    }
+            ]
+            }
+        }
+    },
+    {
+        "contacts_recently_created": {
+            "actions": [
+                "insert",
+                "update"
+            ],
+            "exclude_existing_in_db": true,
+            "source": "hubspot",
+            "destination": "redshift",
+            "request_data_source": "redshift",
+            "destination_unique_keys": [
+                "id"
+            ],
+            "model": "contacts",
+            "update_key": "id",
+            "query": {
+                "template": "{base}?{count}&{timeOffset}&{email}&{firstname}&{lastname}&{job_title}&{company}&{industry}&{hs_analytics_average_page_views}&{contact_owner}&{address}&{zip}&{city}&{region}&{country}&{hs_email_domain}&{hs_analytics_num_event_completions}&{ip_city}&{ip_country}&{ip_country_code}&{ip_state}&{ip_state_code}",
+                "response_datas_key": "contacts",
+                "params": [
+                    {
+                        "name": "base",
+                        "type": "constant",
+                        "output_type": "arg",
+                        "value": "https://api.hubapi.com/contacts/v1/lists/all/contacts/recent"
+                    },
+                    {
+                        "name": "count",
+                        "type": "constant",
+                        "output_type": "kwarg",
+                        "value": 10
+                    },
+                    {
+                        "name": "timeOffset",
+                        "type": "constant",
+                        "output_type": "kwarg",
+                        "value": ""
+                    },
+                    {
+                        "name": "email",
+                        "type": "constant",
+                        "output_type": "arg",
+                        "value": "property=email"
+                    },
+                    {
+                        "name": "firstname",
+                        "type": "constant",
+                        "output_type": "arg",
+                        "value": "property=firstname"
+                    },
+                    {
+                        "name": "lastname",
+                        "type": "constant",
+                        "output_type": "arg",
+                        "value": "property=lastname"
+                    },
+                    {
+                        "name": "job_title",
+                        "type": "constant",
+                        "output_type": "arg",
+                        "value": "property=job_title"
+                    },
+                    {
+                        "name": "company",
+                        "type": "constant",
+                        "output_type": "arg",
+                        "value": "property=company"
+                    },
+                    {
+                        "name": "industry",
+                        "type": "constant",
+                        "output_type": "arg",
+                        "value": "property=industry"
+                    },
+                    {
+                        "name": "hs_analytics_average_page_views",
+                        "type": "constant",
+                        "output_type": "arg",
+                        "value": "property=hs_analytics_average_page_views"
+                    },
+                    {
+                        "name": "contact_owner",
+                        "type": "constant",
+                        "output_type": "arg",
+                        "value": "property=contact_owner"
+                    },
+                    {
+                        "name": "address",
+                        "type": "constant",
+                        "output_type": "arg",
+                        "value": "property=address"
+                    },
+                    {
+                        "name": "zip",
+                        "type": "constant",
+                        "output_type": "arg",
+                        "value": "property=zip"
+                    },
+                    {
+                        "name": "city",
+                        "type": "constant",
+                        "output_type": "arg",
+                        "value": "property=city"
+                    },
+                    {
+                        "name": "region",
+                        "type": "constant",
+                        "output_type": "arg",
+                        "value": "property=region"
+                    },
+                    {
+                        "name": "country",
+                        "type": "constant",
+                        "output_type": "arg",
+                        "value": "property=country"
+                    },
+                    {
+                        "name": "hs_email_domain",
+                        "type": "constant",
+                        "output_type": "arg",
+                        "value": "property=hs_email_domain"
+                    },
+                    {
+                        "name": "hs_analytics_num_event_completions",
+                        "type": "constant",
+                        "output_type": "arg",
+                        "value": "property=hs_analytics_num_event_completions"
+                    },
+                    {
+                        "name": "ip_city",
+                        "type": "constant",
+                        "output_type": "arg",
+                        "value": "property=ip_city"
+                    },
+                    {
+                        "name": "ip_country",
+                        "type": "constant",
+                        "output_type": "arg",
+                        "value": "property=ip_country"
+                    },
+                    {
+                        "name": "ip_country_code",
+                        "type": "constant",
+                        "output_type": "arg",
+                        "value": "property=ip_country_code"
+                    },
+                    {
+                        "name": "ip_state",
+                        "type": "constant",
+                        "output_type": "arg",
+                        "value": "property=ip_state"
+                    },
+                    {
+                        "name": "ip_state_code",
+                        "type": "constant",
+                        "output_type": "arg",
+                        "value": "property=ip_state_code"
+                    },
+                    {
+                        "name": "portal_id",
+                        "type": "constant",
+                        "output_type": "arg",
+                        "value": "property=portal_id"
+                    }
+            ]
+            }
+        }
+    },
+    {
         "contacts_recently_updated": {
             "actions": [
                 "insert",
@@ -42,65 +376,32 @@
             "model": "contacts",
             "update_key": "id",
             "query": {
-                "template": "{base}?{limit}&{offset}",
-                "response_datas_key": "events",
-                "base": "https://api.hubapi.com/contacts/v1/lists/recently_updated/contacts/recent",
+                "template": "{base}?{count}&{timeOffset}&{property}",
+                "response_datas_key": "contacts",
                 "params": [
                     {
                         "name": "base",
                         "type": "constant",
                         "output_type": "arg",
-                        "value": "https://api.hubapi.com/email/public/v1/events"
+                        "value": "https://api.hubapi.com/contacts/v1/lists/recently_updated/contacts/recent"
                     },
                     {
-                        "name": "emailCampaignId",
-                        "type": "db",
-                        "data_source_name": "campaigns",
-                        "source_key": "id",
-                        "output_type": "kwarg"
-                    },
-                    {
-                        "name": "appId",
-                        "type": "db",
-                        "data_source_name": "campaigns",
-                        "source_key": "app_id",
-                        "output_type": "kwarg"
-                    },
-                    {
-                        "name": "limit",
+                        "name": "count",
                         "type": "constant",
                         "output_type": "kwarg",
-                        "value": 1000
+                        "value": 100
                     },
                     {
-                        "name": "offset",
+                        "name": "timeOffset",
                         "type": "constant",
                         "output_type": "kwarg",
                         "value": ""
                     },
                     {
-                        "name": "eventType",
+                        "name": "property",
                         "type": "constant",
-                        "output_type": "kwarg",
-                        "value": "FORWARD"
-                    },
-                    {
-                        "name": "startTimestamp",
-                        "type": "timestamp_from_epoch",
-                        "offset_type": "from_today",
-                        "offset_value": "1",
-                        "offset_unity": "days",
-                        "position": "start",
-                        "output_type": "kwarg"
-                    },
-                    {
-                        "name": "endTimestamp",
-                        "type": "timestamp_from_epoch",
-                        "offset_type": "from_today",
-                        "offset_value": "1",
-                        "offset_unity": "days",
-                        "position": "end",
-                        "output_type": "kwarg"
+                        "output_type": "arg",
+                        "value": "property=ip_city&property=ip_country&property=city"
                     }
                 ]
             }
@@ -126,6 +427,56 @@
                 "type": "service",
                 "response_data_key": [
                     "results"
+                ]
+            }
+        }
+    },
+    {
+        "companies_recently_updated": {
+            "actions": [
+                "insert",
+                "update"
+            ],
+            "exclude_existing_in_db": true,
+            "source": "hubspot",
+            "destination": "redshift",
+            "request_data_source": "redshift",
+            "destination_unique_keys": [
+                "id"
+            ],
+            "model": "companies",
+            "update_key": "id",
+            "query": {
+                "template": "{base}?{count}&{offset}&{since}",
+                "response_datas_key": "results",
+                "params": [
+                    {
+                        "name": "base",
+                        "type": "constant",
+                        "output_type": "arg",
+                        "value": "https://api.hubapi.com/companies/v2/companies/recent/created"
+                    },
+                    {
+                        "name": "count",
+                        "type": "constant",
+                        "output_type": "kwarg",
+                        "value": 100
+                    },
+                    {
+                        "name": "offset",
+                        "type": "constant",
+                        "output_type": "kwarg",
+                        "value": ""
+                    },
+                    {
+                        "name": "since",
+                        "type": "timestamp_from_epoch",
+                        "offset_type": "from_today",
+                        "offset_value": "2",
+                        "offset_unity": "days",
+                        "position": "start",
+                        "output_type": "kwarg"
+                    }
                 ]
             }
         }
@@ -578,6 +929,67 @@
         }
     },
     {
+        "contact_company_associations": {
+            "actions": [
+                "insert"
+            ],
+            "source": "hubspot",
+            "destination": "redshift",
+            "request_data_source": "redshift",
+            "model": "company_contact_associations",
+            "data_source": {
+                "name": "contacts",
+                "raw_sql": "select distinct(id) from {schema}.contacts  where DATE(updated_at) > DATE(GETDATE() - INTERVAL '2 DAY') AND DATE(updated_at) < DATE(GETDATE())"
+            },
+            "fields_to_add_to_api_result": [
+                {
+                    "name": "contact_id",
+                    "origin_key": "contact_id",
+                    "destination_key": "contact_id"
+                }
+            ],
+            "key_for_values": "company_id",
+            "query": {
+                "e_type": "rest",
+                "template": "{base}/{contact_id}/{association_type}?{limit}&{offset}",
+                "response_datas_key": "results",
+                "params": [
+                    {
+                        "name": "base",
+                        "type": "constant",
+                        "output_type": "arg",
+                        "value": "https://api.hubapi.com/crm-associations/v1/associations/"
+                    },
+                    {
+                        "name": "contact_id",
+                        "type": "db",
+                        "data_source_name": "contacts",
+                        "source_key": "id",
+                        "output_type": "arg"
+                    },
+                    {
+                        "name": "limit",
+                        "type": "constant",
+                        "output_type": "kwarg",
+                        "value": 100
+                    },
+                    {
+                        "name": "association_type",
+                        "type": "constant",
+                        "output_type": "arg",
+                        "value": "/HUBSPOT_DEFINED/1"
+                    },
+                    {
+                        "name": "offset",
+                        "type": "constant",
+                        "output_type": "kwarg",
+                        "value": 0
+                    }
+                ]
+            }
+        }
+    },
+    {
         "email_events_click_daily": {
             "actions": [
                 "insert"
@@ -642,7 +1054,7 @@
                         "name": "startTimestamp",
                         "type": "timestamp_from_epoch",
                         "offset_type": "from_today",
-                        "offset_value": "1",
+                        "offset_value": "4",
                         "offset_unity": "days",
                         "position": "start",
                         "output_type": "kwarg"
@@ -725,7 +1137,7 @@
                         "name": "startTimestamp",
                         "type": "timestamp_from_epoch",
                         "offset_type": "from_today",
-                        "offset_value": "1",
+                        "offset_value": "4",
                         "offset_unity": "days",
                         "position": "start",
                         "output_type": "kwarg"
@@ -808,7 +1220,7 @@
                         "name": "startTimestamp",
                         "type": "timestamp_from_epoch",
                         "offset_type": "from_today",
-                        "offset_value": "1",
+                        "offset_value": "4",
                         "offset_unity": "days",
                         "position": "start",
                         "output_type": "kwarg"
