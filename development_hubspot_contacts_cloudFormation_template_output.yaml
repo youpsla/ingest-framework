@@ -1,0 +1,44 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Bing API Ingest Microservice V2a
+Resources:
+  Function:
+    Type: AWS::Serverless::Function
+    Properties:
+      Description: STAGING - Bing API Ingest Microservice V2a
+      Handler: bing.src.lambda_f.lambda_handler
+      CodeUri: s3://jabmo-linkedin-ingest-lambda/2bdb64d6686c76de70fe960e8f0641a8
+      Runtime: python3.8
+      Layers:
+      - arn:aws:lambda:eu-west-1:467882466042:layer:python-aws-psycopg2:1
+      - arn:aws:lambda:eu-west-1:467882466042:layer:python-requests:1
+      Role: arn:aws:iam::467882466042:role/Linkedin-lambda-dev-staging-rw
+      Timeout: 900
+      MemorySize: 1024
+      Environment:
+        Variables:
+          SENTRY_DNS: https://47e2fc82fc674f428f2b3e931eddace7@o1035237.ingest.sentry.io/6094713
+          RUNNING_ENV: production
+  ScheduledRuleJabmoHubspotContactsIngestDaily:
+    Type: AWS::Events::Rule
+    Properties:
+      Description: jabmo-ingest-bing-daily-trigger
+      ScheduleExpression: cron(00 9 * * ? *)
+      State: ENABLED
+      Targets:
+      - Arn:
+          Fn::GetAtt:
+          - Function
+          - Arn
+        Id: Function
+  PermissionRuleJabmoBingIngestDaily:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName:
+        Ref: Function
+      Action: lambda:InvokeFunction
+      Principal: events.amazonaws.com
+      SourceArn:
+        Fn::GetAtt:
+        - ScheduledRuleJabmoHubspotContactsIngestDaily
+        - Arn

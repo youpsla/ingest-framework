@@ -48,6 +48,7 @@ class Endpoint:
         for elem in self.endpoint_param_object_list:
             if elem.name == name:
                 return elem
+        return None
 
     def get_headers(self, header=None, access_token=None):
         """# noqa: E501
