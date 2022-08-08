@@ -17,165 +17,189 @@
             "id": {
                 "type": "raw",
                 "source_path": [
-                    "id"
+                    "vid",
+                    "value"
                 ]
             },
             "email": {
                 "type": "raw",
                 "source_path": [
                     "properties",
-                    "email"
+                    "email",
+                    "value"
                 ]
             },
             "firstname": {
                 "type": "raw",
                 "source_path": [
                     "properties",
-                    "firstname"
+                    "firstname",
+                    "value"
                 ]
             },
             "lastname": {
                 "type": "raw",
                 "source_path": [
                     "properties",
-                    "lastname"
+                    "lastname",
+                    "value"
                 ]
             },
             "job_title": {
                 "type": "raw",
                 "source_path": [
                     "properties",
-                    "job_title"
+                    "job_title",
+                    "value"
                 ]
             },
             "company": {
                 "type": "raw",
                 "source_path": [
                     "properties",
-                    "company"
+                    "company",
+                    "value"
                 ]
             },
             "industry": {
                 "type": "raw",
                 "source_path": [
                     "properties",
-                    "industry"
+                    "industry",
+                    "value"
                 ]
             },
             "hs_analytics_average_page_views": {
                 "type": "raw",
                 "source_path": [
                     "properties",
-                    "hs_analytics_average_page_views"
+                    "hs_analytics_average_page_views",
+                    "value"
                 ]
             },
             "contact_owner": {
                 "type": "raw",
                 "source_path": [
                     "properties",
-                    "contact_owner"
+                    "contact_owner",
+                    "value"
                 ]
             },
             "address": {
                 "type": "raw",
                 "source_path": [
                     "properties",
-                    "address"
+                    "address",
+                    "value"
                 ]
             },
             "zip": {
                 "type": "raw",
                 "source_path": [
                     "properties",
-                    "zip"
+                    "zip",
+                    "value"
                 ]
             },
             "city": {
                 "type": "raw",
                 "source_path": [
                     "properties",
-                    "city"
+                    "city",
+                    "value"
                 ]
             },
             "region": {
                 "type": "raw",
                 "source_path": [
                     "properties",
-                    "region"
+                    "region",
+                    "value"
                 ]
             },
             "country": {
                 "type": "raw",
                 "source_path": [
                     "properties",
-                    "country"
+                    "country",
+                    "value"
                 ]
             },
             "hs_email_domain": {
                 "type": "raw",
                 "source_path": [
                     "properties",
-                    "hs_email_domain"
+                    "hs_email_domain",
+                    "value"
                 ]
             },
             "hs_analytics_num_event_completions": {
                 "type": "raw",
                 "source_path": [
                     "properties",
-                    "hs_analytics_num_event_completions"
+                    "hs_analytics_num_event_completions",
+                    "value"
                 ]
             },
             "ip_city": {
                 "type": "raw",
                 "source_path": [
                     "properties",
-                    "ip_city"
+                    "ip_city",
+                    "value"
                 ]
             },
             "ip_country": {
                 "type": "raw",
                 "source_path": [
                     "properties",
-                    "ip_country"
+                    "ip_country",
+                    "value"
                 ]
             },
             "ip_country_code": {
                 "type": "raw",
                 "source_path": [
                     "properties",
-                    "ip_country_code"
+                    "ip_country_code",
+                    "value"
                 ]
             },
             "ip_state": {
                 "type": "raw",
                 "source_path": [
                     "properties",
-                    "ip_state"
+                    "ip_state",
+                    "value"
                 ]
             },
             "ip_state_code": {
                 "type": "raw",
                 "source_path": [
                     "properties",
-                    "ip_state_code"
+                    "ip_state_code",
+                    "value"
                 ]
             },
             "created_at": {
                 "type": "raw",
                 "source_path": [
-                    "created_at"
+                    "created_at",
+                    "value"
                 ]
             },
             "updated_at": {
                 "type": "raw",
                 "source_path": [
-                    "updated_at"
+                    "updated_at",
+                    "value"
                 ]
             },
             "portal_id": {
                 "type": "raw",
                 "source_path": [
-                    "portal_id"
+                    "portal_id",
+                    "value"
                 ]
             }
         }
