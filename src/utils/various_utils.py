@@ -111,7 +111,6 @@ def run_in_threads_pool(
                 )
             )
         for task in threads_list:
-
             if task[0].result():
                 task_result, endpoint = task[0].result()
                 tmp_result = []
@@ -135,7 +134,7 @@ def run_in_threads_pool(
                             endpoint = pagination_function(endpoint, task_result)
 
                 result.append({task[1]: tmp_result})
-                print(f"# requests run so far: {len(result)}")
+                # print(f"# requests run so far: {len(result)}")
     return result
 
 

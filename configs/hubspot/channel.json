@@ -1,28 +1,38 @@
 {
     "name": "hubspot",
     "daily_tasks_list" : [
-        "contacts_recently_updated",
-        "companies_recently_updated",
-        "campaigns",
-        "campaign_details"
-    ],
-    "bck_daily_tasks_list" : [
-        "contacts_recently_updated",
         "contacts_recently_created",
         "companies_recently_updated",
         "campaigns",
+        "delete_campaigns_with_last_update_time_before_2022_01_01",
         "campaign_details",
-        "contact_company_associations",
+        "contact_created_company_daily_associations",
+        "email_events_open_daily",
+        "email_events_click_daily"
+    ],
+    "daily_tasks_list_bck" : [
+        "contacts_recently_created",
+        "companies_recently_updated",
+        "campaigns",
+        "delete_campaigns_with_last_update_time_before_2022_01_01",
+        "campaign_details",
+        "contact_created_company_daily_associations",
         "email_events_open_daily",
         "email_events_click_daily",
-        "email_events_forward_daily",
+        "email_events_forward_daily"
+    ],
+    "new_client_tasks" : [
+        "contacts",
+        "companies",
+        "campaigns",
+        "delete_campaigns_with_last_update_time_before_2022_01_01",
+        "campaign_details",
+        "company_contact_associations",
         "email_events_click_since_2022",
         "email_events_open_since_2022",
-        "email_events_forward_since_2022",
-        "contacts",
-        "events",
-        "company_contact_associations"
+        "email_events_forward_since_2022"
     ]
+
 }
 
 

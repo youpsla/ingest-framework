@@ -77,14 +77,6 @@ def main():
     for task_name in channel_params["daily_tasks_list"]:
         result, _ = run_task(channel_params["name"], task_name, db_connection)
 
-    today = datetime.datetime.now()
-    run_monthly = True if today.day == 1 else False
-    # run_monthly = True
-    if run_monthly:
-        monthly_tasks_list = channel_params.get("monthly_tasks_list", None)
-        if monthly_tasks_list:
-            for task_name in monthly_tasks_list:
-                result, _ = run_task(channel_params["name"], task_name, db_connection)
     with db_connection.cursor() as cursor:
         cursor.execute("COMMIT;")
     logger.info("All tasks have runned successfully. Daily Worflow ended with success.")

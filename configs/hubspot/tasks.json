@@ -787,7 +787,7 @@
                         "name": "limit",
                         "type": "constant",
                         "output_type": "kwarg",
-                        "value": 1000
+                        "value": 100
                     },
                     {
                         "name": "offset",
@@ -800,27 +800,12 @@
         }
     },
     {
-        "companies_2": {
-            "actions": [
-                "insert",
-                "update"
-            ],
-            "exclude_existing_in_db": true,
-            "exclude_key": "id",
-            "source": "hubspot",
+        "delete_campaigns_with_last_update_time_before_2022_01_01": {
             "destination": "redshift",
-            "destination_unique_keys": [
-                "id"
+            "actions": [
+                "raw_sql"
             ],
-            "request_data_source": "redshift",
-            "model": "companies",
-            "update_key": "id",
-            "url": {
-                "response_datas_key": "campaigns",
-                "template": "{base}/{company_id}/{association_type}?{limit}&{offset}",
-                "base": "https://api.hubapi.com/email/public/v1/campaigns",
-                "params": {}
-            }
+            "raw_sql_to_run": "delete from {schema}.campaigns where last_updated_time < '2022-01-01'"
         }
     },
     {
@@ -884,7 +869,6 @@
             "query": {
                 "template": "{base}?{emailCampaignId}&{appId}&{limit}&{offset}&{startTimestamp}&{endTimestamp}&{eventType}",
                 "response_datas_key": "events",
-                "base": "https://api.hubapi.com/email/public/v1/events",
                 "params": [
                     {
                         "name": "base",
@@ -964,7 +948,6 @@
             "query": {
                 "template": "{base}?{emailCampaignId}&{appId}&{limit}&{offset}&{startTimestamp}&{endTimestamp}&{eventType}",
                 "response_datas_key": "events",
-                "base": "https://api.hubapi.com/email/public/v1/events",
                 "params": [
                     {
                         "name": "base",
@@ -1044,7 +1027,6 @@
             "query": {
                 "template": "{base}?{emailCampaignId}&{appId}&{limit}&{offset}&{startTimestamp}&{endTimestamp}&{eventType}",
                 "response_datas_key": "events",
-                "base": "https://api.hubapi.com/email/public/v1/events",
                 "params": [
                     {
                         "name": "base",
@@ -1175,7 +1157,7 @@
             "model": "company_contact_associations",
             "data_source": {
                 "name": "contacts",
-                "raw_sql": "select distinct(id) from {schema}.contacts  where DATE(updated_at) > DATE(GETDATE() - INTERVAL '2 DAY') AND DATE(updated_at) < DATE(GETDATE())"
+                "raw_sql": "select distinct(id) from {schema}.contacts"
             },
             "fields_to_add_to_api_result": [
                 {
@@ -1219,7 +1201,129 @@
                         "name": "offset",
                         "type": "constant",
                         "output_type": "kwarg",
-                        "value": 0
+                        "value": ""
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "contact_created_company_daily_associations": {
+            "actions": [
+                "insert"
+            ],
+            "source": "hubspot",
+            "destination": "redshift",
+            "request_data_source": "redshift",
+            "model": "company_contact_associations",
+            "data_source": {
+                "name": "contacts",
+                "raw_sql": "select distinct(id) from {schema}.contacts  where DATE(created_at) > DATE(GETDATE() - INTERVAL '2 DAY') AND DATE(created_at) < DATE(GETDATE())"
+            },
+            "fields_to_add_to_api_result": [
+                {
+                    "name": "contact_id",
+                    "origin_key": "contact_id",
+                    "destination_key": "contact_id"
+                }
+            ],
+            "key_for_values": "company_id",
+            "query": {
+                "e_type": "rest",
+                "template": "{base}/{contact_id}/{association_type}?{limit}&{offset}",
+                "response_datas_key": "results",
+                "params": [
+                    {
+                        "name": "base",
+                        "type": "constant",
+                        "output_type": "arg",
+                        "value": "https://api.hubapi.com/crm-associations/v1/associations/"
+                    },
+                    {
+                        "name": "contact_id",
+                        "type": "db",
+                        "data_source_name": "contacts",
+                        "source_key": "id",
+                        "output_type": "arg"
+                    },
+                    {
+                        "name": "limit",
+                        "type": "constant",
+                        "output_type": "kwarg",
+                        "value": 100
+                    },
+                    {
+                        "name": "association_type",
+                        "type": "constant",
+                        "output_type": "arg",
+                        "value": "/HUBSPOT_DEFINED/1"
+                    },
+                    {
+                        "name": "offset",
+                        "type": "constant",
+                        "output_type": "kwarg",
+                        "value": ""
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "contact_updated_company_daily_associations": {
+            "actions": [
+                "insert"
+            ],
+            "source": "hubspot",
+            "destination": "redshift",
+            "request_data_source": "redshift",
+            "model": "company_contact_associations",
+            "data_source": {
+                "name": "contacts",
+                "raw_sql": "select distinct(id) from {schema}.contacts  where DATE(updated_at) > DATE(GETDATE() - INTERVAL '1 DAY') AND DATE(updated_at) < DATE(GETDATE())"
+            },
+            "fields_to_add_to_api_result": [
+                {
+                    "name": "contact_id",
+                    "origin_key": "contact_id",
+                    "destination_key": "contact_id"
+                }
+            ],
+            "key_for_values": "company_id",
+            "query": {
+                "e_type": "rest",
+                "template": "{base}/{contact_id}/{association_type}?{limit}&{offset}",
+                "response_datas_key": "results",
+                "params": [
+                    {
+                        "name": "base",
+                        "type": "constant",
+                        "output_type": "arg",
+                        "value": "https://api.hubapi.com/crm-associations/v1/associations/"
+                    },
+                    {
+                        "name": "contact_id",
+                        "type": "db",
+                        "data_source_name": "contacts",
+                        "source_key": "id",
+                        "output_type": "arg"
+                    },
+                    {
+                        "name": "limit",
+                        "type": "constant",
+                        "output_type": "kwarg",
+                        "value": 100
+                    },
+                    {
+                        "name": "association_type",
+                        "type": "constant",
+                        "output_type": "arg",
+                        "value": "/HUBSPOT_DEFINED/1"
+                    },
+                    {
+                        "name": "offset",
+                        "type": "constant",
+                        "output_type": "kwarg",
+                        "value": ""
                     }
                 ]
             }
@@ -1239,7 +1343,7 @@
             ],
             "data_source": {
                 "name": "campaigns",
-                "raw_sql": "select id, app_id from {schema}.campaigns"
+                "raw_sql": "select id, app_id from {schema}.campaigns where last_updated_time > DATE(GETDATE() - INTERVAL '2 DAY')"
             },
             "model": "email_events",
             "update_key": "id",
@@ -1290,7 +1394,7 @@
                         "name": "startTimestamp",
                         "type": "timestamp_from_epoch",
                         "offset_type": "from_today",
-                        "offset_value": "4",
+                        "offset_value": "2",
                         "offset_unity": "days",
                         "position": "start",
                         "output_type": "kwarg"
@@ -1322,7 +1426,7 @@
             ],
             "data_source": {
                 "name": "campaigns",
-                "raw_sql": "select id, app_id from {schema}.campaigns"
+                "raw_sql": "select id, app_id from {schema}.campaigns where last_updated_time > DATE(GETDATE() - INTERVAL '2 DAY')"
             },
             "model": "email_events",
             "update_key": "id",
@@ -1373,7 +1477,7 @@
                         "name": "startTimestamp",
                         "type": "timestamp_from_epoch",
                         "offset_type": "from_today",
-                        "offset_value": "4",
+                        "offset_value": "2",
                         "offset_unity": "days",
                         "position": "start",
                         "output_type": "kwarg"
@@ -1405,7 +1509,7 @@
             ],
             "data_source": {
                 "name": "campaigns",
-                "raw_sql": "select id, app_id from {schema}.campaigns"
+                "raw_sql": "select id, app_id from {schema}.campaigns where last_updated_time > DATE(GETDATE() - INTERVAL '2 DAY')"
             },
             "model": "email_events",
             "update_key": "id",
@@ -1456,7 +1560,7 @@
                         "name": "startTimestamp",
                         "type": "timestamp_from_epoch",
                         "offset_type": "from_today",
-                        "offset_value": "4",
+                        "offset_value": "2",
                         "offset_unity": "days",
                         "position": "start",
                         "output_type": "kwarg"

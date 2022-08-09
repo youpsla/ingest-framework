@@ -50,32 +50,65 @@ def companies_pagination(endpoint, task_result):
     return endpoint
 
 
-def companies_recently_updated_pagination(endpoint, task_result):
-    has_more_for_contacts = task_result.get("hasMore", None)
-    if not has_more_for_contacts:
+def hasMore_offset_pagination(endpoint, task_result):
+    has_more = task_result.get("hasMore", None)
+    if not has_more:
         return None
     pagination_param = endpoint.get_param_by_name("offset")
     pagination_param.value = task_result["offset"]
     return endpoint
 
 
-def coampaigns_pagination(endpoint, task_result):
-    has_more_for_contacts = task_result.get("hasMore", None)
-    if not has_more_for_contacts:
-        return None
-    pagination_param = endpoint.get_param_by_name("offset")
-    pagination_param.value = task_result["offset"]
-    return endpoint
+companies_recently_updated_pagination = hasMore_offset_pagination
+contact_company_associations_pagination = hasMore_offset_pagination
+email_events_pagination = hasMore_offset_pagination
+campaigns_pagination = hasMore_offset_pagination
 
 
-def contacts_recently_created_pagination(endpoint, task_result):
+# def companies_recently_updated_pagination(endpoint, task_result):
+#     has_more = task_result.get("hasMore", None)
+#     if not has_more:
+#         return None
+#     pagination_param = endpoint.get_param_by_name("offset")
+#     pagination_param.value = task_result["offset"]
+#     return endpoint
+
+
+# def contact_company_associations_pagination(endpoint, task_result):
+#     has_more = task_result.get("hasMore", None)
+#     if not has_more:
+#         return None
+#     pagination_param = endpoint.get_param_by_name("offset")
+#     pagination_param.value = task_result["offset"]
+#     return endpoint
+
+
+# def email_events_pagination(endpoint, task_result):
+#     has_more = task_result.get("hasMore", None)
+#     if not has_more:
+#         return None
+#     pagination_param = endpoint.get_param_by_name("offset")
+#     pagination_param.value = task_result["offset"]
+#     return endpoint
+
+
+# def coampaigns_pagination(endpoint, task_result):
+#     has_more_for_contacts = task_result.get("hasMore", None)
+#     if not has_more_for_contacts:
+#         return None
+#     pagination_param = endpoint.get_param_by_name("offset")
+#     pagination_param.value = task_result["offset"]
+#     return endpoint
+
+
+def contacts_recently_created_updated_pagination(endpoint, task_result):
     has_more = task_result.get("has-more", None)
     if not has_more:
         return None
     time_offset = task_result.get("time-offset", None)
     if time_offset:
         tod = datetime.datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
-        d = datetime.timedelta(days=1)
+        d = datetime.timedelta(days=2)
         yesterday = tod - d
         if time_offset / 1000 < datetime.datetime.timestamp(yesterday):
             return None
@@ -122,21 +155,9 @@ class HubspotClient(Client):
             ]
         return endpoints_list
 
-    def print_result(result):
-        print(result)
-
     def get(self, task_params, **_ignored):
 
         final_result = []
-        # if self.task.name == "contacts":
-        #     # services.get_service("contacts")
-        #     result = self.oauth_api_client.crm.contacts.get_all()
-
-        # raw_sql = "select portal_id from hubspot_development.accounts"
-        # accounts_list = SqlQuery(
-        #     self.db_connection, qtype="raw_sql", raw_sql=raw_sql
-        # ).run()
-
         secrets_list = search_secrets_by_prefix("hubspot/api/")
         portal_token_list = []
         for secret in secrets_list.get("SecretList", []):
@@ -149,9 +170,6 @@ class HubspotClient(Client):
                 )
             )
 
-        # ptl = [(25912207, 'CLWs0tybMBIMggMAUAAAACAAAABIGI_HrQwghercFSj5iTgyFAncLX84DUTpinSCszbkBvScEXT4OjAAMWBB_wcAADwAtABg4HzOKIYAAGAAACA8ACAYAAAAwMN_NgEAAACBZxwY4AAAIAJCFMz1adgaAs5ngxV6JC62tGxh1YwMSgNldTFSAFoA'), ('25955882', 'CKi709ybMBIMggMAUAAAACAAAABIGKqcsAwgioLPDSj5iTgyFL8KPuPP69akxB2E6Rb-7K2WVw5TOjAAMWBB_wcAADwAtABg4HzOKIYAAGAAACA8ACAYAAAAwMN_NgEAAACBZxwY4AAAIAJCFFqrVj3APiWCbyvmw05zSi_EhpQySgNldTFSAFoA'), (1838475, 'CIab1dybMBIMggMAUAAAACAAAABIGIubcCDywqgNKPmJODIUWaoWClovooFugJn6lz4EhyJzb986MAAxYEH_BwAAHAC0AGDgfMYohgAAIAAAABwAIBgAAADAw382AQAAAIFnHBjAAAAgAkIU-PYny8M0Zbo9XURWCQr5O9lJ3MlKA25hMVIAWgA')]
-        # portal_token_list = ptl[0:2]
-
         for ptd in [portal_token_list[2]]:
             # for ptd in portal_token_list:
             access_token = ptd[1]
@@ -161,120 +179,6 @@ class HubspotClient(Client):
             result = []
 
             tmp = None
-
-            ##  Use get all.
-            # if self.task.name == "contacts":
-            #     properties = (
-            #         [
-            #             "email",
-            #             "firstname",
-            #             "lastname",
-            #             "job_title",
-            #             "company",
-            #             "industry",
-            #             "hs_analytics_average_page_views",
-            #             "contact_owner",
-            #             "address",
-            #             "zip",
-            #             "city",
-            #             "region",
-            #             "country",
-            #             "hs_email_domain",
-            #             "hs_analytics_num_event_completions",
-            #             "ip_city",
-            #             "ip_country",
-            #             "ip_country_code",
-            #             "ip_state",
-            #             "ip_state_code",
-            #             "createdAt",
-            #             "updated_at",
-            #             "portal_id",
-            #         ],
-            #     )
-            #     result = oauth_api_client.crm.contacts.get_all(properties=properties)
-
-            if self.task.name == "contacts_sdk":
-                properties = [
-                    "email",
-                    "firstname",
-                    "lastname",
-                    "job_title",
-                    "company",
-                    "industry",
-                    "hs_analytics_average_page_views",
-                    "contact_owner",
-                    "address",
-                    "zip",
-                    "city",
-                    "region",
-                    "country",
-                    "hs_email_domain",
-                    "hs_analytics_num_event_completions",
-                    "ip_city",
-                    "ip_country",
-                    "ip_country_code",
-                    "ip_state",
-                    "ip_state_code",
-                    "createdAt",
-                    "updated_at",
-                    "portal_id",
-                ]
-
-                has_to_continue = True
-                result = []
-                after = 0
-                while has_to_continue:
-                    r = oauth_api_client.crm.contacts.basic_api.get_page(
-                        properties=properties, limit=100, after=after
-                    )
-                    result.extend(r.results)
-                    if r.paging is None:
-                        has_to_continue = False
-                    else:
-                        ## Usefull for testing.
-                        # has_to_continue = False
-                        print(len(result))
-                        after = r.paging.next.after
-                        continue
-                print(f"#contacts for portal_id {portal_id}: {len(result)}")
-
-            if self.task.name == "old_companies":
-
-                access_token = (
-                    TokensApi().create_token(**refresh_token_params).access_token
-                )
-                oauth_api_client = HubSpot(access_token=access_token)
-
-                properties = [
-                    "createdAt",
-                    "updatedAt",
-                    "domain",
-                    "name",
-                    "hs_additional_domains",
-                    "hs_analytics_num_page_views",
-                    "hs_analytics_num_visits",
-                    "hs_is_target_account",
-                    "hs_object_id",
-                    "num_associated_contacts",
-                    "website",
-                    "hs_parent_company_id",
-                    "archived",
-                ]
-                has_to_continue = True
-                result = []
-                after = 0
-                while has_to_continue:
-
-                    r = oauth_api_client.crm.companies.basic_api.get_page(
-                        properties=properties, limit=100, after=after
-                    )
-                    result.extend(r.results)
-                    if r.paging is None:
-                        has_to_continue = False
-                    else:
-                        print(len(result))
-                        after = r.paging.next.after
-                        continue
 
             if self.task.name in ["events"]:
                 db_params = self.get_request_params()
@@ -328,9 +232,12 @@ class HubspotClient(Client):
 
             if self.task.name in [
                 "contacts",
-                "companies",
                 "contacts_recently_created",
+                "contacts_recently_updated",
+                "companies",
                 "companies_recently_updated",
+                "campaigns",
+                "campaign_details",
                 "company_contact_associations",
                 "contact_company_associations",
                 "email_events_click_since_2022",
@@ -339,9 +246,6 @@ class HubspotClient(Client):
                 "email_events_click_daily",
                 "email_events_open_daily",
                 "email_events_forward_daily",
-                "campaigns",
-                "contacts_recently_updated",
-                "campaign_details",
             ]:
 
                 db_params = self.get_request_params()
@@ -374,11 +278,15 @@ class HubspotClient(Client):
 
                     print(f"Chunck with {len(lst)} queries")
 
+                    pagination_function = None
                     if self.task.name in [
                         "contacts_recently_created",
                         "contacts_recently_updated",
                     ]:
-                        pagination_function = contacts_recently_created_pagination
+                        pagination_function = (
+                            contacts_recently_created_updated_pagination
+                        )
+
                     if self.task.name == "contacts":
                         pagination_function = contacts_pagination
 
@@ -389,21 +297,31 @@ class HubspotClient(Client):
                         pagination_function = companies_pagination
 
                     if self.task.name == "campaigns":
-                        pagination_function = coampaigns_pagination
+                        pagination_function = campaigns_pagination
+
+                    if self.task.name == "contact_company_associations":
+                        pagination_function = contact_company_associations_pagination
+
+                    if self.task.name in [
+                        "email_events_open_daily",
+                        "email_events_click_daily",
+                        "email_events_forward_daily",
+                        "email_events_click_since_2022",
+                        "email_events_open_since_2022",
+                        "email_events_forward_since_2022",
+                    ]:
+                        pagination_function = email_events_pagination
 
                     chunks_result_list = run_in_threads_pool(
                         request_params_list=lst,
                         source_function=self.do_get_query,
                         headers=headers,
                         result_key=task_params["query"]["response_datas_key"],
-                        pagination_function=pagination_function,
+                        pagination_function=pagination_function
+                        if pagination_function
+                        else None,
                     )
                     futures_results.extend(chunks_result_list)
-
-                # Remove empty results
-                # no_empty_futures_results = [
-                #     i for i in futures_results if list(i.values())[0]["results"]
-                # ]
 
                 # Construct results
                 # Here the "contact_id" field name is hardcoded. Should be in task.json
@@ -427,28 +345,12 @@ class HubspotClient(Client):
                                 else {task_params["key_for_values"]: r}
                             )
                             local_result.append(
-                                dict(
-                                    ChainMap(
-                                        *data_to_add_to_results,
-                                        ## Only for company contact associations
-                                        # {"contact_id": r},
-                                        api_data,
-                                    )
-                                )
+                                dict(ChainMap(*data_to_add_to_results, api_data))
                             )
                     result.extend(local_result)
 
             if result:
                 for r in result:
-                    if isinstance(
-                        r,
-                        (
-                            companies_public_object,
-                            contacts_public_object,
-                            ExternalUnifiedEvent,
-                        ),
-                    ):
-                        r = r.to_dict()
                     r["portal_id"] = portal_id
                     final_result.append(r)
             else:

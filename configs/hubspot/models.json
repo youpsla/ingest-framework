@@ -527,6 +527,12 @@
                 "source_path": [
                     "portal_id"
                 ]
+            },
+            "group_id": {
+                "type": "raw",
+                "source_path": [
+                    "groupId"
+                ]
             }
         }
     },
@@ -614,6 +620,12 @@
                 "type": "raw",
                 "source_path": [
                     "portal_id"
+                ]
+            },
+            "filtered": {
+                "type": "raw",
+                "source_path": [
+                    "filteredEvent"
                 ]
             }
         }

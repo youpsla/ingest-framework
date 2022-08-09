@@ -151,7 +151,6 @@ class Client:
                         offset_unity=param["offset_unity"],
                     )
                     target_datetime = datetime.fromordinal(target_day.toordinal())
-                    print(target_day)
                     if param["position"] == "start":
                         target_datetime = target_datetime.replace(
                             hour=0, minute=0, second=0, tzinfo=pytz.UTC
@@ -208,7 +207,6 @@ class Client:
 
         today = datetime.date(datetime.now())
         tmp = {offset_unity: int(day_params["offset_value"])}
-        # day = today - relativedelta(**tmp)
         day = today - timedelta(**tmp)
         return day
 
