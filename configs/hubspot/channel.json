@@ -1,10 +1,14 @@
 {
     "name": "hubspot",
     "daily_tasks_list" : [
-        "contacts"
+        "contacts_recently_updated",
+        "companies_recently_updated",
+        "campaigns",
+        "campaign_details"
     ],
     "bck_daily_tasks_list" : [
         "contacts_recently_updated",
+        "contacts_recently_created",
         "companies_recently_updated",
         "campaigns",
         "campaign_details",
