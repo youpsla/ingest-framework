@@ -312,7 +312,9 @@ class Field:
             result: A datetime object
 
         """
-        result = datetime.fromtimestamp(value / 1000.0)
+        result = datetime.fromtimestamp(
+            value / 1000.0 if isinstance(value, int) else int(value) / 1000.0
+        )
 
         return result
 

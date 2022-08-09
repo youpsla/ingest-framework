@@ -44,7 +44,6 @@ CREATE TABLE IF NOT EXISTS hubspot_development.companies
 	,id VARCHAR(255)   ENCODE lzo
 	,domain VARCHAR(255)   ENCODE lzo
 	,name VARCHAR(255)   ENCODE lzo
-	,hs_additional_domains VARCHAR(255)   ENCODE lzo
 	,hs_analytics_num_page_views VARCHAR(255) ENCODE lzo
 	,hs_analytics_num_visits VARCHAR(255) ENCODE lzo
 	,hs_is_target_account VARCHAR(255)   ENCODE lzo
@@ -52,7 +51,6 @@ CREATE TABLE IF NOT EXISTS hubspot_development.companies
 	,num_associated_contacts BIGINT ENCODE lzo
 	,website VARCHAR(255)   ENCODE lzo
 	,hs_parent_company_id VARCHAR(255)   ENCODE lzo
-	,archived BOOLEAN NOT NULL
 	,portal_id VARCHAR(255)   ENCODE lzo
 	
 )

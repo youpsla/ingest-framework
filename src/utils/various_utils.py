@@ -81,8 +81,6 @@ def run_in_threads_pool(
     headers=None,
     result_key=None,
     pagination_function=None,
-    check_has_more_result_function=None,
-    build_get_more_function=None,
 ):
     """
     Runs a function in a thread pool.
@@ -97,14 +95,6 @@ def run_in_threads_pool(
         A list of results. Result is the result property of the Future.
 
     """
-
-    def contacts_pagination(endpoint, task_result):
-        has_more_for_contacts = task_result.get("has-more", None)
-        if not has_more_for_contacts:
-            return None
-        pagination_param = endpoint.get_param_by_name("vidOffset")
-        pagination_param.value = task_result["vid-offset"]
-        return endpoint
 
     threads_list = []
     result = []
@@ -124,59 +114,25 @@ def run_in_threads_pool(
 
             if task[0].result():
                 task_result, endpoint = task[0].result()
-                has_more = task_result.get("hasMore", None)
-                has_more_for_contacts = task_result.get("has-more", None)
                 tmp_result = []
                 if result_key:
                     tmp_result.extend(task_result[result_key])
                 else:
                     tmp_result.append(task_result)
 
-                endpoint = contacts_pagination(endpoint, task_result)
-                while endpoint:
-                    int_task = executor.submit(
-                        source_function,
-                        endpoint=endpoint,
-                        headers=headers,
-                    )
-                    task_result, endpoint = int_task.result()
-                    if task_result:
-                        if task_result[result_key]:
-                            tmp_result.extend(task_result[result_key])
-                        endpoint = contacts_pagination(endpoint, task_result)
-
-                # while has_more or has_more_for_contacts:
-                #     if has_more_for_contacts:
-                #         pagination_param = endpoint.get_param_by_name("timeOffset")
-                #         pagination_param.value = task_result["time-offset"]
-                #     if has_more:
-                #         pagination_param = endpoint.get_param_by_name("offset")
-                #         pagination_param.value = task_result["offset"]
-                #     int_task = executor.submit(
-                #         source_function,
-                #         endpoint=endpoint,
-                #         headers=headers,
-                #     )
-                #     # tmpr = int_task.result()
-                #     # if tmpr:
-                #     task_result, endpoint = int_task.result()
-                #     if task_result:
-                #         if task_result[result_key]:
-                #             tmp_result.extend(task_result[result_key])
-                #     has_more = task_result.get("hasMore", None)
-                #     has_more_for_contacts = task_result.get("has-more", None)
-                #     time_offset_for_contacts = task_result.get("time-offset", None)
-                #     if time_offset_for_contacts:
-                #         tod = datetime.datetime.now().replace(
-                #             hour=0, minute=0, second=0, microsecond=0
-                #         )
-                #         d = datetime.timedelta(days=1)
-                #         yesterday = tod - d
-                #         if (
-                #             time_offset_for_contacts / 1000
-                #             < datetime.datetime.timestamp(yesterday)
-                #         ):
-                #             has_more_for_contacts = None
+                if pagination_function:
+                    endpoint = pagination_function(endpoint, task_result)
+                    while endpoint:
+                        int_task = executor.submit(
+                            source_function,
+                            endpoint=endpoint,
+                            headers=headers,
+                        )
+                        task_result, endpoint = int_task.result()
+                        if task_result:
+                            if task_result[result_key]:
+                                tmp_result.extend(task_result[result_key])
+                            endpoint = pagination_function(endpoint, task_result)
 
                 result.append({task[1]: tmp_result})
                 print(f"# requests run so far: {len(result)}")

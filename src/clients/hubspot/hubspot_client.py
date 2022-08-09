@@ -1,4 +1,4 @@
-import concurrent.futures
+import datetime
 import json
 import time
 from collections import ChainMap
@@ -30,6 +30,58 @@ refresh_token_params = {
     "redirect_uri": "https://connect.jabmo.app",
     "refresh_token": "9c2cb2f5-b460-4bea-b1a1-b1df862bc3c1",
 }
+
+
+def contacts_pagination(endpoint, task_result):
+    has_more_for_contacts = task_result.get("has-more", None)
+    if not has_more_for_contacts:
+        return None
+    pagination_param = endpoint.get_param_by_name("vidOffset")
+    pagination_param.value = task_result["vid-offset"]
+    return endpoint
+
+
+def companies_pagination(endpoint, task_result):
+    has_more_for_contacts = task_result.get("has-more", None)
+    if not has_more_for_contacts:
+        return None
+    pagination_param = endpoint.get_param_by_name("offset")
+    pagination_param.value = task_result["offset"]
+    return endpoint
+
+
+def companies_recently_updated_pagination(endpoint, task_result):
+    has_more_for_contacts = task_result.get("hasMore", None)
+    if not has_more_for_contacts:
+        return None
+    pagination_param = endpoint.get_param_by_name("offset")
+    pagination_param.value = task_result["offset"]
+    return endpoint
+
+
+def coampaigns_pagination(endpoint, task_result):
+    has_more_for_contacts = task_result.get("hasMore", None)
+    if not has_more_for_contacts:
+        return None
+    pagination_param = endpoint.get_param_by_name("offset")
+    pagination_param.value = task_result["offset"]
+    return endpoint
+
+
+def contacts_recently_created_pagination(endpoint, task_result):
+    has_more = task_result.get("has-more", None)
+    if not has_more:
+        return None
+    time_offset = task_result.get("time-offset", None)
+    if time_offset:
+        tod = datetime.datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+        d = datetime.timedelta(days=1)
+        yesterday = tod - d
+        if time_offset / 1000 < datetime.datetime.timestamp(yesterday):
+            return None
+        pagination_param = endpoint.get_param_by_name("timeOffset")
+        pagination_param.value = time_offset
+        return endpoint
 
 
 class HubspotClient(Client):
@@ -186,7 +238,7 @@ class HubspotClient(Client):
                         continue
                 print(f"#contacts for portal_id {portal_id}: {len(result)}")
 
-            if self.task.name == "companies":
+            if self.task.name == "old_companies":
 
                 access_token = (
                     TokensApi().create_token(**refresh_token_params).access_token
@@ -276,6 +328,7 @@ class HubspotClient(Client):
 
             if self.task.name in [
                 "contacts",
+                "companies",
                 "contacts_recently_created",
                 "companies_recently_updated",
                 "company_contact_associations",
@@ -321,11 +374,29 @@ class HubspotClient(Client):
 
                     print(f"Chunck with {len(lst)} queries")
 
+                    if self.task.name in [
+                        "contacts_recently_created",
+                        "contacts_recently_updated",
+                    ]:
+                        pagination_function = contacts_recently_created_pagination
+                    if self.task.name == "contacts":
+                        pagination_function = contacts_pagination
+
+                    if self.task.name == "companies_recently_updated":
+                        pagination_function = companies_recently_updated_pagination
+
+                    if self.task.name == "companies":
+                        pagination_function = companies_pagination
+
+                    if self.task.name == "campaigns":
+                        pagination_function = coampaigns_pagination
+
                     chunks_result_list = run_in_threads_pool(
                         request_params_list=lst,
                         source_function=self.do_get_query,
                         headers=headers,
                         result_key=task_params["query"]["response_datas_key"],
+                        pagination_function=pagination_function,
                     )
                     futures_results.extend(chunks_result_list)
 

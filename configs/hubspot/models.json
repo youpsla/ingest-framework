@@ -17,8 +17,7 @@
             "id": {
                 "type": "raw",
                 "source_path": [
-                    "vid",
-                    "value"
+                    "vid"
                 ]
             },
             "email": {
@@ -182,24 +181,29 @@
                 ]
             },
             "created_at": {
-                "type": "raw",
+                "type": "function",
                 "source_path": [
-                    "created_at",
-                    "value"
-                ]
+                    "addedAt"
+                ],
+                "transform_function": {
+                    "type": "datetime_from_timestamp_in_milliseconds"
+                }
             },
             "updated_at": {
-                "type": "raw",
+                "type": "function",
                 "source_path": [
-                    "updated_at",
+                    "properties",
+                    "lastmodifieddate",
                     "value"
-                ]
+                ],
+                "transform_function": {
+                    "type": "datetime_from_timestamp_in_milliseconds"
+                }
             },
             "portal_id": {
                 "type": "raw",
                 "source_path": [
-                    "portal_id",
-                    "value"
+                    "portal_id"
                 ]
             }
         }
@@ -209,89 +213,85 @@
             "id": {
                 "type": "raw",
                 "source_path": [
-                    "id"
+                    "companyId"
                 ]
             },
             "domain": {
                 "type": "raw",
                 "source_path": [
                     "properties",
-                    "domain"
+                    "domain",
+                    "value"
                 ]
             },
             "name": {
                 "type": "raw",
                 "source_path": [
                     "properties",
-                    "name"
-                ]
-            },
-            "hs_additional_domains": {
-                "type": "raw",
-                "source_path": [
-                    "properties",
-                    "hs_additional_domains"
+                    "name",
+                    "value"
                 ]
             },
             "hs_analytics_num_page_views": {
                 "type": "raw",
                 "source_path": [
                     "properties",
-                    "hs_analytics_num_page_views"
+                    "hs_analytics_num_page_views",
+                    "value"
                 ]
             },
             "hs_analytics_num_visits": {
                 "type": "raw",
                 "source_path": [
                     "properties",
-                    "hs_analytics_num_visits"
+                    "hs_analytics_num_visits",
+                    "value"
                 ]
             },
             "hs_is_target_account": {
                 "type": "raw",
                 "source_path": [
                     "properties",
-                    "hs_is_target_account"
+                    "hs_is_target_account",
+                    "value"
                 ]
             },
             "hs_object_id": {
                 "type": "raw",
                 "source_path": [
                     "properties",
-                    "hs_object_id"
+                    "hs_object_id",
+                    "value"
                 ]
             },
             "num_associated_contacts": {
                 "type": "raw",
                 "source_path": [
                     "properties",
-                    "num_associated_contacts"
-                ]
-            },
-            "website": {
-                "type": "raw",
-                "source_path": [
-                    "properties",
-                    "website"
+                    "num_associated_contacts",
+                    "value"
                 ]
             },
             "hs_parent_company_id": {
                 "type": "raw",
                 "source_path": [
                     "properties",
-                    "hs_parent_company_id"
-                ]
-            },
-            "archived": {
-                "type": "raw",
-                "source_path": [
-                    "archived"
+                    "hs_parent_company_id",
+                    "value"
                 ]
             },
             "portal_id": {
                 "type": "raw",
                 "source_path": [
                     "portal_id"
+                ]
+            },
+            "website": {
+                "type": "raw",
+                "source_path": [
+                    "properties",
+                    "website",
+                    "value"
                 ]
             }
         }
