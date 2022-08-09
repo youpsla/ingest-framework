@@ -114,6 +114,7 @@ CREATE TABLE IF NOT EXISTS hubspot_development.campaign_details
 	,processing_state VARCHAR(255)   ENCODE lzo
 	,type VARCHAR(255)   ENCODE lzo
 	,portal_id VARCHAR(255)   ENCODE lzo
+	,group_id BIGINT ENCODE lzo
 )
 DISTSTYLE AUTO
 ;
@@ -136,6 +137,7 @@ CREATE TABLE IF NOT EXISTS hubspot_development.email_events
 	,type VARCHAR(255)   ENCODE lzo
 	,email_campaign_id VARCHAR(255)   ENCODE lzo
 	,portal_id VARCHAR(255)   ENCODE lzo
+	,filtered BOOLEAN
 )
 DISTSTYLE AUTO
 ;

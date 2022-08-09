@@ -220,9 +220,26 @@ class Model:
             A list of tuple with one tuple containing the max value.
 
         """
-        q = SqlQuery(db_connection, "raw_sql", raw_sql=sql)
+        q = SqlQuery(db_connection, "get_from_raw_sql", raw_sql=sql)
         res = q.run()
         return res
+
+    @staticmethod
+    def run_raw_sql(db_connection, sql):
+        """Allow to query the Db with raw sql.
+
+        Mainly used for retrieving from teh db values used to build the request endpoint.
+
+        Args:
+            db_connection:
+            sql: A string repsenting the sql query.
+
+        Returns:
+            A list of tuple with one tuple containing the max value.
+
+        """
+        q = SqlQuery(db_connection, "raw_sql", raw_sql=sql)
+        q.run()
 
 
 class Field:

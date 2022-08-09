@@ -1,5 +1,4 @@
 import json
-import logging
 import os
 
 from src.clients.bing.bing_client import ReportManager
@@ -31,14 +30,20 @@ class Task:
         self.db_connection = db_connection
         self._params = None
         self._request_data_source = None
+        self._source = None
 
     @property
     def source(self):
         if not self._source:
-            source_name = self.params["source"]
-            self._source = get_client(
-                self.running_env, source_name, self, db_connection=self.db_connection
-            )
+            source_name = self.params.get("source", None)
+            if source_name:
+                # source_name = self.params["source"]
+                self._source = get_client(
+                    self.running_env,
+                    source_name,
+                    self,
+                    db_connection=self.db_connection,
+                )
         return self._source
 
     @property
@@ -120,7 +125,8 @@ class Task:
 
         # Retrieving datas from source
         if "copy" not in self.actions:
-            source_data = self.get_data_from_source()
+            if "raw_sql" not in self.actions:
+                source_data = self.get_data_from_source()
 
         if "download" in self.actions:
             for d in source_data:
@@ -211,6 +217,14 @@ class Task:
                         values_dicts_list,
                         where_dicts_list=where_dicts_list,
                     )
+
+        if "raw_sql" in self.actions:
+            try:
+                query = self.params["raw_sql_to_run"]
+            except KeyError:
+                raise ("A task with raw_sql in actions must have a raw_sql_to_run key")
+
+            Model.run_raw_sql(db_connection=self.db_connection, sql=query)
 
         return True, self.destination
 

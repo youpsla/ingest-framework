@@ -85,9 +85,11 @@ class SqlQuery:
                     self.sql = self.get_sql_select_max_for_date_plus_one_day()
                     cursor.execute(self.sql, self.values)
 
-                elif self.qtype == "raw_sql":
+                elif self.qtype == "get_from_raw_sql":
                     cursor.execute(self.raw_sql)
                     return cursor.fetchall()
+                elif self.qtype == "raw_sql":
+                    cursor.execute(self.raw_sql)
                 elif self.qtype == "write_raw_sql":
                     cursor.execute(self.raw_sql)
                 elif self.qtype == "update":
