@@ -1,29 +1,32 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Bing API Ingest Microservice V2a
+Description: Hubspot API Ingest Daily v1
 Resources:
   Function:
     Type: AWS::Serverless::Function
     Properties:
-      Description: STAGING - Bing API Ingest Microservice V2a
-      Handler: bing.src.lambda_f.lambda_handler
-      CodeUri: s3://jabmo-linkedin-ingest-lambda/2bdb64d6686c76de70fe960e8f0641a8
+      Description: PRODUCTION - Hubspot API Ingest Daily v1
+      Handler: hubspot.src.lambda_f.lambda_handler
+      CodeUri: .
       Runtime: python3.8
       Layers:
       - arn:aws:lambda:eu-west-1:467882466042:layer:python-aws-psycopg2:1
       - arn:aws:lambda:eu-west-1:467882466042:layer:python-requests:1
+      - arn:aws:lambda:eu-west-1:943013980633:layer:SentryPythonServerlessSDK:24
+      - arn:aws:lambda:eu-west-1:467882466042:layer:python-bingads:1
+      - arn:aws:lambda:eu-west-1:770693421928:layer:Klayers-p38-pytz:1
       Role: arn:aws:iam::467882466042:role/Linkedin-lambda-dev-staging-rw
       Timeout: 900
-      MemorySize: 1024
+      MemorySize: 1700
       Environment:
         Variables:
           SENTRY_DNS: https://47e2fc82fc674f428f2b3e931eddace7@o1035237.ingest.sentry.io/6094713
           RUNNING_ENV: production
-  ScheduledRuleJabmoHubspotContactsIngestDaily:
+  ScheduledRuleJabmoHubspotDailyIngestDaily:
     Type: AWS::Events::Rule
     Properties:
       Description: jabmo-ingest-bing-daily-trigger
-      ScheduleExpression: cron(00 9 * * ? *)
+      ScheduleExpression: cron(30 8 * * ? *)
       State: ENABLED
       Targets:
       - Arn:
@@ -31,7 +34,7 @@ Resources:
           - Function
           - Arn
         Id: Function
-  PermissionRuleJabmoBingIngestDaily:
+  PermissionRuleJabmoHubspotIngestDaily:
     Type: AWS::Lambda::Permission
     Properties:
       FunctionName:
@@ -40,5 +43,5 @@ Resources:
       Principal: events.amazonaws.com
       SourceArn:
         Fn::GetAtt:
-        - ScheduledRuleJabmoHubspotContactsIngestDaily
+        - ScheduledRuleJabmoHubspotDailyIngestDaily
         - Arn

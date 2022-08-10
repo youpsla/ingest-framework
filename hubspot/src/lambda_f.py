@@ -1,7 +1,5 @@
 # TODO: manage logger for having logger output in terminal when running locally + cleanup print statements
 
-
-import datetime
 import json
 import os
 import time
