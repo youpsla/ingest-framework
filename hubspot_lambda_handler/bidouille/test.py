@@ -2,7 +2,7 @@ import argparse
 import json
 import os
 
-from hubspot import HubSpot
+from hubspot_lambda_handler import HubSpot
 
 # def api_key():
 #     load_dotenv()

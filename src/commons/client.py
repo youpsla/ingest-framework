@@ -172,7 +172,12 @@ class Client:
                         tmp_result = [{param["name"]: target_timestamp}]
 
                 result_lists.append(tmp_result)
-
+        # As zip_longest_repeat_value needs only non empty lists. We check that here.
+        # Could be the case when we use parameters from Db and the select statement returns no value.
+        # In this case, we return an empty list. Then no request will be done to the endpoint.
+        for r in result_lists:
+            if len(r) == 0:
+                return []
         tmp_result = zip_longest_repeat_value(*result_lists)
         tmp_result = [list(a) for a in tmp_result]
 

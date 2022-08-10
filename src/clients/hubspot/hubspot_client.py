@@ -108,7 +108,7 @@ def contacts_recently_created_updated_pagination(endpoint, task_result):
     time_offset = task_result.get("time-offset", None)
     if time_offset:
         tod = datetime.datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
-        d = datetime.timedelta(days=2)
+        d = datetime.timedelta(days=1)
         yesterday = tod - d
         if time_offset / 1000 < datetime.datetime.timestamp(yesterday):
             return None
@@ -240,6 +240,8 @@ class HubspotClient(Client):
                 "campaign_details",
                 "company_contact_associations",
                 "contact_company_associations",
+                "contact_created_company_daily_associations",
+                "contact_updated_company_daily_associations",
                 "email_events_click_since_2022",
                 "email_events_open_since_2022",
                 "email_events_forward_since_2022",
@@ -299,7 +301,11 @@ class HubspotClient(Client):
                     if self.task.name == "campaigns":
                         pagination_function = campaigns_pagination
 
-                    if self.task.name == "contact_company_associations":
+                    if self.task.name in [
+                        "contact_company_associations",
+                        "contact_updated_company_daily_associations",
+                        "contact_created_company_daily_associations",
+                    ]:
                         pagination_function = contact_company_associations_pagination
 
                     if self.task.name in [

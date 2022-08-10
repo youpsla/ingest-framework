@@ -6,15 +6,15 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Description: PRODUCTION - Hubspot API Ingest Daily v1
-      Handler: hubspot.src.lambda_f.lambda_handler
+      Handler: hubspot_lambda_handler.src.lambda_f.lambda_handler
       CodeUri: .
       Runtime: python3.8
       Layers:
       - arn:aws:lambda:eu-west-1:467882466042:layer:python-aws-psycopg2:1
       - arn:aws:lambda:eu-west-1:467882466042:layer:python-requests:1
       - arn:aws:lambda:eu-west-1:943013980633:layer:SentryPythonServerlessSDK:24
-      - arn:aws:lambda:eu-west-1:467882466042:layer:python-bingads:1
       - arn:aws:lambda:eu-west-1:770693421928:layer:Klayers-p38-pytz:1
+      - arn:aws:lambda:eu-west-1:467882466042:layer:ingest_clients_sdk:1
       Role: arn:aws:iam::467882466042:role/Linkedin-lambda-dev-staging-rw
       Timeout: 900
       MemorySize: 1700

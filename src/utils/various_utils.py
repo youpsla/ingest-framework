@@ -1,8 +1,6 @@
 import itertools as it
 import os
 
-from suds.sudsobject import asdict
-
 
 def nested_get(dic, keys):
 
@@ -18,21 +16,8 @@ def nested_get(dic, keys):
 
 
 def recursive_asdict(d):
-    """Convert Suds object into serializable format."""
-    out = {}
-    for k, v in asdict(d).items():
-        if hasattr(v, "__keylist__"):
-            out[k] = recursive_asdict(v)
-        elif isinstance(v, list):
-            out[k] = []
-            for item in v:
-                if hasattr(item, "__keylist__"):
-                    out[k].append(recursive_asdict(item))
-                else:
-                    out[k].append(item)
-        else:
-            out[k] = "%s" % v
-    return out
+    # Need to sort the 5 layers issue. Make task.py really independant from clients.
+    pass
 
 
 def get_running_env():

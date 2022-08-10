@@ -526,53 +526,6 @@
         }
     },
     {
-        "contacts_recently_updated": {
-            "actions": [
-                "insert",
-                "update"
-            ],
-            "exclude_existing_in_db": true,
-            "source": "hubspot",
-            "destination": "redshift",
-            "request_data_source": "redshift",
-            "destination_unique_keys": [
-                "id"
-            ],
-            "model": "contacts",
-            "update_key": "id",
-            "query": {
-                "template": "{base}?{count}&{timeOffset}&{property}",
-                "response_datas_key": "contacts",
-                "params": [
-                    {
-                        "name": "base",
-                        "type": "constant",
-                        "output_type": "arg",
-                        "value": "https://api.hubapi.com/contacts/v1/lists/recently_updated/contacts/recent"
-                    },
-                    {
-                        "name": "count",
-                        "type": "constant",
-                        "output_type": "kwarg",
-                        "value": 100
-                    },
-                    {
-                        "name": "timeOffset",
-                        "type": "constant",
-                        "output_type": "kwarg",
-                        "value": ""
-                    },
-                    {
-                        "name": "property",
-                        "type": "constant",
-                        "output_type": "arg",
-                        "value": "property=ip_city&property=ip_country&property=city"
-                    }
-                ]
-            }
-        }
-    },
-    {
         "companies": {
             "actions": [
                 "insert",
@@ -1279,7 +1232,7 @@
             "model": "company_contact_associations",
             "data_source": {
                 "name": "contacts",
-                "raw_sql": "select distinct(id) from {schema}.contacts  where DATE(updated_at) > DATE(GETDATE() - INTERVAL '1 DAY') AND DATE(updated_at) < DATE(GETDATE())"
+                "raw_sql": "select distinct(id) from {schema}.contacts  where DATE(updated_at) > DATE(GETDATE() - INTERVAL '2 DAY') AND DATE(updated_at) < DATE(GETDATE())"
             },
             "fields_to_add_to_api_result": [
                 {
