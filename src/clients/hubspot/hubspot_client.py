@@ -15,13 +15,6 @@ from src.utils.various_utils import get_chunks, run_in_threads_pool
 
 from hubspot import HubSpot
 from hubspot.auth.oauth.api.tokens_api import TokensApi
-from hubspot.crm.companies.models.simple_public_object_with_associations import (
-    SimplePublicObjectWithAssociations as companies_public_object,
-)
-from hubspot.crm.contacts.models.simple_public_object_with_associations import (
-    SimplePublicObjectWithAssociations as contacts_public_object,
-)
-from hubspot.events.models.external_unified_event import ExternalUnifiedEvent
 
 refresh_token_params = {
     "grant_type": "refresh_token",
@@ -59,48 +52,6 @@ def hasMore_offset_pagination(endpoint, task_result):
     return endpoint
 
 
-companies_recently_updated_pagination = hasMore_offset_pagination
-contact_company_associations_pagination = hasMore_offset_pagination
-email_events_pagination = hasMore_offset_pagination
-campaigns_pagination = hasMore_offset_pagination
-
-
-# def companies_recently_updated_pagination(endpoint, task_result):
-#     has_more = task_result.get("hasMore", None)
-#     if not has_more:
-#         return None
-#     pagination_param = endpoint.get_param_by_name("offset")
-#     pagination_param.value = task_result["offset"]
-#     return endpoint
-
-
-# def contact_company_associations_pagination(endpoint, task_result):
-#     has_more = task_result.get("hasMore", None)
-#     if not has_more:
-#         return None
-#     pagination_param = endpoint.get_param_by_name("offset")
-#     pagination_param.value = task_result["offset"]
-#     return endpoint
-
-
-# def email_events_pagination(endpoint, task_result):
-#     has_more = task_result.get("hasMore", None)
-#     if not has_more:
-#         return None
-#     pagination_param = endpoint.get_param_by_name("offset")
-#     pagination_param.value = task_result["offset"]
-#     return endpoint
-
-
-# def coampaigns_pagination(endpoint, task_result):
-#     has_more_for_contacts = task_result.get("hasMore", None)
-#     if not has_more_for_contacts:
-#         return None
-#     pagination_param = endpoint.get_param_by_name("offset")
-#     pagination_param.value = task_result["offset"]
-#     return endpoint
-
-
 def contacts_recently_created_updated_pagination(endpoint, task_result):
     has_more = task_result.get("has-more", None)
     if not has_more:
@@ -123,7 +74,6 @@ class HubspotClient(Client):
         self.task = task
         self.http_adapter = get_http_adapter()
         self.db_connection = db_connection
-        # self.access_token = "CPH0rK6aMBIMggMAUAAAACAAAABIGI_HrQwghercFSj5iTgyFJ3Dsaw0d1ZAh1CzjMyZa9GbRFoVOjAAMWBB_wcAADwAtABg4HzOKIYAAGAAACA8ACAYAAAAwMN_NgEAAACBZxwY4AAAIAJCFPzpTnzjZne5_6-ZY8t8bz02VleySgNldTFSAFoA"
 
     def get_access_token(self, portal_id):
         pass
@@ -292,23 +242,14 @@ class HubspotClient(Client):
                     if self.task.name == "contacts":
                         pagination_function = contacts_pagination
 
-                    if self.task.name == "companies_recently_updated":
-                        pagination_function = companies_recently_updated_pagination
-
                     if self.task.name == "companies":
                         pagination_function = companies_pagination
 
-                    if self.task.name == "campaigns":
-                        pagination_function = campaigns_pagination
-
                     if self.task.name in [
+                        "companies_recently_updated",
                         "contact_company_associations",
                         "contact_updated_company_daily_associations",
                         "contact_created_company_daily_associations",
-                    ]:
-                        pagination_function = contact_company_associations_pagination
-
-                    if self.task.name in [
                         "email_events_open_daily",
                         "email_events_click_daily",
                         "email_events_forward_daily",
@@ -316,7 +257,7 @@ class HubspotClient(Client):
                         "email_events_open_since_2022",
                         "email_events_forward_since_2022",
                     ]:
-                        pagination_function = email_events_pagination
+                        pagination_function = hasMore_offset_pagination
 
                     chunks_result_list = run_in_threads_pool(
                         request_params_list=lst,
@@ -329,8 +270,6 @@ class HubspotClient(Client):
                     )
                     futures_results.extend(chunks_result_list)
 
-                # Construct results
-                # Here the "contact_id" field name is hardcoded. Should be in task.json
                 for fr in futures_results:
                     local_result = []
                     for k, v in fr.items():
