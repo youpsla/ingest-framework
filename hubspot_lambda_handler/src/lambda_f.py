@@ -4,6 +4,7 @@ import json
 import os
 import time
 
+import boto3
 import sentry_sdk
 
 # Temporary solution. This import allow init of some envs variables
@@ -83,6 +84,25 @@ def main():
     logger.info(end - start)
 
     logger.info("### Ingest lambda ended ###")
+
+    # Invoke deduplicate Lambda
+    logger.info("### Invoke Redshift deduplication Lambda ###")
+    event = {
+        "schemas": ["hubspot_development"],
+        "tables": [],
+        "do_delete_duplicates": True,
+        "partition_order_by_field": "jab_id",
+        "env": "prod",
+        "mode": "readwrite",
+    }
+
+    lambda_client = boto3.client("lambda")
+    lambda_client.invoke(
+        FunctionName="jabmo-ingest-redshift-deduplicator-Function-jhJwND5R8vnY",
+        Payload=json.dumps(event),
+        InvocationType="Event",
+    )
+    logger.info("### Invocation sent###")
 
 
 if __name__ == "__main__":

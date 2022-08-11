@@ -15,6 +15,10 @@
         "email_events_click_daily",
         "email_events_forward_daily"
     ],
+    "daily_contacts_recently_updated_tasks_list_bck" : [
+        "contacts_recently_updated",
+        "contact_updated_company_daily_associations"
+    ],
     "new_client_tasks" : [
         "contacts",
         "companies",

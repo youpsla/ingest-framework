@@ -1,13 +1,13 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Hubspot API Ingest Daily v1
+Description: Hubspot API Ingest Contacts updated Daily v1
 Resources:
   Function:
     Type: AWS::Serverless::Function
     Properties:
-      Description: PRODUCTION - Hubspot API Ingest Daily v1
+      Description: PRODUCTION - Hubspot API Ingest Contacts updated Daily v1
       Handler: hubspot_lambda_handler.src.lambda_f.lambda_handler
-      CodeUri: s3://jabmo-linkedin-ingest-lambda/37f030aff897d6d3a01a8c31fee3ff87
+      CodeUri: s3://jabmo-linkedin-ingest-lambda/bb658634c3ca9ed9e07e2614939d7f64
       Runtime: python3.8
       Layers:
       - arn:aws:lambda:eu-west-1:467882466042:layer:python-aws-psycopg2:1
@@ -22,11 +22,11 @@ Resources:
         Variables:
           SENTRY_DNS: https://47e2fc82fc674f428f2b3e931eddace7@o1035237.ingest.sentry.io/6094713
           RUNNING_ENV: production
-  ScheduledRuleJabmoHubspotDailyIngestDaily:
+  ScheduledRuleJabmoHubspotDailyContactsUpdatedIngestDaily:
     Type: AWS::Events::Rule
     Properties:
       Description: jabmo-ingest-bing-daily-trigger
-      ScheduleExpression: cron(30 8 * * ? *)
+      ScheduleExpression: cron(45 8 * * ? *)
       State: ENABLED
       Targets:
       - Arn:
@@ -43,5 +43,5 @@ Resources:
       Principal: events.amazonaws.com
       SourceArn:
         Fn::GetAtt:
-        - ScheduledRuleJabmoHubspotDailyIngestDaily
+        - ScheduledRuleJabmoHubspotDailyContactsUpdatedIngestDaily
         - Arn
