@@ -7,7 +7,7 @@ Resources:
     Properties:
       Description: PRODUCTION - Hubspot API Ingest Contacts updated Daily v1
       Handler: hubspot_lambda_handler.src.lambda_f.lambda_handler
-      CodeUri: s3://jabmo-linkedin-ingest-lambda/bb658634c3ca9ed9e07e2614939d7f64
+      CodeUri: s3://jabmo-linkedin-ingest-lambda/8e89129fdd3feb6eaf75bde4f7b91562
       Runtime: python3.8
       Layers:
       - arn:aws:lambda:eu-west-1:467882466042:layer:python-aws-psycopg2:1
@@ -17,7 +17,7 @@ Resources:
       - arn:aws:lambda:eu-west-1:467882466042:layer:ingest_clients_sdk:1
       Role: arn:aws:iam::467882466042:role/Linkedin-lambda-dev-staging-rw
       Timeout: 900
-      MemorySize: 1700
+      MemorySize: 1024
       Environment:
         Variables:
           SENTRY_DNS: https://47e2fc82fc674f428f2b3e931eddace7@o1035237.ingest.sentry.io/6094713
@@ -26,7 +26,7 @@ Resources:
     Type: AWS::Events::Rule
     Properties:
       Description: jabmo-ingest-bing-daily-trigger
-      ScheduleExpression: cron(45 8 * * ? *)
+      ScheduleExpression: cron(0 * * * ? *)
       State: ENABLED
       Targets:
       - Arn:

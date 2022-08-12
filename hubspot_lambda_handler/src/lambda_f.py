@@ -28,6 +28,14 @@ def activate_sentry():
     logger.info("Sentry activated")
 
 
+# Activate Sentry only when running in Lambda
+if os.environ.get("AWS_EXECUTION_ENV") is not None and get_running_env() in [
+    "production",
+    "staging",
+]:
+    activate_sentry()
+
+
 def get_params_json_file_path():
     app_home = os.environ["APPLICATION_HOME"]
     return os.path.realpath(os.path.join(app_home, "configs", CHANNEL, "channel.json"))
@@ -40,8 +48,6 @@ def get_channel_params():
 
 
 def lambda_handler(event, context):
-    if get_running_env() in ["production", "staging"]:
-        activate_sentry()
     main()
 
 
@@ -64,6 +70,8 @@ def run_task(channel, task_name, db_connection):
 def main():
     logger.info("### Starting Ingest lambda ###")
     start = time.time()
+    # dd = {}
+    # dudu = dd["dede"]
 
     channel_params = get_channel_params()
 

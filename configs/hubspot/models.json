@@ -183,7 +183,9 @@
             "created_at": {
                 "type": "function",
                 "source_path": [
-                    "addedAt"
+                    "properties",
+                    "createdate",
+                    "value"
                 ],
                 "transform_function": {
                     "type": "datetime_from_timestamp_in_milliseconds"

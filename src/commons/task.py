@@ -107,9 +107,7 @@ class Task:
             )
 
         else:
-            raise RuntimeError(
-                f"No available params for task {self.name}. Running next task."
-            )
+            raise RuntimeError(f"No available params for task {self.name}.")
 
         if not result:
             logger.info(f"{self.name}: No data from source." " Running next task.")

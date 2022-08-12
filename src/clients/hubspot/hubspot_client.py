@@ -58,10 +58,10 @@ def contacts_recently_created_updated_pagination(endpoint, task_result):
         return None
     time_offset = task_result.get("time-offset", None)
     if time_offset:
-        tod = datetime.datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
-        d = datetime.timedelta(days=1)
-        yesterday = tod - d
-        if time_offset / 1000 < datetime.datetime.timestamp(yesterday):
+        tod = datetime.datetime.now()
+        d = datetime.timedelta(hours=1, seconds=600)
+        start = tod - d
+        if time_offset / 1000 < datetime.datetime.timestamp(start):
             return None
         pagination_param = endpoint.get_param_by_name("timeOffset")
         pagination_param.value = time_offset
