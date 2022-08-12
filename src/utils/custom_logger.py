@@ -1,5 +1,7 @@
 import logging
 
+import boto3
+
 # Enable suds logging
 # logging.basicConfig(level=logging.INFO)
 # logging.getLogger("suds.client").setLevel(logging.DEBUG)
@@ -15,3 +17,5 @@ else:
 
 
 logger = logging.getLogger("ingest")
+
+boto3.set_stream_logger(name="botocore.credentials", level=logging.WARNING)

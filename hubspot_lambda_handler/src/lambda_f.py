@@ -25,6 +25,7 @@ def activate_sentry():
         integrations=[AwsLambdaIntegration(timeout_warning=True)],
         traces_sample_rate=1.0,
     )
+    logger.info("Sentry activated")
 
 
 def get_params_json_file_path():
