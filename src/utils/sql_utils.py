@@ -103,7 +103,13 @@ class SqlQuery:
                         sql_insert,
                         self.values_list,
                     )
-                    # 3) Do the update
+                    # 3) Count number of fileds to be updated
+                    cursor.execute(self.get_count_sql_update())
+                    count_update_result = result = cursor.fetchone()
+                    logger.info(
+                        f"Number of records to be updated: {count_update_result['count']}"
+                    )
+                    # 4) Do the update
                     self.sql = self.get_sql_update()
                     cursor.execute(self.sql)
                 elif self.qtype == "partial_update":
@@ -234,6 +240,90 @@ class SqlQuery:
                 schema_table=self.schema_table,
                 set_part=update_get_set(self),
                 stage_table_name=self.stage_table_name,
+                where_primary_key=update_get_where_primary_key(self, target),
+                and_where=update_get_and_where(self),
+            )
+        )
+        return sql
+
+    def get_count_sql_update(self):
+        set_fields = [f.name for f in self.model.fields_list]
+        set_fields.remove(self.update_key)
+
+        def update_get_set(self):
+            set_data = " , ".join(
+                [
+                    "=".join(
+                        (
+                            "{}".format(str(f)),
+                            "{stage_table_name}.{table_name}".format(
+                                stage_table_name=self.stage_table_name,
+                                table_name=f,
+                            ),
+                        )
+                    )
+                    for f in set_fields
+                ]
+            )
+            return set_data
+
+        def update_get_where_primary_key(self, target):
+            result = "{target}.{pk} = {stage_table_name}.{pk}".format(
+                target=self.schema_table,
+                stage_table_name=self.stage_table_name,
+                pk=self.update_key,
+            )
+            return result
+
+        def update_get_and_where(self):
+            comparaison_fields = list(self.values[0].keys())
+            comparaison_fields.remove(self.update_key)
+            where_data = " or ".join(
+                [
+                    " != ".join(
+                        (
+                            "{}.{}".format(self.schema_table, str(f)),
+                            "{}.{}".format(self.stage_table_name, str(f)),
+                        )
+                    )
+                    for f in comparaison_fields
+                ]
+            )
+
+            ## SOlutino managing ca se of null value in redshift.
+            # where_data = " or ".join(
+            #     [
+            #         "("
+            #         + "("
+            #         + " != ".join(
+            #             (
+            #                 "{}.{}".format(self.model.model_name, str(f)),
+            #                 "{}.{}".format(self.stage_table_name, str(f)),
+            #             )
+            #         )
+            #         + ")"
+            #         + " or "
+            #         + "("
+            #         + "{}.{}".format(self.stage_table_name, str(f))
+            #         + " is not null "
+            #         + " and "
+            #         + "{}.{}".format(self.model.model_name, str(f))
+            #         + " is null "
+            #         + ")"
+            #         + ")"
+            #         for f in comparaison_fields
+            #     ]
+            # )
+
+            return where_data
+
+        target = self.model.model_name
+
+        sql = (
+            "select count(*) from {stage_table_name}, {source_table} where"
+            " {where_primary_key} and ({and_where})".format(
+                stage_table_name=self.stage_table_name,
+                source_table=self.schema_table,
                 where_primary_key=update_get_where_primary_key(self, target),
                 and_where=update_get_and_where(self),
             )
