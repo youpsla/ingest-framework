@@ -30,13 +30,18 @@ class Model:
 
     """
 
-    def __init__(self, model_name, db_connection=None, channel=None):
+    def __init__(
+        self,
+        model_name,
+        db_connection=None,
+        channel=None,
+        model_params_dict=None,
+    ):
         self.model_name = model_name
         self.db_connection = db_connection
         self.channel = channel
-        self.params_file_path = None
+        self._params = model_params_dict
         self._fields_list = None
-        self._params = None
         self.set_fields()
 
     def get_params_json_file_path(self):

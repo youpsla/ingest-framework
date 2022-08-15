@@ -1,5 +1,6 @@
 import json
 import os
+import time
 
 from src.clients.bing.bing_client import ReportManager
 
@@ -8,7 +9,7 @@ from src.commons.client_helper import get_client
 from src.commons.model import Model
 from src.utils.custom_logger import logger
 from src.utils.sql_utils import SqlQuery
-from src.utils.various_utils import get_running_env
+from src.utils.various_utils import get_model_params_as_dict, get_running_env
 
 
 class Task:
@@ -228,29 +229,25 @@ class Task:
 
     def get_data_objs(self, source_data):
         data_objs = []
+        start = time.time()
+        model_params = get_model_params_as_dict(self.channel, self.params["model"])
         for d in source_data:
             elem = d["datas"]
             if elem is not None:
                 m = Model(
-                    self.model.model_name,
+                    self.params["model"],
                     db_connection=self.db_connection,
                     channel=self.channel,
+                    model_params_dict=model_params,
                 )
                 m.populate_values(elem)
                 data_objs.append(m)
+        end = time.time()
+
+        logger.debug(f"{self.name}: Generation of data_objs took: {end-start}")
         return data_objs
 
     def insert(self, data):
-        # import pickle
-
-        # input_f = open("/Users/alain/Projects/jabmo/ingest/mypickle.pickle", "rb")
-        # source_data = pickle.load(input_f)
-        # # print(len(source_data))
-        # data = []
-        # for e in source_data:
-        #     data.append(e)
-
-        # print(len(data))
 
         sql_query = SqlQuery(
             self.db_connection,

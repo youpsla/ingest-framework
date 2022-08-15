@@ -7,7 +7,7 @@ Resources:
     Properties:
       Description: PRODUCTION - Hubspot API Ingest Daily v1
       Handler: hubspot_lambda_handler.src.lambda_f.lambda_handler
-      CodeUri: s3://jabmo-linkedin-ingest-lambda/08b961d9dd585c3cb7f21868f8475d21
+      CodeUri: s3://jabmo-linkedin-ingest-lambda/62079a4fdba4283448030e743b5e2840
       Runtime: python3.8
       Layers:
       - arn:aws:lambda:eu-west-1:467882466042:layer:python-aws-psycopg2:1

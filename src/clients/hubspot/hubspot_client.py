@@ -78,33 +78,6 @@ class HubspotClient(Client):
     def get_access_token(self, portal_id):
         pass
 
-    def get_endpoints_list(self):
-        try:
-            params = self.task.params["url"]["params"]
-        except KeyError:
-            params = []
-        request_params_list = self.get_request_params(self.task)
-        dynamics_params = self.get_dynamics_params(params)
-        statics_params = self.get_statics_params(params)
-        kwargs = dynamics_params + statics_params
-        kwargs = self.get_kwargs_list()
-        endpoints_list = []
-        if not request_params_list:
-            return [(self.build_endpoint(base=self.task.params["url"]["base"]), [])]
-        for rp in request_params_list:
-            endpoints_list = [
-                (
-                    self.build_endpoint(
-                        base=rp["base"],
-                        kwargs=zd[1] + kwargs,
-                        args=zd[2],
-                    ),
-                    zd[0],
-                )
-                for zd in request_params_list
-            ]
-        return endpoints_list
-
     def get(self, task_params, **_ignored):
 
         final_result = []
@@ -125,60 +98,7 @@ class HubspotClient(Client):
             access_token = ptd[1]
             portal_id = ptd[0]
             access_token = TokensApi().create_token(**refresh_token_params).access_token
-            oauth_api_client = HubSpot(access_token=access_token)
             result = []
-
-            tmp = None
-
-            if self.task.name in ["events"]:
-                db_params = self.get_request_params()
-                cpt = 0
-                if db_params:
-                    for param in db_params:
-                        try:
-                            if self.task.name == "events":
-                                _tmp_result = (
-                                    oauth_api_client.events.events_api.get_page(
-                                        **param[1][0],
-                                        **param[1][1],
-                                        limit=10000000,
-                                    )
-                                )
-                            if self.task.name == "email_events":
-                                _tmp_result = (
-                                    oauth_api_client.crm.objects.emails.basic_api.get_page()
-                                )
-                        except:
-                            refresh_token_params["refresh_token"] = ptd[2]
-                            access_token = (
-                                TokensApi()
-                                .create_token(**refresh_token_params)
-                                .access_token
-                            )
-                            oauth_api_client = HubSpot(access_token=access_token)
-                            if self.task.name == "events":
-                                _tmp_result = (
-                                    oauth_api_client.events.events_api.get_page(
-                                        **param[1][0],
-                                        **param[1][1],
-                                        limit=10000000,
-                                    )
-                                )
-                            if self.task.name == "email_events":
-                                _tmp_result = oauth_api_client.crm.objects.emails.basic_api.get_page(
-                                    **param[1][0],
-                                    **param[1][1],
-                                    limit=10000000,
-                                )
-
-                        r = _tmp_result.results
-
-                        cpt += 1
-                        print(cpt)
-                        result.extend(r)
-                        print(len(result))
-                else:
-                    pass
 
             if self.task.name in [
                 "contacts",
@@ -246,6 +166,7 @@ class HubspotClient(Client):
                         pagination_function = companies_pagination
 
                     if self.task.name in [
+                        "campaigns",
                         "companies_recently_updated",
                         "contact_company_associations",
                         "contact_updated_company_daily_associations",
@@ -303,58 +224,6 @@ class HubspotClient(Client):
 
         to_return = [{"datas": d} for d in final_result]
         return to_return
-
-        # if self.task.name == "events":
-        #     db_params = self.get_request_params(self.task)
-        #     if db_params:
-        #         for param in db_params:
-        #             tmp = self.oauth_api_client.events.events_api.get_page(
-        #                 **param[1][0], **param[1][1]
-        #             ).results
-
-        #             if tmp:
-        #                 for t in tmp:
-        #                     for i in param[0]:
-        #                         for k, v in i.items():
-        #                             t[k] = v
-        #                     result.append(t)
-        #     else:
-        #         pass
-
-        tmp = []
-        for r in result:
-            tmp.append({"datas": r})
-
-        return tmp
-
-    def build_endpoint(self, base=None, kwargs=None, args=None):
-        """# noqa: E501
-        Build the enpoint url with all args, kwargs.
-
-        Use the access_token and optionnal header defined in json.
-
-        Args:
-            base: str
-                Base url as retrieved from json definition
-            category: str
-                The type of API call.
-            q: str
-                The type of the query. Can be "search" or "analytics" for linkedin
-
-        Returns:
-            A str representing an url
-        """
-
-        if kwargs:
-            kwargs_tuple = [(k, v) for f in kwargs for k, v in f.items()]
-        endpoint = (
-            f"{base}"
-            f"{str(args[0]) if args else ''}"
-            f"/HUBSPOT_DEFINED/2"
-            f"{'?' if kwargs else ''}"
-            f"{'&' + urlencode(kwargs_tuple) if kwargs else ''}"
-        )
-        return endpoint
 
     def do_get_query(
         self,

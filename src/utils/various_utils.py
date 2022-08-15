@@ -1,4 +1,5 @@
 import itertools as it
+import json
 import os
 
 
@@ -31,6 +32,16 @@ def get_schema_name(channel):
     schema_name = channel + "_" + get_running_env()
     # return schema_name
     return "hubspot_development"
+
+
+def get_model_params_as_dict(channel, model_name):
+    app_home = os.environ.get("APPLICATION_HOME")
+    model_file = os.path.join(app_home, "configs", channel, "models.json")
+    with open(model_file, "r") as f:
+        models_list = json.load(f)
+        for model in models_list:
+            if model_name in model:
+                return model[model_name]
 
 
 def get_chunks(source_list, chunk_size=500):
