@@ -1236,7 +1236,7 @@
         }
     },
     {
-        "contact_updated_company_daily_associations": {
+        "contact_updated_company_hourly_associations": {
             "actions": [
                 "insert"
             ],
@@ -1246,7 +1246,7 @@
             "model": "company_contact_associations",
             "data_source": {
                 "name": "contacts",
-                "raw_sql": "select distinct(id) from {schema}.contacts  where updated_at > GETDATE() - INTERVAL '1 HOUR' AND updated_at < GETDATE()"
+                "raw_sql": "select distinct(id) from {schema}.contacts  where updated_at > GETDATE() - INTERVAL '1 HOUR'"
             },
             "fields_to_add_to_api_result": [
                 {

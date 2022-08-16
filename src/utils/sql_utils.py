@@ -105,7 +105,7 @@ class SqlQuery:
                     )
                     # 3) Count number of fileds to be updated
                     cursor.execute(self.get_count_sql_update())
-                    count_update_result = result = cursor.fetchone()
+                    count_update_result = cursor.fetchone()
                     logger.info(
                         f"Number of records to be updated: {count_update_result['count']}"
                     )

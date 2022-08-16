@@ -2,7 +2,7 @@
     "name": "hubspot",
     "daily_tasks_list" : [
         "contacts_recently_updated",
-        "contact_updated_company_daily_associations"
+        "contact_updated_company_hourly_associations"
     ],
     "daily_tasks_list_bck" : [
         "companies_recently_updated",
@@ -15,7 +15,7 @@
     ],
     "hourly_tasks_list_bck" : [
         "contacts_recently_updated",
-        "contact_updated_company_daily_associations"
+        "contact_updated_company_hourly_associations"
     ],
     "new_client_tasks" : [
         "contacts",
