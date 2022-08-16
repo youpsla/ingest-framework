@@ -13,7 +13,9 @@ from src.utils.various_utils import get_model_params_as_dict, get_running_env
 
 
 class Task:
-    """This class manage lots of things. Some of them are not directly connected to linkedin and should be extract to a Client class.
+    """
+    # noqa: E501
+    # This class manage lots of things. Some of them are not directly connected to linkedin and should be extract to a Client class.
     TODO: Create Client class
 
     - Retrieving task parameters from json file
@@ -51,13 +53,17 @@ class Task:
     def destination(self):
         if not self._destination:
             destination_name = self.params["destination"]
-            self._destination = get_client(self.running_env, destination_name, self)
+            self._destination = get_client(
+                self.running_env, destination_name, self
+            )  # noqa: E501
         return self._destination
 
     @property
     def request_data_source(self):
         if not self._request_data_source:
-            request_data_source_name = self.params.get("request_data_source", None)
+            request_data_source_name = self.params.get(
+                "request_data_source", None
+            )  # noqa: E501
             self._request_data_source = get_client(
                 self.running_env, request_data_source_name, self
             )
@@ -102,7 +108,7 @@ class Task:
         result = None
 
         if self.params is not None:
-            # TODO: Remove header as it is not used by bing. Pass other params as group.
+            # TODO: Remove header as it is not used by bing. Pass other params as group. # noqa: E501
             result = self.source.get(
                 task_params=self.params,
             )
@@ -111,7 +117,9 @@ class Task:
             raise RuntimeError(f"No available params for task {self.name}.")
 
         if not result:
-            logger.info(f"{self.name}: No data from source." " Running next task.")
+            logger.info(
+                f"{self.name}: No data from source." " Running next task."
+            )  # noqa: E501
 
         return result
 
@@ -152,7 +160,12 @@ class Task:
                     existing_ids = [
                         "".join(
                             str(r[e])
-                            for e in [d for d in self.params["destination_unique_keys"]]
+                            for e in [
+                                d
+                                for d in self.params[
+                                    "destination_unique_keys"
+                                ]  # noqa: E501
+                            ]  # noqa: E501
                         )
                         for r in self.model.get_all()
                     ]
@@ -178,10 +191,11 @@ class Task:
             data_objs = self.get_data_objs(source_data)
 
             values_dicts_list = [
-                {f.name: f.db_value for f in obj.fields_list} for obj in data_objs
+                {f.name: f.db_value for f in obj.fields_list}
+                for obj in data_objs  # noqa: E501
             ]
 
-            # TODO: Manage the case when no quries are done to source because of prefiltering from DB. This is the case for sponsored_video_update
+            # TODO: Manage the case when no quries are done to source because of prefiltering from DB. This is the case for sponsored_video_update # noqa: E501
             if values_dicts_list:
                 self.update(values_dicts_list, self.params["update_key"])
             else:
@@ -191,7 +205,9 @@ class Task:
             for d in source_data:
                 if d["datas"] is not None:
                     m = Model(
-                        self.model.model_name, self.db_connection, channel=self.channel
+                        self.model.model_name,
+                        self.db_connection,
+                        channel=self.channel,  # noqa: E501
                     )
                     # m.set_field(
                     #     self.params["db_query"]["fields"][0],
@@ -202,7 +218,7 @@ class Task:
                     #     m.params[d["where_field"]],
                     # )
                     m.populate_values(d["datas"])
-                    # setattr(getattr(m, d["where_field"]), "value", d["where_value"])
+                    # setattr(getattr(m, d["where_field"]), "value", d["where_value"]) # noqa: E501
 
                     where_dicts_list = []
                     for v in self.params["db_query"]["keys"]:
@@ -221,7 +237,9 @@ class Task:
             try:
                 query = self.params["raw_sql_to_run"]
             except KeyError:
-                raise ("A task with raw_sql in actions must have a raw_sql_to_run key")
+                raise (
+                    "A task with raw_sql in actions must have a raw_sql_to_run key"  # noqa: E501
+                )  # noqa: E501
 
             Model.run_raw_sql(db_connection=self.db_connection, sql=query)
 
@@ -230,7 +248,9 @@ class Task:
     def get_data_objs(self, source_data):
         data_objs = []
         start = time.time()
-        model_params = get_model_params_as_dict(self.channel, self.params["model"])
+        model_params = get_model_params_as_dict(
+            self.channel, self.params["model"]
+        )  # noqa: E501
         for d in source_data:
             elem = d["datas"]
             if elem is not None:

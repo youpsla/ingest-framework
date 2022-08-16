@@ -17,7 +17,7 @@ class ModelManager:
 
 
 class Model:
-    """A class representing datas to be store in Db.
+    """A class representing datas to be store in Db. # noqa: E501
 
     Each attribute of type Field represent a data collected from the source.
     This class contains some methods for querying the Db.
@@ -52,7 +52,7 @@ class Model:
 
     @property
     def params(self):
-        """Property to access model params stored in json file.
+        """Property to access model params stored in json file. # noqa: E501
         Each time the property is accessed, the json file is read. Normally, this happens only ont time per task
 
         TODO: Currently, source file is hardcoded.
@@ -66,7 +66,7 @@ class Model:
 
         """
 
-        # TODO: Add cache here because retrieved each time Model is instantiated.
+        # TODO: Add cache here because retrieved each time Model is instantiated. # noqa: E501
         if self._params is None:
             """Get task params from Json file. Store as property for reuse."""
             with open(self.get_params_json_file_path(), "r") as f:
@@ -156,7 +156,7 @@ class Model:
         return result
 
     def get_all(self, fields=None, filter_field=None):
-        """Get all record for a table corresponding to the current model.
+        """Get all record for a table corresponding to the current model. # noqa: E501
 
         Args:
             fields: A list of fields for filtering request result fields.
@@ -207,13 +207,15 @@ class Model:
             A list of tuple with one tuple containing the max value.
 
         """
-        q = SqlQuery(self.db_connection, "select_max", max_field=field, model=self)
+        q = SqlQuery(
+            self.db_connection, "select_max", max_field=field, model=self
+        )  # noqa: E501
         res = q.run()
         return res
 
     @staticmethod
     def get_from_raw_sql(db_connection, sql):
-        """Allow to query the Db with raw sql.
+        """Allow to query the Db with raw sql. # noqa: E501
 
         Mainly used for retrieving from teh db values used to build the request endpoint.
 
@@ -231,7 +233,7 @@ class Model:
 
     @staticmethod
     def run_raw_sql(db_connection, sql):
-        """Allow to query the Db with raw sql.
+        """Allow to query the Db with raw sql. # noqa: E501
 
         Mainly used for retrieving from teh db values used to build the request endpoint.
 
@@ -368,7 +370,7 @@ class Field:
             result = value.split(caracter)
         except IndexError as e:
             logger.info(
-                f"Error while splitting '{value}' with caracter {caracter} at position"
+                f"Error while splitting '{value}' with caracter {caracter} at position"  # noqa: E501
                 f" {position}"
             )
             logger.info(e)
@@ -426,7 +428,7 @@ class Field:
         return self.get_sql_escaped(result)
 
     def get_sql_escaped(self, value):
-        """Could be "'" caracter in values to insert in Db. Need to be double in this case.
+        """Could be "'" caracter in values to insert in Db. Need to be double in this case. # noqa: E501
 
         Args:
             value: The value to escape

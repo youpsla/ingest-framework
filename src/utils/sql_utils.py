@@ -64,20 +64,18 @@ class SqlQuery:
         pass
 
     def run(self):
-
-        # write_results_db_connection = self.destination.write_results_db_connection
-        # write_cur = write_results_db_connection.cursor()
-
-        # db_connection = self.destination.db_connection
-        # cursor = db_connection.cursor()
-        with self.db_connection.cursor(cursor_factory=RealDictCursor) as cursor:
+        with self.db_connection.cursor(
+            cursor_factory=RealDictCursor
+        ) as cursor:  # noqa: E501
             try:
                 if self.qtype == "select":
                     self.sql = self.get_sql_select()
                     cursor.execute(self.sql)
                 elif self.qtype == "insert":
                     self.sql = self.get_sql_insert(self.schema_table)
-                    extras.execute_values(cursor, self.sql, self.values, page_size=500)
+                    extras.execute_values(
+                        cursor, self.sql, self.values, page_size=500
+                    )  # noqa: E501
                 elif self.qtype == "select_max":
                     self.sql = self.get_sql_select_max()
                     cursor.execute(self.sql, self.values)
@@ -107,7 +105,7 @@ class SqlQuery:
                     cursor.execute(self.get_count_sql_update())
                     count_update_result = cursor.fetchone()
                     logger.info(
-                        f"Number of records to be updated: {count_update_result['count']}"
+                        f"Number of records to be updated: {count_update_result['count']}"  # noqa: E501
                     )
                     # 4) Do the update
                     self.sql = self.get_sql_update()
@@ -132,7 +130,7 @@ class SqlQuery:
             f"SELECT {'*' if not self.fields else ','.join(self.fields)}"
             f" from {self.schema_table}"
             # f" {'where '+self.where if self.where else ''}"
-            f" {'where '+self.filter_field['name'] +'=' + str(self.filter_field['value']) if self.filter_field else ''}"
+            f" {'where '+self.filter_field['name'] +'=' + str(self.filter_field['value']) if self.filter_field else ''}"  # noqa: E501
         )
         return sql
 
@@ -141,19 +139,20 @@ class SqlQuery:
         return sql
 
     def get_sql_select_max_for_date_plus_one_day(self):
-        sql = f"SELECT MAX({self.max_field}) + INTERVAL '1 day' as max_date FROM {self.schema_table}"
+        sql = f"SELECT MAX({self.max_field}) + INTERVAL '1 day' as max_date FROM {self.schema_table}"  # noqa: E501
         return sql
 
     def get_sql_insert(self, schema_table):
         sql = """INSERT INTO {} ({}) VALUES %s"""
         sql = sql.format(
-            schema_table, ", ".join([f.name for f in self.model.get_db_fields_list()])
+            schema_table,
+            ", ".join([f.name for f in self.model.get_db_fields_list()]),  # noqa: E501
         )
         return sql
 
     def create_tmp_stage_table(self):
         sql_create_tmp_table = (
-            "DROP TABLE IF EXISTS {stage_table_name}; create table IF NOT EXISTS {stage_table_name}"
+            "DROP TABLE IF EXISTS {stage_table_name}; create table IF NOT EXISTS {stage_table_name}"  # noqa: E501
             " (like {schema_table});".format(
                 schema_table=self.schema_table,
                 stage_table_name=self.stage_table_name,
@@ -205,7 +204,7 @@ class SqlQuery:
                 ]
             )
 
-            ## SOlutino managing ca se of null value in redshift.
+            # SOlutino managing ca se of null value in redshift.
             # where_data = " or ".join(
             #     [
             #         "("
@@ -235,7 +234,7 @@ class SqlQuery:
         target = self.model.model_name
 
         sql = (
-            "update {schema_table} set {set_part} from {stage_table_name} where"
+            "update {schema_table} set {set_part} from {stage_table_name} where"  # noqa: E501
             " {where_primary_key} and ({and_where})".format(
                 schema_table=self.schema_table,
                 set_part=update_get_set(self),
@@ -290,7 +289,7 @@ class SqlQuery:
                 ]
             )
 
-            ## SOlutino managing ca se of null value in redshift.
+            # SOlutino managing ca se of null value in redshift.
             # where_data = " or ".join(
             #     [
             #         "("
@@ -333,7 +332,9 @@ class SqlQuery:
     def get_sql_partial_update(self):
         sql = """UPDATE {} SET {} WHERE {}"""
 
-        where = " ".join([f" {k}='{v}'" for d in self.where for k, v in d.items()])
+        where = " ".join(
+            [f" {k}='{v}'" for d in self.where for k, v in d.items()]
+        )  # noqa: E501
 
         # set_data = ' , '.join(['='.join((str(a[0]),str(a[1]))) for a in zip(fields,values)]) # noqa: E501
         set_data = " , ".join(

@@ -1,9 +1,7 @@
-import datetime
 import json
 import time
 from collections import ChainMap
 from threading import current_thread, get_ident, get_native_id
-from urllib.parse import urlencode
 
 from requests.exceptions import ConnectionError, ConnectTimeout, RetryError
 from requests.structures import CaseInsensitiveDict
@@ -13,7 +11,6 @@ from src.utils.endpoint_utils import Endpoint
 from src.utils.http_utils import get_http_adapter
 from src.utils.various_utils import get_chunks, run_in_threads_pool
 
-from hubspot import HubSpot
 from hubspot.auth.oauth.api.tokens_api import TokensApi
 
 refresh_token_params = {
@@ -97,7 +94,9 @@ class HubspotClient(Client):
             # for ptd in portal_token_list:
             access_token = ptd[1]
             portal_id = ptd[0]
-            access_token = TokensApi().create_token(**refresh_token_params).access_token
+            access_token = (
+                TokensApi().create_token(**refresh_token_params).access_token
+            )  # noqa: E501
             result = []
 
             if self.task.name in [
@@ -141,12 +140,16 @@ class HubspotClient(Client):
                 for lst in endpoint_list_list:
                     # for lst in [endpoint_list_list[0]]:
                     access_token = (
-                        TokensApi().create_token(**refresh_token_params).access_token
+                        TokensApi()
+                        .create_token(**refresh_token_params)
+                        .access_token  # noqa: E501
                     )
-                    headers = self.build_headers(header=None, access_token=access_token)
+                    headers = self.build_headers(
+                        header=None, access_token=access_token
+                    )  # noqa: E501
 
-                    for l in lst:
-                        l[0].access_token = access_token
+                    for ll in lst:
+                        ll[0].access_token = access_token
 
                     print(f"Chunck with {len(lst)} queries")
 
@@ -196,14 +199,18 @@ class HubspotClient(Client):
                     for k, v in fr.items():
                         for r in v:
                             data_to_add_to_results = []
-                            if task_params.get("fields_to_add_to_api_result", None):
+                            if task_params.get(
+                                "fields_to_add_to_api_result", None
+                            ):  # noqa: E501
                                 data_to_add_to_results = [
                                     {
                                         e["destination_key"]: db_params[k][
                                             e["origin_key"]
                                         ]
                                     }
-                                    for e in task_params["fields_to_add_to_api_result"]
+                                    for e in task_params[
+                                        "fields_to_add_to_api_result"
+                                    ]  # noqa: E501
                                 ]
                             api_data = (
                                 r
@@ -211,7 +218,9 @@ class HubspotClient(Client):
                                 else {task_params["key_for_values"]: r}
                             )
                             local_result.append(
-                                dict(ChainMap(*data_to_add_to_results, api_data))
+                                dict(
+                                    ChainMap(*data_to_add_to_results, api_data)
+                                )  # noqa: E501
                             )
                     result.extend(local_result)
 
@@ -263,7 +272,7 @@ class HubspotClient(Client):
             time.sleep(300)
             c_thread = current_thread()
             print(
-                f"{cpt} attemp(s) failed. Restarting thread after 100 seconds of pause: name={c_thread.name}, idnet={get_ident()}, id={get_native_id()}"
+                f"{cpt} attemp(s) failed. Restarting thread after 100 seconds of pause: name={c_thread.name}, idnet={get_ident()}, id={get_native_id()}"  # noqa: E501
             )
             response = self.do_get_query(endpoint=endpoint, headers=headers)
             if cpt == 5:
@@ -279,7 +288,8 @@ class HubspotClient(Client):
             # TODO: Manage differents error cases.
             if (
                 response.status_code == 404
-                and "Unknown email campaign id" in json.loads(response.text)["message"]
+                and "Unknown email campaign id"
+                in json.loads(response.text)["message"]  # noqa: E501
             ):
                 return None
             elif response.status_code == 401:

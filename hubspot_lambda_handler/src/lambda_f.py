@@ -1,4 +1,4 @@
-# TODO: manage logger for having logger output in terminal when running locally + cleanup print statements
+# TODO: manage logger for having logger output in terminal when running locally + cleanup print statements # noqa: E501
 
 import json
 import os
@@ -38,7 +38,9 @@ if os.environ.get("AWS_EXECUTION_ENV") is not None and get_running_env() in [
 
 def get_params_json_file_path():
     app_home = os.environ["APPLICATION_HOME"]
-    return os.path.realpath(os.path.join(app_home, "configs", CHANNEL, "channel.json"))
+    return os.path.realpath(
+        os.path.join(app_home, "configs", CHANNEL, "channel.json")
+    )  # noqa: E501
 
 
 def get_channel_params():
@@ -87,7 +89,9 @@ def main():
 
     with db_connection.cursor() as cursor:
         cursor.execute("COMMIT;")
-    logger.info("All tasks have runned successfully. Daily Worflow ended with success.")
+    logger.info(
+        "All tasks have runned successfully. Daily Worflow ended with success."
+    )  # noqa: E501
 
     end = time.time()
     logger.info(end - start)
@@ -107,7 +111,7 @@ def main():
 
     lambda_client = boto3.client("lambda")
     lambda_client.invoke(
-        FunctionName="jabmo-ingest-redshift-deduplicator-Function-jhJwND5R8vnY",
+        FunctionName="jabmo-ingest-redshift-deduplicator-Function-jhJwND5R8vnY",  # noqa: E501
         Payload=json.dumps(event),
         InvocationType="Event",
     )

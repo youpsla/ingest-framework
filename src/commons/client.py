@@ -5,7 +5,6 @@ from datetime import date, datetime, timedelta
 
 import dateutil
 import pytz
-from dateutil.relativedelta import relativedelta
 from src.commons.model import Model
 from src.constants import ENVS_LIST
 from src.utils.various_utils import zip_longest_repeat_value
@@ -32,7 +31,7 @@ class Client:
 
     def get_month_day_range(date):
         """
-        For a date 'date' returns the start and end date for the month of 'date'.
+        For a date 'date' returns the start and end date for the month of 'date'. # noqa: E501
 
         Month with 31 days:
         >>> date = datetime.date(2011, 7, 27)
@@ -45,7 +44,9 @@ class Client:
         (datetime.date(2011, 2, 1), datetime.date(2011, 2, 28))
         """
         first_day = date.replace(day=1)
-        last_day = date.replace(day=calendar.monthrange(date.year, date.month)[1])
+        last_day = date.replace(
+            day=calendar.monthrange(date.year, date.month)[1]
+        )  # noqa: E501
         return first_day, last_day
 
     def get_dynamics_group_params(self, params):
@@ -140,17 +141,18 @@ class Client:
                     )
                     tmp_result = [dict(r) for r in tmp_result]
                     tmp_result = [
-                        {param["name"]: tr[param["source_key"]]} for tr in tmp_result
+                        {param["name"]: tr[param["source_key"]]}
+                        for tr in tmp_result  # noqa: E501
                     ]
-                    # for tr in tmp_result:
-                    #     final_result.append({param["name"]: tr[param["source_key"]]})
 
                 if param["type"] == "timestamp_from_epoch":
                     target_day = self.get_day_relative_to_today_from_params(
                         day_params=param,
                         offset_unity=param["offset_unity"],
                     )
-                    target_datetime = datetime.fromordinal(target_day.toordinal())
+                    target_datetime = datetime.fromordinal(
+                        target_day.toordinal()
+                    )  # noqa: E501
                     if param["position"] == "start":
                         target_datetime = target_datetime.replace(
                             hour=0, minute=0, second=0, tzinfo=pytz.UTC
@@ -172,9 +174,9 @@ class Client:
                         tmp_result = [{param["name"]: target_timestamp}]
 
                 result_lists.append(tmp_result)
-        # As zip_longest_repeat_value needs only non empty lists. We check that here.
-        # Could be the case when we use parameters from Db and the select statement returns no value.
-        # In this case, we return an empty list. Then no request will be done to the endpoint.
+        # As zip_longest_repeat_value needs only non empty lists. We check that here. # noqa: E501
+        # Could be the case when we use parameters from Db and the select statement returns no value. # noqa: E501
+        # In this case, we return an empty list. Then no request will be done to the endpoint. # noqa: E501
         for r in result_lists:
             if len(r) == 0:
                 return []
@@ -257,7 +259,8 @@ class Client:
         )
 
         end_date = self.get_end_date(
-            end_date_params=date_range_params["end_date"], offset_unity=offset_unity
+            end_date_params=date_range_params["end_date"],
+            offset_unity=offset_unity,  # noqa: E501
         )
 
         if end_date == datetime.date(datetime.today()):
@@ -267,9 +270,14 @@ class Client:
 
         result = []
 
-        if start_date != end_date and date_range_params["split_allowed"] is True:
+        if (
+            start_date != end_date
+            and date_range_params["split_allowed"] is True  # noqa: E501
+        ):  # noqa: E501
             delta = end_date - start_date
-            days = [start_date + timedelta(days=i) for i in range(delta.days + 1)]
+            days = [
+                start_date + timedelta(days=i) for i in range(delta.days + 1)
+            ]  # noqa: E501
             for d in days:
                 tmp_result = []
                 tmp_result.append(
@@ -278,7 +286,9 @@ class Client:
                     )
                 )
                 tmp_result.append(
-                    self.get_date_params(date_range_params["end_date"]["url_params"], d)
+                    self.get_date_params(
+                        date_range_params["end_date"]["url_params"], d
+                    )  # noqa: E501
                 )
                 result.append(tmp_result)
         else:
@@ -316,11 +326,15 @@ class Client:
             ed = date(year, month, last_day_of_month_number)
 
             tmp_result.append(
-                self.get_date_params(date_range_params["start_date"]["url_params"], sd)
+                self.get_date_params(
+                    date_range_params["start_date"]["url_params"], sd
+                )  # noqa: E501
             )
 
             tmp_result.append(
-                self.get_date_params(date_range_params["end_date"]["url_params"], ed)
+                self.get_date_params(
+                    date_range_params["end_date"]["url_params"], ed
+                )  # noqa: E501
             )
 
             result.append(tmp_result)
@@ -363,23 +377,10 @@ class Client:
             return []
 
         zip_data = (
-            self.get_request_parameters_lists() if self.task.params else ([], [], [])
+            self.get_request_parameters_lists()
+            if self.task.params
+            else ([], [], [])  # noqa: E501
         )
-
-        # date_range = params.get("date_range", None)
-        # if not date_range:
-        #     result = zip_data
-        # else:
-        #     result = []
-        #     for idx, zd in enumerate(zip_data):
-        #         date_range_list = self.get_date_ranges_list(params["date_range"])
-        #         for dr in date_range_list:
-        #             tmp = copy.deepcopy(zd)
-        #             for d in dr:
-        #                 tmp[1].extend(d)
-        #             result.append(tmp)
-
-        # return result
 
         # Add uuid to each record
         final_result = {}
