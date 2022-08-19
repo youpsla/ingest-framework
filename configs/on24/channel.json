@@ -1,0 +1,20 @@
+{
+    "name": "on24",
+    "daily_tasks_list" : [
+        "contacts_recently_updated",
+        "contact_updated_company_hourly_associations"
+    ],
+    "daily_tasks_list_bck" : [
+        "ontime_registrants",
+        "attendees",
+        "speakers",
+        "videos",
+        "slides",
+        "ondemand_registrants"
+    ],
+    "new_client_tasks" : [
+    ]
+
+}
+
+

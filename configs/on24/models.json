@@ -1,0 +1,195 @@
+[
+    {
+        "events": {
+            "client_id": {
+                "type": "raw",
+                "source_path": [
+                    "events",
+                    "clientid"
+                ]
+            },
+            "event_id": {
+                "type": "raw",
+                "source_path": [
+                    "events",
+                    "eventid"
+                ]
+            },
+            "goodafter": {
+                "type": "raw",
+                "source_path": [
+                    "events",
+                    "goodafter"
+                ]
+            },
+            "description": {
+                "type": "raw",
+                "source_path": [
+                    "events",
+                    "description"
+                ]
+            },
+            "displaytimezonecd": {
+                "type": "raw",
+                "source_path": [
+                    "events",
+                    "displaytimezonecd"
+                ]
+            },
+            "eventtype": {
+                "type": "raw",
+                "source_path": [
+                    "events",
+                    "eventtype"
+                ]
+            },
+            "createtimestamp": {
+                "type": "raw",
+                "source_path": [
+                    "events",
+                    "createtimestamp"
+                ]
+            },
+            "localelanguagecd": {
+                "type": "raw",
+                "source_path": [
+                    "events",
+                    "localelanguagecd"
+                ]
+            },
+            "lastmodified": {
+                "type": "raw",
+                "source_path": [
+                    "events",
+                    "lastmodified"
+                ]
+            },
+            "iseliteexpired": {
+                "type": "raw",
+                "source_path": [
+                    "events",
+                    "iseliteexpired"
+                ]
+            },
+            "livestart": {
+                "type": "raw",
+                "source_path": [
+                    "events",
+                    "livestart"
+                ]
+            },
+            "liveend": {
+                "type": "raw",
+                "source_path": [
+                    "events",
+                    "liveend"
+                ]
+            },
+            "archivestart": {
+                "type": "raw",
+                "source_path": [
+                    "events",
+                    "archivestart"
+                ]
+            },
+            "archiveend": {
+                "type": "raw",
+                "source_path": [
+                    "events",
+                    "archiveend"
+                ]
+            },
+            "audienceurl": {
+                "type": "raw",
+                "source_path": [
+                    "events",
+                    "audienceurl"
+                ]
+            },
+            "eventprofile": {
+                "type": "raw",
+                "source_path": [
+                    "events",
+                    "eventprofile"
+                ]
+            },
+            "streamtype": {
+                "type": "raw",
+                "source_path": [
+                    "events",
+                    "streamtype"
+                ]
+            },
+            "audiencekey": {
+                "type": "raw",
+                "source_path": [
+                    "events",
+                    "audiencekey"
+                ]
+            },
+            "reporturl": {
+                "type": "raw",
+                "source_path": [
+                    "events",
+                    "reporturl"
+                ]
+            },
+            "uploadurl": {
+                "type": "raw",
+                "source_path": [
+                    "events",
+                    "uploadurl"
+                ]
+            },
+            "pmurl": {
+                "type": "raw",
+                "source_path": [
+                    "events",
+                    "pmurl"
+                ]
+            },
+            "previewurl": {
+                "type": "raw",
+                "source_path": [
+                    "events",
+                    "previewurl"
+                ]
+            },
+            "contenttype": {
+                "type": "raw",
+                "source_path": [
+                    "events",
+                    "contenttype"
+                ]
+            },
+            "lastupdated": {
+                "type": "raw",
+                "source_path": [
+                    "events",
+                    "lastupdated"
+                ]
+            },
+            "category": {
+                "type": "raw",
+                "source_path": [
+                    "events",
+                    "category"
+                ]
+            },
+            "isactive": {
+                "type": "raw",
+                "source_path": [
+                    "events",
+                    "isactive"
+                ]
+            },
+            "regrequired": {
+                "type": "raw",
+                "source_path": [
+                    "events",
+                    "regrequired"
+                ]
+            }
+        }
+    }
+]

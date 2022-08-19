@@ -30,6 +30,8 @@ create table if not exists attendees
 
 create table if not exists events
 (
+	jab_id INT IDENTITY(1,1),
+	jab_created_at TIMESTAMP WITHOUT TIME ZONE   ENCODE az64 default sysdate,
     client_id         integer distkey,
     event_id          integer,
     goodafter         timestamp encode az64,
@@ -53,9 +55,8 @@ create table if not exists events
     pmurl             varchar(1000) encode lzo,
     previewurl        varchar(1000) encode lzo,
     contenttype       varchar(255) encode lzo,
-    lastupdated       TIMESTAMP WITHOUT TIME ZONE encode az64,
-    entry_date        TIMESTAMP WITHOUT TIME ZONE encode az64,
-    category          varchar(255),
+    lastupdated       timestamp encode az64,
+    category          varchar(255) encode lzo,
     isactive          boolean,
     regrequired       boolean
 )
