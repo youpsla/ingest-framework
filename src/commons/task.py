@@ -157,6 +157,7 @@ class Task:
             if data_objs:
                 if self.params.get("exclude_existing_in_db"):
                     # if getattr(self.params, "exclude_existing_in_db", None):
+                    all_from_db = self.model.get_all()
                     existing_ids = [
                         "".join(
                             str(r[e])

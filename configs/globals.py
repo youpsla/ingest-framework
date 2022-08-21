@@ -4,7 +4,7 @@ import sys
 from src.utils.various_utils import get_schema_name
 
 #### User defined variables ####
-CHANNEL = "hubspot"
+CHANNEL = "on24"
 ###############################
 os.environ["INGEST_CURRENT_CHANNEL"] = CHANNEL
 

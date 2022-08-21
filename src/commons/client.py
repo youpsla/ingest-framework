@@ -173,6 +173,16 @@ class Client:
 
                         tmp_result = [{param["name"]: target_timestamp}]
 
+                if param["type"] == "as_YYYY-MM-DD":
+                    target_day = self.get_day_relative_to_today_from_params(
+                        day_params=param,
+                        offset_unity=param["offset_unity"],
+                    )
+
+                    target_day = target_day.strftime("%Y-%m-%d")
+
+                    tmp_result = [{param["name"]: target_day}]
+
                 result_lists.append(tmp_result)
         # As zip_longest_repeat_value needs only non empty lists. We check that here. # noqa: E501
         # Could be the case when we use parameters from Db and the select statement returns no value. # noqa: E501

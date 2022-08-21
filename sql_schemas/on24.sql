@@ -2,6 +2,8 @@ CREATE SCHEMA on24_development;
 
 create table if not exists attendees
 (
+    jab_id INT IDENTITY(1,1),
+	jab_created_at TIMESTAMP WITHOUT TIME ZONE   ENCODE az64 default sysdate,
     client_id                  integer distkey,
     event_id                   integer,
     event_user_id              integer encode az64,
@@ -34,7 +36,7 @@ create table if not exists events
 	jab_created_at TIMESTAMP WITHOUT TIME ZONE   ENCODE az64 default sysdate,
     client_id         integer distkey,
     event_id          integer,
-    goodafter         timestamp encode az64,
+    goodafter         timestamp encode az64 ,
     description       varchar(1000) encode lzo,
     displaytimezonecd varchar(255) encode lzo,
     eventtype         varchar(255) encode lzo,
@@ -108,6 +110,8 @@ create table if not exists clients
 
 create table if not exists registrants
 (
+    jab_id INT IDENTITY(1,1),
+	jab_created_at TIMESTAMP WITHOUT TIME ZONE   ENCODE az64 default sysdate,
     client_id        integer distkey,
     event_id         integer,
     event_user_id    integer encode az64,
@@ -126,9 +130,8 @@ create table if not exists registrants
     source_event_id  integer encode az64,
     partnerref       varchar(255) encode lzo,
     user_status      varchar(255) encode lzo,
-    create_timestamp TIMESTAMP WITHOUT TIME ZONE encode az64,
-    last_activity    TIMESTAMP WITHOUT TIME ZONE encode az64,
-    entry_date       TIMESTAMP WITHOUT TIME ZONE encode az64,
+    create_timestamp timestamp encode az64,
+    last_activity    timestamp encode az64,
     registrant_type  varchar(255) encode lzo
 )
     diststyle key
@@ -140,7 +143,7 @@ create table if not exists registrants
  GRANT SELECT ON ALL TABLES IN SCHEMA on24_development TO GROUP dev_ro;
  ALTER DEFAULT PRIVILEGES IN SCHEMA on24_development GRANT SELECT ON TABLES TO GROUP dev_ro;
 
- GRANT CREATE ON SCHEMA on24_development TO GROUP dev_rw;
+ GRANT USAGE ON SCHEMA on24_development TO GROUP dev_rw;
  GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA on24_development TO GROUP dev_rw;
  ALTER DEFAULT PRIVILEGES IN SCHEMA on24_development GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO GROUP dev_rw;
 

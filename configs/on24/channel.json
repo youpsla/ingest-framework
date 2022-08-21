@@ -1,11 +1,11 @@
 {
     "name": "on24",
     "daily_tasks_list" : [
-        "contacts_recently_updated",
-        "contact_updated_company_hourly_associations"
+        "registrants"
     ],
     "daily_tasks_list_bck" : [
-        "ontime_registrants",
+        "events",
+        "registrants",
         "attendees",
         "speakers",
         "videos",

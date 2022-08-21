@@ -30,6 +30,16 @@ refresh_token_params = {
 #     return endpoint
 
 
+def registrants_pagination(endpoint, task_result):
+    pagecount = task_result.get("pagecount", None)
+    currentpage = task_result.get("currentpage", None)
+    if currentpage == pagecount - 1:
+        return None
+    pagination_param = endpoint.get_param_by_name("pageOffset")
+    pagination_param.value = currentpage + 1
+    return endpoint
+
+
 class On24Client(Client):
     def __init__(self, task=None, env=None, db_connection=None):
         super().__init__(env)
@@ -59,144 +69,82 @@ class On24Client(Client):
             header = dict(**ptd)
             header["Accept"] = "application/json"
             header["cache-control"] = "no-cache"
-            access_token = (
-                TokensApi().create_token(**refresh_token_params).access_token
-            )  # noqa: E501
             result = []
 
-            if self.task.name in [
-                "contacts",
-                "contacts_recently_created",
-                "contacts_recently_updated",
-                "companies",
-                "companies_recently_updated",
-                "campaigns",
-                "campaign_details",
-                "company_contact_associations",
-                "contact_company_associations",
-                "contact_created_company_daily_associations",
-                "contact_updated_company_hourly_associations",
-                "email_events_click_since_2022",
-                "email_events_open_since_2022",
-                "email_events_forward_since_2022",
-                "email_events_click_daily",
-                "email_events_open_daily",
-                "email_events_forward_daily",
-            ]:
+            db_params = self.get_request_params()
+            total_requests_number = len(db_params)
+            endpoint_list = [
+                (
+                    Endpoint(
+                        params=v,
+                        url_template=task_params["query"]["template"],
+                        query_params=task_params["query"]["params"],
+                    ),
+                    k,
+                )
+                for k, v in db_params.items()
+            ]
+            print(f"Number of requests to run: {total_requests_number}")
 
-                db_params = self.get_request_params()
-                total_requests_number = len(db_params)
-                endpoint_list = [
-                    (
-                        Endpoint(
-                            params=v,
-                            url_template=task_params["query"]["template"],
-                            query_params=task_params["query"]["params"],
-                        ),
-                        k,
-                    )
-                    for k, v in db_params.items()
-                ]
-                print(f"Number of requests to run: {total_requests_number}")
+            futures_results = []
 
-                futures_results = []
+            endpoint_list_list = get_chunks(endpoint_list, chunk_size=100)
+            for lst in endpoint_list_list:
+                # for lst in [endpoint_list_list[0]]:
+                access_token = (
+                    TokensApi()
+                    .create_token(**refresh_token_params)
+                    .access_token  # noqa: E501
+                )
+                headers = header
 
-                endpoint_list_list = get_chunks(endpoint_list, chunk_size=100)
-                for lst in endpoint_list_list:
-                    # for lst in [endpoint_list_list[0]]:
-                    access_token = (
-                        TokensApi()
-                        .create_token(**refresh_token_params)
-                        .access_token  # noqa: E501
-                    )
-                    headers = self.build_headers(
-                        header=None, access_token=access_token
-                    )  # noqa: E501
+                for ll in lst:
+                    ll[0].access_token = access_token
 
-                    for ll in lst:
-                        ll[0].access_token = access_token
+                print(f"Chunck with {len(lst)} queries")
 
-                    print(f"Chunck with {len(lst)} queries")
+                pagination_function = None
+                if self.task.name in ["registrants"]:
+                    pagination_function = registrants_pagination
 
-                    pagination_function = None
-                    if self.task.name in [
-                        "contacts_recently_created",
-                        "contacts_recently_updated",
-                    ]:
-                        pagination_function = (
-                            contacts_recently_created_updated_pagination
+                chunks_result_list = run_in_threads_pool(
+                    request_params_list=lst,
+                    source_function=self.do_get_query,
+                    headers=headers,
+                    result_key=task_params["query"]["response_datas_key"],
+                    pagination_function=pagination_function
+                    if pagination_function
+                    else None,
+                )
+                futures_results.extend(chunks_result_list)
+
+            for fr in futures_results:
+                local_result = []
+                for k, v in fr.items():
+                    for r in v:
+                        data_to_add_to_results = []
+                        if task_params.get(
+                            "fields_to_add_to_api_result", None
+                        ):  # noqa: E501
+                            data_to_add_to_results = [
+                                {e["destination_key"]: db_params[k][e["origin_key"]]}
+                                for e in task_params[
+                                    "fields_to_add_to_api_result"
+                                ]  # noqa: E501
+                            ]
+                        api_data = (
+                            r
+                            if isinstance(r, dict)
+                            else {task_params["key_for_values"]: r}
                         )
+                        local_result.append(
+                            dict(
+                                ChainMap(*data_to_add_to_results, api_data)
+                            )  # noqa: E501
+                        )
+                result.extend(local_result)
 
-                    if self.task.name == "contacts":
-                        pagination_function = contacts_pagination
-
-                    if self.task.name == "companies":
-                        pagination_function = companies_pagination
-
-                    if self.task.name in [
-                        "campaigns",
-                        "companies_recently_updated",
-                        "contact_company_associations",
-                        "contact_updated_company_hourly_associations",
-                        "contact_created_company_daily_associations",
-                        "email_events_open_daily",
-                        "email_events_click_daily",
-                        "email_events_forward_daily",
-                        "email_events_click_since_2022",
-                        "email_events_open_since_2022",
-                        "email_events_forward_since_2022",
-                    ]:
-                        pagination_function = hasMore_offset_pagination
-
-                    chunks_result_list = run_in_threads_pool(
-                        request_params_list=lst,
-                        source_function=self.do_get_query,
-                        headers=headers,
-                        result_key=task_params["query"]["response_datas_key"],
-                        pagination_function=pagination_function
-                        if pagination_function
-                        else None,
-                    )
-                    futures_results.extend(chunks_result_list)
-
-                for fr in futures_results:
-                    local_result = []
-                    for k, v in fr.items():
-                        for r in v:
-                            data_to_add_to_results = []
-                            if task_params.get(
-                                "fields_to_add_to_api_result", None
-                            ):  # noqa: E501
-                                data_to_add_to_results = [
-                                    {
-                                        e["destination_key"]: db_params[k][
-                                            e["origin_key"]
-                                        ]
-                                    }
-                                    for e in task_params[
-                                        "fields_to_add_to_api_result"
-                                    ]  # noqa: E501
-                                ]
-                            api_data = (
-                                r
-                                if isinstance(r, dict)
-                                else {task_params["key_for_values"]: r}
-                            )
-                            local_result.append(
-                                dict(
-                                    ChainMap(*data_to_add_to_results, api_data)
-                                )  # noqa: E501
-                            )
-                    result.extend(local_result)
-
-            if result:
-                for r in result:
-                    r["portal_id"] = portal_id
-                    final_result.append(r)
-            else:
-                pass
-
-        to_return = [{"datas": d} for d in final_result]
+        to_return = [{"datas": d} for d in result]
         return to_return
 
     def do_get_query(
