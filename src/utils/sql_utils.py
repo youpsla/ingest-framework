@@ -192,42 +192,46 @@ class SqlQuery:
         def update_get_and_where(self):
             comparaison_fields = list(self.values[0].keys())
             comparaison_fields.remove(self.update_key)
-            where_data = " or ".join(
-                [
-                    " != ".join(
-                        (
-                            "{}.{}".format(self.model.model_name, str(f)),
-                            "{}.{}".format(self.stage_table_name, str(f)),
-                        )
-                    )
-                    for f in comparaison_fields
-                ]
-            )
 
-            # SOlutino managing ca se of null value in redshift.
+            # THis does not amange null value in Db.
+            # https://docs.aws.amazon.com/redshift/latest/dg/r_Nulls.html
             # where_data = " or ".join(
             #     [
-            #         "("
-            #         + "("
-            #         + " != ".join(
+            #         " != ".join(
             #             (
             #                 "{}.{}".format(self.model.model_name, str(f)),
             #                 "{}.{}".format(self.stage_table_name, str(f)),
             #             )
             #         )
-            #         + ")"
-            #         + " or "
-            #         + "("
-            #         + "{}.{}".format(self.stage_table_name, str(f))
-            #         + " is not null "
-            #         + " and "
-            #         + "{}.{}".format(self.model.model_name, str(f))
-            #         + " is null "
-            #         + ")"
-            #         + ")"
             #         for f in comparaison_fields
             #     ]
             # )
+
+            # Solution managing case of null value in redshift.
+            # TODO: Manage when new value is NULL
+            where_data = " or ".join(
+                [
+                    "("
+                    + "("
+                    + " != ".join(
+                        (
+                            "{}.{}".format(self.model.model_name, str(f)),
+                            "{}.{}".format(self.stage_table_name, str(f)),
+                        )
+                    )
+                    + ")"
+                    + " or "
+                    + "("
+                    + "{}.{}".format(self.stage_table_name, str(f))
+                    + " is not null "
+                    + " and "
+                    + "{}.{}".format(self.model.model_name, str(f))
+                    + " is null "
+                    + ")"
+                    + ")"
+                    for f in comparaison_fields
+                ]
+            )
 
             return where_data
 
