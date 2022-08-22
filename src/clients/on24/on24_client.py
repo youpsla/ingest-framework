@@ -30,13 +30,26 @@ refresh_token_params = {
 #     return endpoint
 
 
-def registrants_pagination(endpoint, task_result):
+def pageOffset_pagination(endpoint, task_result):
     pagecount = task_result.get("pagecount", None)
     currentpage = task_result.get("currentpage", None)
     if currentpage == pagecount - 1:
         return None
     pagination_param = endpoint.get_param_by_name("pageOffset")
     pagination_param.value = currentpage + 1
+    return endpoint
+
+
+def all_events(endpoint, task_result):
+    # Need to use special pagination here because this endpoint doesn't allow more than 180 days for startDate.
+    # If there is a gap of more than 180 days between 2 events,
+    # pagination will stop and older events will not be retrieved.
+    totalevents = task_result.get("totalevents", None)
+    if totalevents == 0:
+        return None
+    pagination_param = endpoint.get_param_by_name("dateIntervalOffset")
+    current_value = pagination_param.formatted_value
+    pagination_param.value = current_value + 180
     return endpoint
 
 
@@ -104,8 +117,16 @@ class On24Client(Client):
                 print(f"Chunck with {len(lst)} queries")
 
                 pagination_function = None
-                if self.task.name in ["registrants"]:
-                    pagination_function = registrants_pagination
+                if self.task.name in [
+                    "all_registrants",
+                    "all_attendees",
+                    "events_updated",
+                    "events_modified",
+                ]:
+                    pagination_function = pageOffset_pagination
+
+                if self.task.name == "all_events":
+                    pagination_function = all_events
 
                 chunks_result_list = run_in_threads_pool(
                     request_params_list=lst,

@@ -1,12 +1,14 @@
 {
     "name": "on24",
     "daily_tasks_list" : [
-        "registrants"
+        "events_modified"
     ],
     "daily_tasks_list_bck" : [
-        "events",
-        "registrants",
-        "attendees",
+        "all_events",
+        "all_registrants",
+        "all_attendees",
+        "events_updated",
+        "events_modified",
         "speakers",
         "videos",
         "slides",

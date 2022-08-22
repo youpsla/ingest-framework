@@ -1,6 +1,6 @@
 [
     {
-        "events": {
+        "all_events": {
             "actions": [
                 "insert",
                 "update"
@@ -15,7 +15,7 @@
             "model": "events",
             "update_key": "event_id",
             "query": {
-                "template": "{base}/{client_id}/event?{startDate}&{dateFilterMode}",
+                "template": "{base}/{client_id}/event?{dateInterval}&{dateIntervalOffset}&{includeInactive}&{dateFilterMode}",
                 "response_datas_key": "events",
                 "params": [
                     {
@@ -31,13 +31,22 @@
                         "value": 50386
                     },
                     {
-                        "name": "startDate",
-                        "type": "as_YYYY-MM-DD",
-                        "offset_type": "from_today",
-                        "offset_value": "180",
-                        "offset_unity": "days",
-                        "position": "start",
-                        "output_type": "kwarg"
+                        "name": "dateInterval",
+                        "type": "constant",
+                        "output_type": "kwarg",
+                        "value": 180
+                    },
+                    {
+                        "name": "dateIntervalOffset",
+                        "type": "constant",
+                        "output_type": "kwarg",
+                        "value": 0
+                    },
+                    {
+                        "name": "includeInactive",
+                        "type": "constant",
+                        "output_type": "kwarg",
+                        "value": "Y"
                     },
                     {
                         "name": "dateFilterMode",
@@ -50,7 +59,7 @@
         }
     },
     {
-        "registrants": {
+        "all_registrants": {
             "actions": [
                 "insert",
                 "update"
@@ -109,6 +118,207 @@
                         "type": "constant",
                         "output_type": "kwarg",
                         "value": 0
+                    }
+            ]
+            }
+        }
+    },
+    {
+        "all_attendees": {
+            "actions": [
+                "insert",
+                "update"
+            ],
+            "exclude_existing_in_db": true,
+            "source": "on24",
+            "destination": "redshift",
+            "request_data_source": "redshift",
+            "destination_unique_keys": [
+                "event_user_id"
+            ],
+            "model": "attendees",
+            "update_key": "event_user_id",
+            "query": {
+                "template": "{base}/{client_id}/attendee?{startDate}&{endDate}&{itemsPerPage}&{pageOffset}",
+                "response_datas_key": "attendees",
+                "params": [
+                    {
+                        "name": "base",
+                        "type": "constant",
+                        "output_type": "arg",
+                        "value": "http://api.on24.com/v2/client"
+                    },
+                    {
+                        "name": "client_id",
+                        "type": "constant",
+                        "output_type": "arg",
+                        "value": 50386
+                    },
+                    {
+                        "name": "startDate",
+                        "type": "as_YYYY-MM-DD",
+                        "offset_type": "from_today",
+                        "offset_value": "2000",
+                        "offset_unity": "days",
+                        "position": "start",
+                        "output_type": "kwarg"
+                    },
+                    {
+                        "name": "endDate",
+                        "type": "as_YYYY-MM-DD",
+                        "offset_type": "from_today",
+                        "offset_value": "1",
+                        "offset_unity": "days",
+                        "position": "start",
+                        "output_type": "kwarg"
+                    },
+                    {
+                        "name": "itemsPerPage",
+                        "type": "constant",
+                        "output_type": "kwarg",
+                        "value": 100
+                    },
+                    {
+                        "name": "pageOffset",
+                        "type": "constant",
+                        "output_type": "kwarg",
+                        "value": 0
+                    }
+            ]
+            }
+        }
+    },
+    {
+        "events_updated": {
+            "actions": [
+                "insert",
+                "update"
+            ],
+            "exclude_existing_in_db": true,
+            "source": "on24",
+            "destination": "redshift",
+            "request_data_source": "redshift",
+            "destination_unique_keys": [
+                "event_id"
+            ],
+            "model": "events",
+            "update_key": "event_id",
+            "query": {
+                "template": "{base}/{client_id}/event?{startDate}&{includeInactive}&{dateFilterMode}&{pageOffset}&{includeSubaccounts}",
+                "response_datas_key": "events",
+                "params": [
+                    {
+                        "name": "base",
+                        "type": "constant",
+                        "output_type": "arg",
+                        "value": "http://api.on24.com/v2/client"
+                    },
+                    {
+                        "name": "client_id",
+                        "type": "constant",
+                        "output_type": "arg",
+                        "value": 50386
+                    },
+                    {
+                        "name": "startDate",
+                        "type": "as_YYYY-MM-DD",
+                        "offset_type": "from_today",
+                        "offset_value": "3",
+                        "offset_unity": "days",
+                        "position": "start",
+                        "output_type": "kwarg"
+                    },
+                    {
+                        "name": "includeInactive",
+                        "type": "constant",
+                        "output_type": "kwarg",
+                        "value": "Y"
+                    },
+                    {
+                        "name": "dateFilterMode",
+                        "type": "constant",
+                        "output_type": "kwarg",
+                        "value": "updated"
+                    },
+                    {
+                        "name": "pageOffset",
+                        "type": "constant",
+                        "output_type": "kwarg",
+                        "value": 0
+                    },
+                    {
+                        "name": "includeSubaccounts",
+                        "type": "constant",
+                        "output_type": "kwarg",
+                        "value": "Y"
+                    }
+            ]
+            }
+        }
+    },
+    {
+        "events_modified": {
+            "actions": [
+                "insert",
+                "update"
+            ],
+            "exclude_existing_in_db": true,
+            "source": "on24",
+            "destination": "redshift",
+            "request_data_source": "redshift",
+            "destination_unique_keys": [
+                "event_id"
+            ],
+            "model": "events",
+            "update_key": "event_id",
+            "query": {
+                "template": "{base}/{client_id}/event?{startDate}&{includeInactive}&{dateFilterMode}&{pageOffset}&{includeSubaccounts}",
+                "response_datas_key": "events",
+                "params": [
+                    {
+                        "name": "base",
+                        "type": "constant",
+                        "output_type": "arg",
+                        "value": "http://api.on24.com/v2/client"
+                    },
+                    {
+                        "name": "client_id",
+                        "type": "constant",
+                        "output_type": "arg",
+                        "value": 50386
+                    },
+                    {
+                        "name": "startDate",
+                        "type": "as_YYYY-MM-DD",
+                        "offset_type": "from_today",
+                        "offset_value": "3",
+                        "offset_unity": "days",
+                        "position": "start",
+                        "output_type": "kwarg"
+                    },
+                    {
+                        "name": "includeInactive",
+                        "type": "constant",
+                        "output_type": "kwarg",
+                        "value": "Y"
+                    },
+                    {
+                        "name": "dateFilterMode",
+                        "type": "constant",
+                        "output_type": "kwarg",
+                        "value": "modified"
+                    },
+                    {
+                        "name": "pageOffset",
+                        "type": "constant",
+                        "output_type": "kwarg",
+                        "value": 0
+                    },
+                    {
+                        "name": "includeSubaccounts",
+                        "type": "constant",
+                        "output_type": "kwarg",
+                        "value": "Y"
                     }
             ]
             }

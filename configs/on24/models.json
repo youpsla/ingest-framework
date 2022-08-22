@@ -294,5 +294,135 @@
                 ]
             }
         }
+    },
+    {
+        "attendees": {
+            "client_id": {
+                "type": "raw",
+                "source_path": [
+                    "clientid"
+                ]
+            },
+            "event_id": {
+                "type": "raw",
+                "source_path": [
+                    "eventid"
+                ]
+            },
+            "event_user_id": {
+                "type": "raw",
+                "source_path": [
+                    "eventuserid"
+                ]
+            },
+            "source_event_id": {
+                "type": "raw",
+                "source_path": [
+                    "sourceeventid"
+                ]
+            },
+            "email": {
+                "type": "raw",
+                "source_path": [
+                    "email"
+                ]
+            },
+            "is_blocked": {
+                "type": "raw",
+                "source_path": [
+                    "isblocked"
+                ]
+            },
+            "engagement_score": {
+                "type": "raw",
+                "source_path": [
+                    "engagementscore"
+                ]
+            },
+            "live_minutes": {
+                "type": "raw",
+                "source_path": [
+                    "liveminutes"
+                ]
+            },
+            "live_viewed": {
+                "type": "raw",
+                "source_path": [
+                    "liveviewed"
+                ]
+            },
+            "archive_minutes": {
+                "type": "raw",
+                "source_path": [
+                    "archiveminutes"
+                ]
+            },
+            "archive_viewed": {
+                "type": "raw",
+                "source_path": [
+                    "archiveviewed"
+                ]
+            },
+            "asked_questions": {
+                "type": "raw",
+                "source_path": [
+                    "askedquestions"
+                ]
+            },
+            "resources_downloaded": {
+                "type": "raw",
+                "source_path": [
+                    "resourcesdownloaded"
+                ]
+            },
+            "answered_polls": {
+                "type": "raw",
+                "source_path": [
+                    "answeredpolls"
+                ]
+            },
+            "answered_surveys": {
+                "type": "raw",
+                "source_path": [
+                    "answeredsurveys"
+                ]
+            },
+            "user_profile_url": {
+                "type": "raw",
+                "source_path": [
+                    "userprofileurl"
+                ]
+            },
+            "user_status": {
+                "type": "raw",
+                "source_path": [
+                    "userstatus"
+                ]
+            },
+            "cumulative_live_minutes": {
+                "type": "raw",
+                "source_path": [
+                    "cumulativeliveminutes"
+                ]
+            },
+            "cumulative_archive_minutes": {
+                "type": "raw",
+                "source_path": [
+                    "cumulativearchiveminutes"
+                ]
+            },
+            "first_archive_activity": {
+                "type": "raw",
+                "source_path": [
+                    "firstarchiveactivity"
+                ]
+            },
+            "last_archive_activity": {
+                "type": "raw",
+                "source_path": [
+                    "lastarchiveactivity"
+                ]
+            }
+        }
     }
 ]
