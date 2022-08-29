@@ -13,14 +13,6 @@ from src.utils.various_utils import get_chunks, run_in_threads_pool
 
 from hubspot.auth.oauth.api.tokens_api import TokensApi
 
-refresh_token_params = {
-    "grant_type": "refresh_token",
-    "client_id": "fa6040db-72c2-4cca-b529-34d951716062",
-    "client_secret": "f5d8dedb-7d18-4c19-a2a7-d25053d9c6cb",
-    "redirect_uri": "https://connect.jabmo.app",
-    "refresh_token": "9c2cb2f5-b460-4bea-b1a1-b1df862bc3c1",
-}
-
 
 def contacts_pagination(endpoint, task_result):
     has_more_for_contacts = task_result.get("has-more", None)
@@ -90,10 +82,17 @@ class HubspotClient(Client):
                 )
             )
 
-        for ptd in [portal_token_list[2]]:
+        for ptd in [portal_token_list[4]]:
             # for ptd in portal_token_list:
-            access_token = ptd[1]
             portal_id = ptd[0]
+            refresh_token_params = {
+                "grant_type": "refresh_token",
+                "client_id": "fa6040db-72c2-4cca-b529-34d951716062",
+                "client_secret": "f5d8dedb-7d18-4c19-a2a7-d25053d9c6cb",
+                "redirect_uri": "https://connect.jabmo.app",
+                # "refresh_token": "9c2cb2f5-b460-4bea-b1a1-b1df862bc3c1",
+                "refresh_token": ptd[2],
+            }
             access_token = (
                 TokensApi().create_token(**refresh_token_params).access_token
             )  # noqa: E501
