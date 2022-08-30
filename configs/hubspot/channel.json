@@ -1,7 +1,8 @@
 {
     "name": "hubspot",
     "daily_tasks_list" : [
-        "contacts"
+        "contacts_recently_updated",
+        "contact_updated_company_hourly_associations"
     ],
     "daily_tasks_list_bck" : [
         "companies_recently_updated",

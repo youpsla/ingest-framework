@@ -13,7 +13,7 @@
                 "email"
             ],
             "request_data_source": "redshift",
-            "update_key": "email",
+            "update_keys": "email",
             "model": "contacts",
             "url": {
                 "response_data_key": [
@@ -40,7 +40,7 @@
                 "id", "portal_id"
             ],
             "model": "contacts",
-            "update_key": "id",
+            "update_keys": ["id","portal_id"],
             "query": {
                 "template": "{base}?{count}&{vidOffset}&{email}&{firstname}&{lastname}&{job_title}&{company}&{industry}&{hs_analytics_average_page_views}&{contact_owner}&{address}&{zip}&{city}&{region}&{country}&{hs_email_domain}&{hs_analytics_num_event_completions}&{ip_city}&{ip_country}&{ip_country_code}&{ip_state}&{ip_state_code}&{createdate}",
                 "response_datas_key": "contacts",
@@ -208,11 +208,9 @@
             "source": "hubspot",
             "destination": "redshift",
             "request_data_source": "redshift",
-            "destination_unique_keys": [
-                "id"
-            ],
+            "destination_unique_keys": ["id","portal_id"],
             "model": "contacts",
-            "update_key": "id",
+            "update_keys": ["id","portal_id"],
             "query": {
                 "template": "{base}?{count}&{timeOffset}&{email}&{firstname}&{lastname}&{job_title}&{company}&{industry}&{hs_analytics_average_page_views}&{contact_owner}&{address}&{zip}&{city}&{region}&{country}&{hs_email_domain}&{hs_analytics_num_event_completions}&{ip_city}&{ip_country}&{ip_country_code}&{ip_state}&{ip_state_code}",
                 "response_datas_key": "contacts",
@@ -375,11 +373,9 @@
             "source": "hubspot",
             "destination": "redshift",
             "request_data_source": "redshift",
-            "destination_unique_keys": [
-                "id"
-            ],
+            "destination_unique_keys": ["id","portal_id"],
             "model": "contacts",
-            "update_key": "id",
+            "update_keys": ["id","portal_id"],
             "query": {
                 "template": "{base}?{count}&{timeOffset}&{email}&{firstname}&{lastname}&{job_title}&{company}&{industry}&{hs_analytics_average_page_views}&{contact_owner}&{address}&{zip}&{city}&{region}&{country}&{hs_email_domain}&{hs_analytics_num_event_completions}&{ip_city}&{ip_country}&{ip_country_code}&{ip_state}&{ip_state_code}&{createdate}",
                 "response_datas_key": "contacts",
@@ -549,11 +545,9 @@
             "source": "hubspot",
             "destination": "redshift",
             "request_data_source": "redshift",
-            "destination_unique_keys": [
-                "id"
-            ],
+            "destination_unique_keys": ["id","portal_id"],
             "model": "companies",
-            "update_key": "id",
+            "update_keys": ["id","portal_id"],
             "query": {
                 "template": "{base}?{limit}&{offset}&{domain}&{name}&{hs_analytics_num_page_views}&{hs_analytics_num_visits}&{hs_is_target_account}&{hs_object_id}&{num_associated_contacts}&{hs_parent_company_id}&{website}",
                 "response_datas_key": "companies",
@@ -644,11 +638,9 @@
             "source": "hubspot",
             "destination": "redshift",
             "request_data_source": "redshift",
-            "destination_unique_keys": [
-                "id"
-            ],
+            "destination_unique_keys": ["id","portal_id"],
             "model": "companies",
-            "update_key": "id",
+            "update_keys": ["id","portal_id"],
             "query": {
                 "template": "{base}?{count}&{offset}&{since}",
                 "response_datas_key": "results",
@@ -734,12 +726,10 @@
             "exclude_key": "id",
             "source": "hubspot",
             "destination": "redshift",
-            "destination_unique_keys": [
-                "id"
-            ],
+            "destination_unique_keys": ["id","portal_id"],
             "request_data_source": "redshift",
             "model": "campaigns",
-            "update_key": "id",
+            "update_keys": ["id","portal_id"],
             "query": {
                 "response_datas_key": "campaigns",
                 "template": "{base}?{limit}&{offset}",
@@ -785,14 +775,12 @@
             "source": "hubspot",
             "destination": "redshift",
             "request_data_source": "redshift",
-            "destination_unique_keys": [
-                "id"
-            ],
+            "destination_unique_keys": ["id","portal_id"],
             "model": "campaign_details",
-            "update_key": "id",
+            "update_keys": ["id","portal_id"],
             "data_source": {
                 "name": "campaigns",
-                "raw_sql": "select distinct(id) from {schema}.campaigns"
+                "raw_sql": "select distinct(id) from {schema}.campaigns where portal_id = 20290640"
             },
             "query": {
                 "response_datas_key": null,
@@ -824,15 +812,13 @@
             "source": "hubspot",
             "destination": "redshift",
             "request_data_source": "redshift",
-            "destination_unique_keys": [
-                "id"
-            ],
+            "destination_unique_keys": ["id","portal_id"],
             "data_source": {
                 "name": "campaigns",
                 "raw_sql": "select id, app_id from {schema}.campaigns"
             },
             "model": "email_events",
-            "update_key": "id",
+            "update_keys": ["id","portal_id"],
             "query": {
                 "template": "{base}?{emailCampaignId}&{appId}&{limit}&{offset}&{startTimestamp}&{endTimestamp}&{eventType}",
                 "response_datas_key": "events",
@@ -903,15 +889,13 @@
             "source": "hubspot",
             "destination": "redshift",
             "request_data_source": "redshift",
-            "destination_unique_keys": [
-                "id"
-            ],
+            "destination_unique_keys": ["id","portal_id"],
             "data_source": {
                 "name": "campaigns",
-                "raw_sql": "select id, app_id from {schema}.campaigns"
+                "raw_sql": "select id, app_id from {schema}.campaigns  where portal_id = 20290640"
             },
             "model": "email_events",
-            "update_key": "id",
+            "update_keys": ["id","portal_id"],
             "query": {
                 "template": "{base}?{emailCampaignId}&{appId}&{limit}&{offset}&{startTimestamp}&{endTimestamp}&{eventType}",
                 "response_datas_key": "events",
@@ -982,15 +966,13 @@
             "source": "hubspot",
             "destination": "redshift",
             "request_data_source": "redshift",
-            "destination_unique_keys": [
-                "id"
-            ],
+            "destination_unique_keys": ["id","portal_id"],
             "data_source": {
                 "name": "campaigns",
                 "raw_sql": "select id, app_id from {schema}.campaigns"
             },
             "model": "email_events",
-            "update_key": "id",
+            "update_keys": ["id","portal_id"],
             "query": {
                 "template": "{base}?{emailCampaignId}&{appId}&{limit}&{offset}&{startTimestamp}&{endTimestamp}&{eventType}",
                 "response_datas_key": "events",
@@ -1185,7 +1167,7 @@
             "model": "company_contact_associations",
             "data_source": {
                 "name": "contacts",
-                "raw_sql": "select distinct(id) from {schema}.contacts  where DATE(created_at) > DATE(GETDATE() - INTERVAL '2 DAY') AND DATE(created_at) < DATE(GETDATE())"
+                "raw_sql": "select distinct(id) from {schema}.contacts  where DATE(created_at) > DATE(GETDATE() - INTERVAL '2 DAY') AND DATE(created_at) < DATE(GETDATE()) and portal_id = 20290640"
             },
             "fields_to_add_to_api_result": [
                 {
@@ -1246,7 +1228,7 @@
             "model": "company_contact_associations",
             "data_source": {
                 "name": "contacts",
-                "raw_sql": "select distinct(id) from {schema}.contacts  where updated_at > GETDATE() - INTERVAL '1 HOUR'"
+                "raw_sql": "select distinct(id) from {schema}.contacts  where updated_at > GETDATE() - INTERVAL '1 HOUR' and portal_id = 20290640"
             },
             "fields_to_add_to_api_result": [
                 {
@@ -1305,15 +1287,13 @@
             "source": "hubspot",
             "destination": "redshift",
             "request_data_source": "redshift",
-            "destination_unique_keys": [
-                "id"
-            ],
+            "destination_unique_keys": ["id","portal_id"],
             "data_source": {
                 "name": "campaigns",
-                "raw_sql": "select id, app_id from {schema}.campaigns where last_updated_time > DATE(GETDATE() - INTERVAL '2 DAY')"
+                "raw_sql": "select id, app_id from {schema}.campaigns where last_updated_time > DATE(GETDATE() - INTERVAL '2 DAY') and portal_id = 20290640"
             },
             "model": "email_events",
-            "update_key": "id",
+            "update_keys": ["id","portal_id"],
             "query": {
                 "template": "{base}?{emailCampaignId}&{appId}&{limit}&{offset}&{startTimestamp}&{endTimestamp}&{eventType}",
                 "response_datas_key": "events",
@@ -1388,15 +1368,14 @@
             "source": "hubspot",
             "destination": "redshift",
             "request_data_source": "redshift",
-            "destination_unique_keys": [
-                "id"
-            ],
+            "destination_unique_keys": ["id","portal_id"],
             "data_source": {
                 "name": "campaigns",
-                "raw_sql": "select id, app_id from {schema}.campaigns where last_updated_time > DATE(GETDATE() - INTERVAL '2 DAY')"
+                "raw_sql": "select id, app_id from {schema}.campaigns where last_updated_time > DATE(GETDATE() - INTERVAL '2 DAY') and portal_id = 20290640"
+
             },
             "model": "email_events",
-            "update_key": "id",
+            "update_keys": ["id","portal_id"],
             "query": {
                 "template": "{base}?{emailCampaignId}&{appId}&{limit}&{offset}&{startTimestamp}&{endTimestamp}&{eventType}",
                 "response_datas_key": "events",
@@ -1471,15 +1450,13 @@
             "source": "hubspot",
             "destination": "redshift",
             "request_data_source": "redshift",
-            "destination_unique_keys": [
-                "id"
-            ],
+            "destination_unique_keys": ["id","portal_id"],
             "data_source": {
                 "name": "campaigns",
-                "raw_sql": "select id, app_id from {schema}.campaigns where last_updated_time > DATE(GETDATE() - INTERVAL '2 DAY')"
+                "raw_sql": "select id, app_id from {schema}.campaigns where last_updated_time > DATE(GETDATE() - INTERVAL '2 DAY') and portal_id = 20290640"
             },
             "model": "email_events",
-            "update_key": "id",
+            "update_keys": ["id","portal_id"],
             "query": {
                 "template": "{base}?{emailCampaignId}&{appId}&{limit}&{offset}&{startTimestamp}&{endTimestamp}&{eventType}",
                 "response_datas_key": "events",
