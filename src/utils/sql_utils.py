@@ -17,7 +17,7 @@ class SqlQuery:
         max_field=None,
         raw_sql=None,
         where=None,
-        update_key=None,
+        update_keys=None,
         filter_field=None,
     ):
         self.qtype = qtype
@@ -29,7 +29,7 @@ class SqlQuery:
         self._raw_sql = raw_sql
         self.sql = None
         self.where = where
-        self.update_key = update_key
+        self.update_keys = update_keys
         self.filter_field = filter_field
         self._values_list = None
 
@@ -161,8 +161,9 @@ class SqlQuery:
         return sql_create_tmp_table
 
     def get_sql_update(self):
-        set_fields = [f.name for f in self.model.fields_list]
-        set_fields.remove(self.update_key)
+        set_fields = set(self.values[0].keys()) - set(self.update_keys)
+        # set_fields_1 = [f.name for f in self.model.fields_list]
+        # set_fields_1.remove(self.update_keys)
 
         def update_get_set(self):
             set_data = " , ".join(
@@ -182,16 +183,27 @@ class SqlQuery:
             return set_data
 
         def update_get_where_primary_key(self, target):
-            result = "{target}.{pk} = {stage_table_name}.{pk}".format(
-                target=target,
-                stage_table_name=self.stage_table_name,
-                pk=self.update_key,
+            result = " AND ".join(
+                [
+                    "{target}.{pk} = {stage_table_name}.{pk}".format(
+                        target=target,
+                        stage_table_name=self.stage_table_name,
+                        pk=pk,
+                    )
+                    for pk in self.update_keys
+                ]
             )
+            # result = "{target}.{pk} = {stage_table_name}.{pk}".format(
+            #     target=target,
+            #     stage_table_name=self.stage_table_name,
+            #     pk=self.update_key,
+            # )
             return result
 
         def update_get_and_where(self):
-            comparaison_fields = list(self.values[0].keys())
-            comparaison_fields.remove(self.update_key)
+            comparaison_fields = set(self.values[0].keys()) - set(self.update_keys)
+            # comparaison_fields = list(self.values[0].keys())
+            # comparaison_fields.remove(*self.update_keys)
             where_data = " or ".join(
                 [
                     " != ".join(
@@ -246,42 +258,31 @@ class SqlQuery:
         return sql
 
     def get_count_sql_update(self):
-        set_fields = [f.name for f in self.model.fields_list]
-        set_fields.remove(self.update_key)
-
-        def update_get_set(self):
-            set_data = " , ".join(
+        def update_get_where_primary_key(self, target):
+            result = " AND ".join(
                 [
-                    "=".join(
-                        (
-                            "{}".format(str(f)),
-                            "{stage_table_name}.{table_name}".format(
-                                stage_table_name=self.stage_table_name,
-                                table_name=f,
-                            ),
-                        )
+                    "{target}.{pk} = {stage_table_name}.{pk}".format(
+                        target=target,
+                        stage_table_name=self.stage_table_name,
+                        pk=pk,
                     )
-                    for f in set_fields
+                    for pk in self.update_keys
                 ]
             )
-            return set_data
-
-        def update_get_where_primary_key(self, target):
-            result = "{target}.{pk} = {stage_table_name}.{pk}".format(
-                target=self.schema_table,
-                stage_table_name=self.stage_table_name,
-                pk=self.update_key,
-            )
+            # result = "{target}.{pk} = {stage_table_name}.{pk}".format(
+            #     target=target,
+            #     stage_table_name=self.stage_table_name,
+            #     pk=self.update_key,
+            # )
             return result
 
         def update_get_and_where(self):
-            comparaison_fields = list(self.values[0].keys())
-            comparaison_fields.remove(self.update_key)
+            comparaison_fields = set(self.values[0].keys()) - set(self.update_keys)
             where_data = " or ".join(
                 [
                     " != ".join(
                         (
-                            "{}.{}".format(self.schema_table, str(f)),
+                            "{}.{}".format(self.model.model_name, str(f)),
                             "{}.{}".format(self.stage_table_name, str(f)),
                         )
                     )

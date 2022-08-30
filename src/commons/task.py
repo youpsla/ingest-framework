@@ -197,7 +197,7 @@ class Task:
 
             # TODO: Manage the case when no quries are done to source because of prefiltering from DB. This is the case for sponsored_video_update # noqa: E501
             if values_dicts_list:
-                self.update(values_dicts_list, self.params["update_key"])
+                self.update(values_dicts_list, self.params["update_keys"])
             else:
                 pass
 
@@ -289,12 +289,12 @@ class Task:
         )
         sql_query.run()
 
-    def update(self, values_dicts_list, update_key):
+    def update(self, values_dicts_list, update_keys):
         sql_query = SqlQuery(
             self.db_connection,
             "update",
             values=values_dicts_list,
             model=self.model,
-            update_key=update_key,
+            update_keys=update_keys,
         )
         sql_query.run()
