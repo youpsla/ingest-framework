@@ -1,12 +1,13 @@
 import calendar
-import copy
+import uuid
+from collections import ChainMap
 from datetime import date, datetime, timedelta
-from itertools import zip_longest
 
 import dateutil
-from dateutil.relativedelta import relativedelta
+import pytz
 from src.commons.model import Model
 from src.constants import ENVS_LIST
+from src.utils.various_utils import zip_longest_repeat_value
 
 
 class Client:
@@ -25,16 +26,12 @@ class Client:
         else:
             return True
 
-    def get_months_list(self, start_month_params, end_month_params):
-        start_month = self.get_first_month_of_range(start_month_params)
-        end_month = ""
-
     def get_month_from_offset(self, date):
         pass
 
     def get_month_day_range(date):
         """
-        For a date 'date' returns the start and end date for the month of 'date'.
+        For a date 'date' returns the start and end date for the month of 'date'. # noqa: E501
 
         Month with 31 days:
         >>> date = datetime.date(2011, 7, 27)
@@ -47,7 +44,9 @@ class Client:
         (datetime.date(2011, 2, 1), datetime.date(2011, 2, 28))
         """
         first_day = date.replace(day=1)
-        last_day = date.replace(day=calendar.monthrange(date.year, date.month)[1])
+        last_day = date.replace(
+            day=calendar.monthrange(date.year, date.month)[1]
+        )  # noqa: E501
         return first_day, last_day
 
     def get_dynamics_group_params(self, params):
@@ -85,13 +84,14 @@ class Client:
 
         return result
 
-    def get_kwargs_list(self, kwargs_fields=[], sql_datas=[]):
+    def get_kwargs_list(self, kwargs_fields=[], sql_datas=[], statics={}):
         result = []
         for d in sql_datas:
             tmp_result = []
             for f in kwargs_fields:
                 r = {f[2]: f[1].format(d[f[0]])}
-                tmp_result.append(r)
+                tmp_result.append({**r})
+            tmp_result.append({**statics})
             result.append(tmp_result)
 
         return result
@@ -120,38 +120,75 @@ class Client:
 
         return result
 
-    def get_request_parameters_lists(self, params=None, db_connection=None):
-        if not params:
-            return [], [], []
+    def get_request_parameters_lists(self):
+        result = [], [], []
+        query = self.task.params.get("query", None)
+        if not query:
+            return result
 
-        for v in params.values():
-            if "rawsql" in v["type"]:
-                tmp = Model.get_from_raw_sql(db_connection, v["raw_sql"])
-            else:
-                model = Model(
-                    v["filter_model"],
-                    db_connection=db_connection,
-                    channel=self.task.channel,
-                )
-                if self.task.params.get("retrieve_history", False):
-                    tmp = model.get_all(
-                        fields=v["all_fields"], filter_field=v["filter_field"]
+        query_params = query.get("params", None)
+
+        result_lists = []
+        if query_params:
+            for param in query_params:
+                tmp_result = []
+                if param["type"] == "constant":
+                    tmp_result = [{param["name"]: param["value"]}]
+                if param["type"] == "db":
+                    tmp_result = Model.get_from_raw_sql(
+                        self.task.db_connection,
+                        self.task.params["data_source"]["raw_sql"],
                     )
-                else:
-                    tmp = model.get_all(fields=v["all_fields"])
+                    tmp_result = [dict(r) for r in tmp_result]
+                    tmp_result = [
+                        {param["name"]: tr[param["source_key"]]}
+                        for tr in tmp_result  # noqa: E501
+                    ]
 
-            kwargs_list, args_list, sql_list = [], [], []
+                if param["type"] == "timestamp_from_epoch":
+                    target_day = self.get_day_relative_to_today_from_params(
+                        day_params=param,
+                        offset_unity=param["offset_unity"],
+                    )
+                    target_datetime = datetime.fromordinal(
+                        target_day.toordinal()
+                    )  # noqa: E501
+                    if param["position"] == "start":
+                        target_datetime = target_datetime.replace(
+                            hour=0, minute=0, second=0, tzinfo=pytz.UTC
+                        )
+                        target_timestamp = (
+                            int(datetime.timestamp(target_datetime)) * 1000
+                        )
 
-            if v.get("kwargs_fields", None):
-                kwargs_list = self.get_kwargs_list(v["kwargs_fields"], tmp)
+                        tmp_result = [{param["name"]: target_timestamp}]
 
-            if v.get("args_fields", None):
-                args_list = self.get_args_list(v["args_fields"], tmp)
+                    if param["position"] == "end":
+                        target_datetime = target_datetime.replace(
+                            hour=23, minute=59, second=59, tzinfo=pytz.UTC
+                        )
+                        target_timestamp = (
+                            int(datetime.timestamp(target_datetime)) * 1000
+                        )
 
-            if v.get("db_fields", None):
-                sql_list = self.get_sql_list(v["db_fields"], tmp)
+                        tmp_result = [{param["name"]: target_timestamp}]
 
-        return kwargs_list, args_list, sql_list
+                result_lists.append(tmp_result)
+        # As zip_longest_repeat_value needs only non empty lists. We check that here. # noqa: E501
+        # Could be the case when we use parameters from Db and the select statement returns no value. # noqa: E501
+        # In this case, we return an empty list. Then no request will be done to the endpoint. # noqa: E501
+        for r in result_lists:
+            if len(r) == 0:
+                return []
+        tmp_result = zip_longest_repeat_value(*result_lists)
+        tmp_result = [list(a) for a in tmp_result]
+
+        final_result = []
+
+        for tmp in tmp_result:
+            final_result.append(dict(ChainMap(*tmp)))
+
+        return final_result
 
     def get_date_params(self, url_params, value):
         result = []
@@ -174,10 +211,10 @@ class Client:
         return None
 
     def get_day_relative_to_today_from_params(self, day_params, offset_unity):
+
         today = datetime.date(datetime.now())
         tmp = {offset_unity: int(day_params["offset_value"])}
-        day = today - relativedelta(**tmp)
-        # day = today - timedelta(**tmp)
+        day = today - timedelta(**tmp)
         return day
 
     def get_start_date(self, start_date_params=None, offset_unity=None):
@@ -222,7 +259,8 @@ class Client:
         )
 
         end_date = self.get_end_date(
-            end_date_params=date_range_params["end_date"], offset_unity=offset_unity
+            end_date_params=date_range_params["end_date"],
+            offset_unity=offset_unity,  # noqa: E501
         )
 
         if end_date == datetime.date(datetime.today()):
@@ -232,9 +270,14 @@ class Client:
 
         result = []
 
-        if start_date != end_date and date_range_params["split_allowed"] is True:
+        if (
+            start_date != end_date
+            and date_range_params["split_allowed"] is True  # noqa: E501
+        ):  # noqa: E501
             delta = end_date - start_date
-            days = [start_date + timedelta(days=i) for i in range(delta.days + 1)]
+            days = [
+                start_date + timedelta(days=i) for i in range(delta.days + 1)
+            ]  # noqa: E501
             for d in days:
                 tmp_result = []
                 tmp_result.append(
@@ -243,7 +286,9 @@ class Client:
                     )
                 )
                 tmp_result.append(
-                    self.get_date_params(date_range_params["end_date"]["url_params"], d)
+                    self.get_date_params(
+                        date_range_params["end_date"]["url_params"], d
+                    )  # noqa: E501
                 )
                 result.append(tmp_result)
         else:
@@ -281,11 +326,15 @@ class Client:
             ed = date(year, month, last_day_of_month_number)
 
             tmp_result.append(
-                self.get_date_params(date_range_params["start_date"]["url_params"], sd)
+                self.get_date_params(
+                    date_range_params["start_date"]["url_params"], sd
+                )  # noqa: E501
             )
 
             tmp_result.append(
-                self.get_date_params(date_range_params["end_date"]["url_params"], ed)
+                self.get_date_params(
+                    date_range_params["end_date"]["url_params"], ed
+                )  # noqa: E501
             )
 
             result.append(tmp_result)
@@ -322,43 +371,19 @@ class Client:
             result = [{k: v} for k, v in params.get("statics", {}).items()]
         return result
 
-    def get_request_params(self, task):
-        params = task.params
-        params = params.get("url", None)
-        params = params.get("params", None)
-        if params:
-            kwargs_list, args_list, sql_list = (
-                self.get_request_parameters_lists(
-                    params=params.get("db", None),
-                    db_connection=self.task.db_connection,
-                )
-                if params
-                else ([], [], [])
-            )
+    def get_request_params(self):
+        query_params = self.task.params.get("query", None)
+        if not query_params:
+            return []
 
-            zip_data = list(zip_longest(sql_list, kwargs_list, args_list, fillvalue=[]))
+        zip_data = (
+            self.get_request_parameters_lists()
+            if self.task.params
+            else ([], [], [])  # noqa: E501
+        )
 
-            date_range = params.get("date_range", None)
-
-            idx_to_del = []
-            if date_range:
-                result = []
-                for idx, zd in enumerate(zip_data):
-                    date_range_list = self.get_date_ranges_list(params["date_range"])
-                    # Check if date_range parameters are consistent.
-                    # if len(date_range_list) == 0:
-                    #     idx_to_del.append(idx)
-                    #     continue
-                    for dr in date_range_list:
-                        tmp = copy.deepcopy(zd)
-                        for d in dr:
-                            tmp[1].extend(d)
-                        result.append(tmp)
-
-                # for ele in sorted(idx_to_del, reverse=True):
-                #     del result[ele]
-
-                return result
-
-            return zip_data
-        return None
+        # Add uuid to each record
+        final_result = {}
+        for z in zip_data:
+            final_result[uuid.uuid4()] = z
+        return final_result
