@@ -121,8 +121,7 @@ class SqlQuery:
                     pass
 
             except Exception as e:
-                logger.error(f"The following error occur: {e}")
-                raise RuntimeError
+                raise RuntimeError(f"The following error occur: {e}")
             return result
 
     def get_sql_select(self):
