@@ -251,8 +251,7 @@ class Task:
         model_params = get_model_params_as_dict(
             self.channel, self.params["model"]
         )  # noqa: E501
-        for d in source_data:
-            elem = d["datas"]
+        for elem in source_data:
             if elem is not None:
                 m = Model(
                     self.params["model"],
