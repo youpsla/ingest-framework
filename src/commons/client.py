@@ -7,7 +7,12 @@ import dateutil
 import pytz
 from src.commons.model import Model
 from src.constants import ENVS_LIST
-from src.utils.various_utils import zip_longest_repeat_value
+from src.utils.endpoint_utils import Endpoint
+from src.utils.various_utils import (
+    get_chunks,
+    run_in_threads_pool,
+    zip_longest_repeat_value,
+)
 
 
 class Client:
@@ -387,3 +392,64 @@ class Client:
         for z in zip_data:
             final_result[uuid.uuid4()] = z
         return final_result
+
+    def add_request_params_to_api_call_result(
+        self,
+        futures_results,
+        task_params,
+        db_params,
+    ):
+        result = []
+        for fr in futures_results:
+            local_result = []
+            for k, v in fr.items():
+                for r in v:
+                    data_to_add_to_results = []
+                    if task_params.get(
+                        "fields_to_add_to_api_result", None
+                    ):  # noqa: E501
+                        data_to_add_to_results = [
+                            {e["destination_key"]: db_params[k][e["origin_key"]]}
+                            for e in task_params[
+                                "fields_to_add_to_api_result"
+                            ]  # noqa: E501
+                        ]
+                    api_data = (
+                        r if isinstance(r, dict) else {task_params["key_for_values"]: r}
+                    )
+                    local_result.append(
+                        dict(ChainMap(*data_to_add_to_results, api_data))  # noqa: E501
+                    )
+            result.extend(local_result)
+        return result
+
+    def get_endpoint_list(self, task_params, db_params):
+        endpoint_list = [
+            (
+                Endpoint(
+                    params=v,
+                    url_template=task_params["query"]["template"],
+                    query_params=task_params["query"]["params"],
+                ),
+                k,
+            )
+            for k, v in db_params.items()
+        ]
+        return endpoint_list
+
+    def do_requests(self, task_params, headers, endpoint_list):
+        futures_results = []
+        pagination_function = None
+        endpoint_list_list = get_chunks(endpoint_list)
+        for lst in endpoint_list_list:
+            chunks_result_list = run_in_threads_pool(
+                request_params_list=lst,
+                source_function=self.do_get_query,
+                headers=headers,
+                result_key=task_params["query"]["response_datas_key"],
+                pagination_function=pagination_function
+                if pagination_function
+                else None,
+            )
+            futures_results.extend(chunks_result_list)
+        return futures_results
