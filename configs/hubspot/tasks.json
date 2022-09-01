@@ -780,7 +780,7 @@
             "update_keys": ["id","portal_id"],
             "data_source": {
                 "name": "campaigns",
-                "raw_sql": "select distinct(id) from {schema}.campaigns where portal_id = 20290640"
+                "raw_sql": "select distinct(id) from {schema}.campaigns where portal_id = 1838475"
             },
             "query": {
                 "response_datas_key": null,
@@ -892,7 +892,7 @@
             "destination_unique_keys": ["id","portal_id"],
             "data_source": {
                 "name": "campaigns",
-                "raw_sql": "select id, app_id from {schema}.campaigns  where portal_id = 20290640"
+                "raw_sql": "select id, app_id from {schema}.campaigns  where portal_id = 1838475"
             },
             "model": "email_events",
             "update_keys": ["id","portal_id"],
@@ -1040,6 +1040,8 @@
                 "insert"
             ],
             "source": "hubspot",
+            "exclude_existing_in_db": true,
+            "destination_unique_keys": ["company_id","contact_id", "portal_id"],
             "destination": "redshift",
             "request_data_source": "redshift",
             "model": "company_contact_associations",
@@ -1101,6 +1103,8 @@
                 "insert"
             ],
             "source": "hubspot",
+            "exclude_existing_in_db": true,
+            "destination_unique_keys": ["company_id","contact_id", "portal_id"],
             "destination": "redshift",
             "request_data_source": "redshift",
             "model": "company_contact_associations",
@@ -1162,12 +1166,14 @@
                 "insert"
             ],
             "source": "hubspot",
+            "exclude_existing_in_db": true,
+            "destination_unique_keys": ["company_id","contact_id", "portal_id"],
             "destination": "redshift",
             "request_data_source": "redshift",
             "model": "company_contact_associations",
             "data_source": {
                 "name": "contacts",
-                "raw_sql": "select distinct(id) from {schema}.contacts  where DATE(created_at) > DATE(GETDATE() - INTERVAL '2 DAY') AND DATE(created_at) < DATE(GETDATE()) and portal_id = 20290640"
+                "raw_sql": "select distinct(id) from {schema}.contacts  where DATE(created_at) > DATE(GETDATE() - INTERVAL '2 DAY') AND DATE(created_at) < DATE(GETDATE()) and portal_id = 1838475"
             },
             "fields_to_add_to_api_result": [
                 {
@@ -1223,12 +1229,14 @@
                 "insert"
             ],
             "source": "hubspot",
+            "exclude_existing_in_db": true,
+            "destination_unique_keys": ["company_id","contact_id", "portal_id"],
             "destination": "redshift",
             "request_data_source": "redshift",
             "model": "company_contact_associations",
             "data_source": {
                 "name": "contacts",
-                "raw_sql": "select distinct(id) from {schema}.contacts  where updated_at > GETDATE() - INTERVAL '1 HOUR' and portal_id = 20290640"
+                "raw_sql": "select distinct(id) from {schema}.contacts  where updated_at > GETDATE() - INTERVAL '1 HOUR' and portal_id = 1838475"
             },
             "fields_to_add_to_api_result": [
                 {
@@ -1290,7 +1298,7 @@
             "destination_unique_keys": ["id","portal_id"],
             "data_source": {
                 "name": "campaigns",
-                "raw_sql": "select id, app_id from {schema}.campaigns where last_updated_time > DATE(GETDATE() - INTERVAL '2 DAY') and portal_id = 20290640"
+                "raw_sql": "select id, app_id from {schema}.campaigns where last_updated_time > DATE(GETDATE() - INTERVAL '2 DAY') and portal_id = 1838475"
             },
             "model": "email_events",
             "update_keys": ["id","portal_id"],
@@ -1371,7 +1379,7 @@
             "destination_unique_keys": ["id","portal_id"],
             "data_source": {
                 "name": "campaigns",
-                "raw_sql": "select id, app_id from {schema}.campaigns where last_updated_time > DATE(GETDATE() - INTERVAL '2 DAY') and portal_id = 20290640"
+                "raw_sql": "select id, app_id from {schema}.campaigns where last_updated_time > DATE(GETDATE() - INTERVAL '2 DAY') and portal_id = 1838475"
 
             },
             "model": "email_events",
@@ -1453,7 +1461,7 @@
             "destination_unique_keys": ["id","portal_id"],
             "data_source": {
                 "name": "campaigns",
-                "raw_sql": "select id, app_id from {schema}.campaigns where last_updated_time > DATE(GETDATE() - INTERVAL '2 DAY') and portal_id = 20290640"
+                "raw_sql": "select id, app_id from {schema}.campaigns where last_updated_time > DATE(GETDATE() - INTERVAL '2 DAY') and portal_id = 1838475"
             },
             "model": "email_events",
             "update_keys": ["id","portal_id"],
