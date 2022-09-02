@@ -345,7 +345,8 @@
             "creative_name": {
                 "type": "raw",
                 "source_path": [
-                    "name"
+                    "adContext",
+                    "dscName"
                 ]
             },
             "campaign_id": {

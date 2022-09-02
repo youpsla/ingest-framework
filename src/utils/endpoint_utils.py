@@ -1,4 +1,4 @@
-from urllib.parse import urlencode
+from urllib.parse import quote_plus, urlencode
 
 from requests.structures import CaseInsensitiveDict
 
@@ -95,28 +95,33 @@ class EndpointParam:
     @property
     def formatted_value(self):
         if hasattr(self, "template"):
-            return self.template.format(self.value)
-        return self.value
+            result = self.template.format(self.value)
+        else:
+            result = self.value
+
+        if hasattr(self, "force_url_encoding"):
+            return quote_plus(result)
+
+        return result
+
+    @property
+    def formatted_key(self):
+        if hasattr(self, "url_key_string"):
+            return self.url_key_string
+        return self.name
 
     def __repr__(self):
-        return f"EndpointParam {self.name}/{self.value}"
+        return f"EndpointParam {self.formatted_key}/{self.value}"
 
     def get_as_dict_url_formatted(self):
         if self.output_type == "arg":
             url_str = self.formatted_value
         if self.output_type == "kwarg":
-            url_str = urlencode({self.name: self.formatted_value})
+            url_str = urlencode({self.formatted_key: self.formatted_value})
         return {self.name: url_str}
 
-    def get_as_url_encoded(self):
-        if self.output_type == "arg":
-            url_str = self.formatted_value
-        if self.output_type == "kwarg":
-            url_str = urlencode({self.name: self.formatted_value})
-        return url_str
-
     def get_as_dict(self):
-        return {self.name: self.get_formatted_value()}
+        return {self.name: self.get_formatted_value}
 
 
 if __name__ == "__main__":

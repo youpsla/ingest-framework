@@ -55,6 +55,7 @@ class Client:
         return first_day, last_day
 
     def get_dynamics_group_params(self, params):
+        # TODO: Alain. To be deleted.
         url_params = params["url_params"]
         today = datetime.today()
         result = []
@@ -90,6 +91,7 @@ class Client:
         return result
 
     def get_kwargs_list(self, kwargs_fields=[], sql_datas=[], statics={}):
+        # TODO Alain: Check if can be deleted.
         result = []
         for d in sql_datas:
             tmp_result = []
@@ -102,6 +104,7 @@ class Client:
         return result
 
     def get_args_list(self, args_fields=[], sql_datas=[]):
+        # TODO Alain: Check if can be deleted.
         result = []
         if not args_fields:
             return args_fields
@@ -178,6 +181,21 @@ class Client:
 
                         tmp_result = [{param["name"]: target_timestamp}]
 
+                if param["type"] == "part_of_date":
+                    target_day = self.get_day_relative_to_today_from_params(
+                        day_params=param,
+                        offset_unity=param["offset_unity"],
+                    )
+                    if param["part_of_date_name"] == "day":
+                        result = datetime.strftime(target_day, "%d")
+                        tmp_result = [{param["name"]: result}]
+                    if param["part_of_date_name"] == "month":
+                        result = datetime.strftime(target_day, "%m")
+                        tmp_result = [{param["name"]: result}]
+                    if param["part_of_date_name"] == "year":
+                        result = datetime.strftime(target_day, "%Y")
+                        tmp_result = [{param["name"]: result}]
+
                 result_lists.append(tmp_result)
         # As zip_longest_repeat_value needs only non empty lists. We check that here. # noqa: E501
         # Could be the case when we use parameters from Db and the select statement returns no value. # noqa: E501
@@ -195,7 +213,22 @@ class Client:
 
         return final_result
 
+    def get_part_of_date(self, date_object, part_type):
+        """Return digit correspondign to days, month or year from datetime object.
+
+        parameters:
+            date_object: The source of value
+            datetime
+            part_type: The part to return
+            str
+
+        Returns:
+            int: The digits extracted from source.
+
+        """
+
     def get_date_params(self, url_params, value):
+        # TODO Alain: Check if can be deleted.
         result = []
         if url_params:
             for n, p in url_params.items():
@@ -437,19 +470,16 @@ class Client:
         ]
         return endpoint_list
 
-    def do_requests(self, task_params, headers, endpoint_list):
+    def do_requests(self, task_params, headers, endpoint_list, pagination_function):
         futures_results = []
-        pagination_function = None
-        endpoint_list_list = get_chunks(endpoint_list)
-        for lst in endpoint_list_list:
+        endpoint_list_list = get_chunks(endpoint_list, chunk_size=50)
+        for lst in endpoint_list_list[0:2]:
             chunks_result_list = run_in_threads_pool(
                 request_params_list=lst,
                 source_function=self.do_get_query,
                 headers=headers,
                 result_key=task_params["query"]["response_datas_key"],
-                pagination_function=pagination_function
-                if pagination_function
-                else None,
+                pagination_function=pagination_function,
             )
             futures_results.extend(chunks_result_list)
         return futures_results

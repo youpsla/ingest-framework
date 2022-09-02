@@ -9,7 +9,11 @@ from src.commons.client_helper import get_client
 from src.commons.model import Model
 from src.utils.custom_logger import logger
 from src.utils.sql_utils import SqlQuery
-from src.utils.various_utils import get_model_params_as_dict, get_running_env
+from src.utils.various_utils import (
+    get_model_params_as_dict,
+    get_running_env,
+    nested_get,
+)
 
 
 class Task:
@@ -40,7 +44,6 @@ class Task:
         if not self._source:
             source_name = self.params.get("source", None)
             if source_name:
-                # source_name = self.params["source"]
                 self._source = get_client(
                     self.running_env,
                     source_name,
@@ -124,13 +127,7 @@ class Task:
         return result
 
     def run(self):
-        # try:
         logger.info(f"Channel: {self.channel} - Task: {self.name} - Start")
-        # with open("fixtures.json", "r") as f:
-        #     fix = json.load(f)
-        #     datas_from_source = fix["social_metrics"]["elements"]
-
-        # Retrieving datas from source
         if "copy" not in self.actions:
             if "raw_sql" not in self.actions:
                 source_data = self.get_data_from_source()
@@ -203,35 +200,42 @@ class Task:
 
         if "partial_update" in self.actions:
             for d in source_data:
-                if d["datas"] is not None:
-                    m = Model(
-                        self.model.model_name,
-                        self.db_connection,
-                        channel=self.channel,  # noqa: E501
+                # m = Model(
+                #     self.model.model_name,
+                #     self.db_connection,
+                #     channel=self.channel,  # noqa: E501
+                # )
+                # m.set_field(
+                #     self.params["db_query"]["fields"][0],
+                #     m.params[self.params["db_query"]["fields"][0]],
+                # )
+                # m.set_field(
+                #     d["where_field"],
+                #     m.params[d["where_field"]],
+                # )
+                # m.populate_values(d["datas"])
+                # setattr(getattr(m, d["where_field"]), "value", d["where_value"]) # noqa: E501
+
+                where_dicts_list = []
+                for v in self.params["db_query"]["keys"]:
+                    where_dicts_list.append(
+                        {
+                            v["table_field_name_used_as_key"]: nested_get(
+                                d, v["api_result_path"]
+                            )
+                        }
                     )
-                    # m.set_field(
-                    #     self.params["db_query"]["fields"][0],
-                    #     m.params[self.params["db_query"]["fields"][0]],
-                    # )
-                    # m.set_field(
-                    #     d["where_field"],
-                    #     m.params[d["where_field"]],
-                    # )
-                    m.populate_values(d["datas"])
-                    # setattr(getattr(m, d["where_field"]), "value", d["where_value"]) # noqa: E501
 
-                    where_dicts_list = []
-                    for v in self.params["db_query"]["keys"]:
-                        where_dicts_list.append({v: d["datas"][v]})
-
-                    values_dicts_list = []
-                    for v in self.params["db_query"]["fields"]:
-                        values_dicts_list.append({v[0]: d["datas"][v[1]]})
-
-                    self.partial_update(
-                        values_dicts_list,
-                        where_dicts_list=where_dicts_list,
+                values_dicts_list = []
+                for v in self.params["db_query"]["fields"]:
+                    values_dicts_list.append(
+                        {v["table_field_name"]: nested_get(d, v["api_result_path"])}
                     )
+
+                self.partial_update(
+                    values_dicts_list,
+                    where_dicts_list=where_dicts_list,
+                )
 
         if "raw_sql" in self.actions:
             try:
@@ -281,7 +285,7 @@ class Task:
         sql_query = SqlQuery(
             self.db_connection,
             "partial_update",
-            fields=self.params["db_query"]["fields"],
+            fields=[f["table_field_name"] for f in self.params["db_query"]["fields"]],
             values=values_dicts_list,
             model=self.model,
             where=where_dicts_list,

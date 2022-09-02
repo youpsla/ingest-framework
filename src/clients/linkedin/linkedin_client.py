@@ -1,9 +1,7 @@
 import json
 import time
-from collections import ChainMap
 from datetime import datetime
 from threading import current_thread, get_ident, get_native_id
-from urllib.parse import urlencode
 
 import requests
 from requests.exceptions import ConnectionError, ConnectTimeout, RetryError
@@ -11,7 +9,6 @@ from requests.structures import CaseInsensitiveDict
 from src.clients.aws.aws_tools import Secret
 from src.commons.client import Client
 from src.utils.http_utils import get_http_adapter
-from src.utils.various_utils import get_chunks, run_in_threads_pool
 
 
 class LinkedInAccessToken:
@@ -51,6 +48,10 @@ class LinkedInAccessToken:
         }
 
         response = LinkedInClient.do_auth_post_query(endpoint=endpoint, data=data)
+
+        # WIth the new API, looks like the generated token is not fully processed enough quick by linkedin.
+        # A small sleep here allow Linkedin to have time to proceed.
+        time.sleep(2)
 
         access_token = response.json()["access_token"]
 
@@ -107,6 +108,17 @@ class LinkedInRefreshToken(Secret):
         return False
 
 
+def paging_pagination(endpoint, task_result):
+    start = task_result["paging"]["start"]
+    total = task_result["paging"]["total"]
+    count = task_result["paging"]["count"]
+    if start >= total:
+        return None
+    pagination_param = endpoint.get_param_by_name("start")
+    pagination_param.value = start + count
+    return endpoint
+
+
 class LinkedInClient(Client):
     """# noqa: E501
     Inerface to the provider.
@@ -158,9 +170,20 @@ class LinkedInClient(Client):
         endpoint_list = self.get_endpoint_list(task_params, db_params)
 
         # Request provider. and get result of all requests.
-        api_datas = self.do_requests(task_params, headers, endpoint_list)
+        if self.task.name not in [
+            "creative_sponsored_video_daily_update",
+            "daily_social_metrics_update",
+            "creative_sponsored_video__creative_name_daily_update",
+            "creative_sponsored_update_daily_update",
+        ]:
+            pagination_function = paging_pagination
+        else:
+            pagination_function = None
+        api_datas = self.do_requests(
+            task_params, headers, endpoint_list, pagination_function
+        )
 
-        # Add data not in retruened results by provider.
+        # Add data to the API response
         result = self.add_request_params_to_api_call_result(
             api_datas, task_params, db_params
         )
@@ -183,6 +206,11 @@ class LinkedInClient(Client):
         headers["Accept"] = "application/json"
         headers["cache-control"] = "no-cache"
         headers["Authorization"] = f"Bearer {self.access_token}"
+
+        # Add custom header from task params
+        task_headers = self.task.params.get("request_header", None)
+        if task_headers:
+            headers.update(task_headers)
 
         if header:
             headers.update(header)

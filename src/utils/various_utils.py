@@ -31,8 +31,8 @@ def get_running_env():
 
 def get_schema_name(channel):
     schema_name = channel + "_" + get_running_env()
-    # return schema_name
-    return "hubspot_development"
+    return schema_name
+    # return "hubspot_development"
 
 
 def get_model_params_as_dict(channel, model_name):
