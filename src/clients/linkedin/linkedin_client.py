@@ -175,6 +175,7 @@ class LinkedInClient(Client):
             "daily_social_metrics_update",
             "creative_sponsored_video__creative_name_daily_update",
             "creative_sponsored_update_daily_update",
+            "creative_url_daily_update",
         ]:
             pagination_function = paging_pagination
         else:

@@ -588,6 +588,67 @@
     {
         "creative_url_daily_update": {
             "actions": [
+                "insert",
+                "update"
+            ],
+            "exclude_existing_in_db": true,
+            "source": "linkedin",
+            "destination": "redshift",
+            "request_data_source": "redshift",
+            "destination_unique_keys": [
+                "creative_id"
+            ],
+            "model": "creative_url",
+            "update_keys": [
+                "creative_id"
+            ],
+            "data_source": {
+                "name": "creatives_id",
+                "raw_sql": "select distinct(creative_id) from {schema}.social_metrics"
+            },
+            "fields_to_add_to_api_result": [
+                {
+                    "name": "creative_id",
+                    "origin_key": "creative_id",
+                    "destination_key": "creative_id"
+                }
+            ],
+            "query": {
+                "response_datas_key": null,
+                "template": "{base}{api_name}/{creative_id}?{projection}",
+                "params": [
+                    {
+                        "name": "base",
+                        "type": "constant",
+                        "output_type": "arg",
+                        "value": "https://api.linkedin.com/v2/"
+                    },
+                    {
+                        "name": "api_name",
+                        "type": "constant",
+                        "output_type": "arg",
+                        "value": "adCreativesV2"
+                    },
+                    {
+                        "name": "creative_id",
+                        "type": "db",
+                        "data_source_name": "creatives_id",
+                        "source_key": "creative_id",
+                        "output_type": "arg"
+                    },
+                    {
+                        "name": "projection",
+                        "type": "constant",
+                        "output_type": "kwarg",
+                        "value": "(variables(data(*,com.linkedin.ads.SponsoredUpdateCreativeVariables(*,share~(*)))))"
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "creative_url_daily_update_old": {
+            "actions": [
                 "insert"
             ],
             "exclude_existing_in_db": false,
