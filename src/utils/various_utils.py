@@ -134,6 +134,15 @@ def run_in_threads_pool(
 
 
 def zip_longest_repeat_value(*iterables):
+    """Equalize size of iterables to the longuest one. The latest value "short" irerable is repeated.
+    Inputs:
+        - [1,2,3]
+        - [A]
+        - [F]
+
+    Output:
+        [[1,2,3], [A,A,A], [F,F,F]]
+    """
     iterators = [
         iter(i) for i in iterables
     ]  # make sure we're operating on iterators # noqa: E501
