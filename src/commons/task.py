@@ -188,7 +188,7 @@ class Task:
             data_objs = self.get_data_objs(source_data)
 
             values_dicts_list = [
-                {f.name: f.db_value for f in obj.fields_list}
+                {f.name: f.db_value for f in obj.get_db_fields_list()}
                 for obj in data_objs  # noqa: E501
             ]
 
