@@ -41,67 +41,6 @@ class Client:
         else:
             return True
 
-    def get_month_from_offset(self, date):
-        pass
-
-    def get_month_day_range(date):
-        """
-        For a date 'date' returns the start and end date for the month of 'date'. # noqa: E501
-
-        Month with 31 days:
-        >>> date = datetime.date(2011, 7, 27)
-        >>> get_month_day_range(date)
-        (datetime.date(2011, 7, 1), datetime.date(2011, 7, 31))
-
-        Month with 28 days:
-        >>> date = datetime.date(2011, 2, 15)
-        >>> get_month_day_range(date)
-        (datetime.date(2011, 2, 1), datetime.date(2011, 2, 28))
-        """
-        first_day = date.replace(day=1)
-        last_day = date.replace(
-            day=calendar.monthrange(date.year, date.month)[1]
-        )  # noqa: E501
-        return first_day, last_day
-
-    def get_kwargs_list(self, kwargs_fields=[], sql_datas=[], statics={}):
-        # TODO Alain: Check if can be deleted.
-        result = []
-        for d in sql_datas:
-            tmp_result = []
-            for f in kwargs_fields:
-                r = {f[2]: f[1].format(d[f[0]])}
-                tmp_result.append({**r})
-            tmp_result.append({**statics})
-            result.append(tmp_result)
-
-        return result
-
-    def get_args_list(self, args_fields=[], sql_datas=[]):
-        # TODO Alain: Check if can be deleted.
-        result = []
-        if not args_fields:
-            return args_fields
-        for d in sql_datas:
-            tmp_result = []
-            for f in args_fields:
-                tmp_result.append(d[f])
-            result.append(tmp_result)
-
-        return result
-
-    def get_sql_list(self, db_fields=[], sql_datas=[]):
-        result = []
-        if not db_fields:
-            return db_fields
-        for d in sql_datas:
-            tmp_result = []
-            for f in db_fields:
-                tmp_result.append({f["destination_key"]: d[f["origin_key"]]})
-            result.append(tmp_result)
-
-        return result
-
     def get_request_parameters_lists(self):
         result = [], [], []
         query = self.task.params.get("query", None)
