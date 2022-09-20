@@ -5,7 +5,13 @@ It is used for:
 - transforming those datas
 - writing to destination (S3, Redshift, ...)
 
-Tasks to be runned are defined in a tasks.json file and data models in a models.json file.
+Tasks to be runned are defined in a tasks.json file and data model in a models.json file.
+
+## List of configuration files
+- channel.json: Define the list of tasks to be runned
+- tasks.json: Define params of each task
+- model.json: Define the data model.
+
 
 ## Task.json
 This file contains a list of tasks. Here is an example of task:
