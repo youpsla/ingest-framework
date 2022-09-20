@@ -16,6 +16,16 @@ from src.utils.various_utils import (
 
 
 class Client:
+    """
+    # noqa: E501
+    # This class manage lots of things. Some of them are not directly connected to linkedin and should be extract to a Client class.
+    TODO: Create Client class
+
+    - Retrieving task parameters from json file
+    - Creating the url to request and all associated operation (requesting Db for filter values, building args and kwargs, )
+    - Retrieving request result from source
+    """
+
     def __init__(self, env):
         if self.check_env(env):
             self.env = env
@@ -53,42 +63,6 @@ class Client:
             day=calendar.monthrange(date.year, date.month)[1]
         )  # noqa: E501
         return first_day, last_day
-
-    def get_dynamics_group_params(self, params):
-        # TODO: Alain. To be deleted.
-        url_params = params["url_params"]
-        today = datetime.today()
-        result = []
-        if params["offset_unity"] == "days":
-            tmp = {params["offset_unity"]: int(params["offset_value"])}
-            start_date = today - timedelta(**tmp)
-            for k, v in url_params.items():
-                result.append(self.get_dynamics_param(k, v, start_date))
-
-        if params["offset_unity"] == "months":
-
-            today = date.today()
-            last_day_of_prev_month = (
-                today
-                - dateutil.relativedelta.relativedelta(
-                    months=int(params["offset_value"]) - 1
-                )
-            ).replace(day=1) - timedelta(days=1)
-
-            start_day_of_prev_month = last_day_of_prev_month.replace(day=1)
-
-            for k, v in url_params.items():
-                result.append(
-                    self.get_dynamics_param(
-                        k,
-                        v,
-                        start_day_of_prev_month
-                        if params["offset_range_position"] == "start_day"
-                        else last_day_of_prev_month,
-                    )
-                )
-
-        return result
 
     def get_kwargs_list(self, kwargs_fields=[], sql_datas=[], statics={}):
         # TODO Alain: Check if can be deleted.
