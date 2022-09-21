@@ -3,7 +3,6 @@ import uuid
 from collections import ChainMap
 from datetime import date, datetime, timedelta
 
-import dateutil
 import pytz
 from src.commons.model import Model
 from src.constants import ENVS_LIST
@@ -18,12 +17,9 @@ from src.utils.various_utils import (
 class Client:
     """
     # noqa: E501
-    # This class manage lots of things. Some of them are not directly connected to linkedin and should be extract to a Client class.
-    TODO: Create Client class
-
-    - Retrieving task parameters from json file
-    - Creating the url to request and all associated operation (requesting Db for filter values, building args and kwargs, )
-    - Retrieving request result from source
+    # This class contains functions allowing:
+        - getting a list of all endpoints to be qeried
+        - doing http call to the provider endpoint
     """
 
     def __init__(self, env):
@@ -32,6 +28,22 @@ class Client:
 
     @staticmethod
     def check_env(env):
+        """Check if the running env is a good one.
+        TODO: Remove or move at another place
+
+        parameters:
+            date_object: The source of value
+            datetime
+            part_type: The part to return
+            str
+
+        Returns:
+            list: A
+
+        Raises:
+            Attribute Error is env does not exist.
+
+        """
         if env not in ENVS_LIST:
             raise AttributeError(
                 "Argument 'env' has to be:\n{}\nGot '{}' instead".format(
@@ -42,19 +54,33 @@ class Client:
             return True
 
     def get_request_parameters_lists(self):
-        result = [], [], []
+        """Construct the list dict. Each dict contains parameters for one endpoint.
+
+        Returns:
+            list: A list of dicts
+
+        """
+
+        # Retrieve the "query" part of the task json definition
+        # If not params, returns an empty list
         query = self.task.params.get("query", None)
         if not query:
-            return result
+            return []
 
+        # Get the params of the query
         query_params = query.get("params", None)
 
+        # Get each param and add it ti the result_lists (list of list)
         result_lists = []
         if query_params:
             for param in query_params:
                 tmp_result = []
+
+                # Case when param is a constant
                 if param["type"] == "constant":
                     tmp_result = [{param["name"]: param["value"]}]
+
+                # Case when param is of type "db". A request of data source is done
                 if param["type"] == "db":
                     tmp_result = Model.get_from_raw_sql(
                         self.task.db_connection,
@@ -66,6 +92,8 @@ class Client:
                         for tr in tmp_result  # noqa: E501
                     ]
 
+                # Case when param is of type "timestamp_from_epoch"
+                # Used for buiding date range params.
                 if param["type"] == "timestamp_from_epoch":
                     target_day = self.get_day_relative_to_today_from_params(
                         day_params=param,
@@ -297,16 +325,6 @@ class Client:
                 month += 1
         return result
 
-    def get_date_ranges_list(self, params):
-
-        result = []
-        if params["offset_unity"] == "days":
-            result = self.get_day_ranges_list(params)
-        if params["offset_unity"] == "months":
-            result = self.get_month_ranges_list(params)
-
-        return result
-
     def get_dynamics_params(self, params):
         result = []
         if params:
@@ -386,7 +404,7 @@ class Client:
     def do_requests(self, task_params, headers, endpoint_list, pagination_function):
         futures_results = []
         endpoint_list_list = get_chunks(endpoint_list, chunk_size=50)
-        for lst in endpoint_list_list[0:2]:
+        for lst in endpoint_list_list:
             chunks_result_list = run_in_threads_pool(
                 request_params_list=lst,
                 source_function=self.do_get_query,
