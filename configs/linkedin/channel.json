@@ -1,7 +1,7 @@
 {
     "name": "linkedin",
     "daily_tasks_list" : [
-        "creative_sponsored_update_daily_update"
+        "creative_url_daily_update"
     ],
     "bck_daily_tasks_list" : [
         "daily_accounts_update",
@@ -28,6 +28,9 @@
         "pivot_job_title_monthly_update",
         "pivot_member_organization_monthly_update",
         "pivot_member_county_monthly_update"
+    ],
+    "3_months_tasks" : [
+        "creative_url_3_months_daily_update"
     ]
 }
 
