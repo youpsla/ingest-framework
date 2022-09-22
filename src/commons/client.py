@@ -32,13 +32,11 @@ class Client:
         TODO: Remove or move at another place
 
         parameters:
-            date_object: The source of value
-            datetime
-            part_type: The part to return
+            env: The running env
             str
 
         Returns:
-            list: A
+            Bool: True
 
         Raises:
             Attribute Error is env does not exist.
@@ -154,191 +152,12 @@ class Client:
 
         return final_result
 
-    def get_part_of_date(self, date_object, part_type):
-        """Return digit correspondign to days, month or year from datetime object.
-
-        parameters:
-            date_object: The source of value
-            datetime
-            part_type: The part to return
-            str
-
-        Returns:
-            int: The digits extracted from source.
-
-        """
-
-    def get_date_params(self, url_params, value):
-        # TODO Alain: Check if can be deleted.
-        result = []
-        if url_params:
-            for n, p in url_params.items():
-                result.append(self.get_date_param(n, p, value))
-
-        return result
-
-    def get_date_param(self, name, params, value):
-        if params["value_type"] == "date":
-            return {
-                name: params["url_query_parameter_value"].format(
-                    day=value.day,
-                    month=value.month,
-                    year=value.year,
-                ),
-            }
-
-        return None
-
     def get_day_relative_to_today_from_params(self, day_params, offset_unity):
 
         today = datetime.date(datetime.now())
         tmp = {offset_unity: int(day_params["offset_value"])}
         day = today - timedelta(**tmp)
         return day
-
-    def get_start_date(self, start_date_params=None, offset_unity=None):
-        # Use max(field) to retrieve start_date.
-        # If source table is empty, then the "offset_value" is used.
-
-        if start_date_params.get("use_max_from_field", None):
-            tmp_date = Model(
-                start_date_params["use_max_from_field"]["model"],
-                db_connection=self.task.db_connection,
-                channel=self.task.channel,
-            ).get_max_for_date_field_plus_one_day(
-                start_date_params["use_max_from_field"]["field"]
-            )[
-                0
-            ][
-                "max_date"
-            ]
-            if tmp_date:
-                start_date = tmp_date.date()
-        else:
-            if start_date_params["offset_value"] is not None:
-                start_date = self.get_day_relative_to_today_from_params(
-                    start_date_params, offset_unity
-                )
-
-        return start_date
-
-    def get_end_date(self, end_date_params=None, offset_unity=None):
-        end_date = self.get_day_relative_to_today_from_params(
-            end_date_params, offset_unity
-        )
-        return end_date
-
-    def get_day_ranges_list(self, date_range_params):
-
-        offset_unity = date_range_params["offset_unity"]
-
-        start_date = self.get_start_date(
-            start_date_params=date_range_params["start_date"],
-            offset_unity=offset_unity,
-        )
-
-        end_date = self.get_end_date(
-            end_date_params=date_range_params["end_date"],
-            offset_unity=offset_unity,  # noqa: E501
-        )
-
-        if end_date == datetime.date(datetime.today()):
-            raise ValueError(
-                "end_date can't be today. Must be previous day or older one."
-            )
-
-        result = []
-
-        if (
-            start_date != end_date
-            and date_range_params["split_allowed"] is True  # noqa: E501
-        ):  # noqa: E501
-            delta = end_date - start_date
-            days = [
-                start_date + timedelta(days=i) for i in range(delta.days + 1)
-            ]  # noqa: E501
-            for d in days:
-                tmp_result = []
-                tmp_result.append(
-                    self.get_date_params(
-                        date_range_params["start_date"]["url_params"], d
-                    )
-                )
-                tmp_result.append(
-                    self.get_date_params(
-                        date_range_params["end_date"]["url_params"], d
-                    )  # noqa: E501
-                )
-                result.append(tmp_result)
-        else:
-            tmp_result = []
-            tmp_result.append(
-                self.get_date_params(
-                    date_range_params["start_date"]["url_params"], start_date
-                )
-            )
-            tmp_result.append(
-                self.get_date_params(
-                    date_range_params["end_date"]["url_params"], end_date
-                )
-            )
-            result.append(tmp_result)
-
-        return result
-
-    def get_month_ranges_list(self, date_range_params):
-        offset_unity = date_range_params["offset_unity"]
-        start_date = self.get_day_relative_to_today_from_params(
-            date_range_params["start_date"], offset_unity
-        )
-
-        end_date = self.get_day_relative_to_today_from_params(
-            date_range_params["end_date"], offset_unity
-        )
-        year = start_date.year
-        month = start_date.month
-        result = []
-        while (year, month) <= (end_date.year, end_date.month):
-            tmp_result = []
-            sd = date(year, month, 1)
-            last_day_of_month_number = calendar.monthrange(year, month)[1]
-            ed = date(year, month, last_day_of_month_number)
-
-            tmp_result.append(
-                self.get_date_params(
-                    date_range_params["start_date"]["url_params"], sd
-                )  # noqa: E501
-            )
-
-            tmp_result.append(
-                self.get_date_params(
-                    date_range_params["end_date"]["url_params"], ed
-                )  # noqa: E501
-            )
-
-            result.append(tmp_result)
-
-            if month == 12:
-                month = 1
-                year += 1
-            else:
-                month += 1
-        return result
-
-    def get_dynamics_params(self, params):
-        result = []
-        if params:
-            dynamics_params = params.get("dynamics", {})
-            for n, p in dynamics_params.items():
-                result += self.get_dynamics_param(n, p)
-
-        return result
-
-    def get_statics_params(self, params):
-        result = []
-        if params:
-            result = [{k: v} for k, v in params.get("statics", {}).items()]
-        return result
 
     def get_request_params(self):
         query_params = self.task.params.get("query", None)
