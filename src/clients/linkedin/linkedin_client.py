@@ -179,6 +179,7 @@ class LinkedInClient(Client):
             "account_pivot_campaign_daily_update",
             "pivot_member_country_monthly_update",
             "pivot_member_county_monthly_update",
+            "pivot_job_title_monthly_update",
         ]:
             pagination_function = paging_pagination
         else:
