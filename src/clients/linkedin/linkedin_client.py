@@ -177,6 +177,7 @@ class LinkedInClient(Client):
             "creative_sponsored_update_daily_update",
             "creative_url_daily_update",
             "account_pivot_campaign_daily_update",
+            "pivot_member_country_monthly_update",
         ]:
             pagination_function = paging_pagination
         else:

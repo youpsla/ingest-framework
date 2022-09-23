@@ -1,8 +1,8 @@
-import calendar
 import uuid
 from collections import ChainMap
 from datetime import date, datetime, timedelta
 
+import pendulum
 import pytz
 from src.commons.model import Model
 from src.constants import ENVS_LIST
@@ -135,6 +135,25 @@ class Client:
                         result = datetime.strftime(target_day, "%Y")
                         tmp_result = [{param["name"]: result}]
 
+                if param["type"] == "part_of_date_month":
+                    target_month = pendulum.now().subtract(
+                        **{param["offset_unity"]: param["offset_value"]}
+                    )
+                    if param["position"] == "start":
+                        target_day = target_month.first_of("month")
+                    if param["position"] == "end":
+                        target_day = target_month.last_of("month")
+
+                    if param["part_of_date_name"] == "day":
+                        result = datetime.strftime(target_day, "%d")
+                        tmp_result = [{param["name"]: result}]
+                    if param["part_of_date_name"] == "month":
+                        result = datetime.strftime(target_day, "%m")
+                        tmp_result = [{param["name"]: result}]
+                    if param["part_of_date_name"] == "year":
+                        result = datetime.strftime(target_day, "%Y")
+                        tmp_result = [{param["name"]: result}]
+
                 result_lists.append(tmp_result)
         # As zip_longest_repeat_value needs only non empty lists. We check that here. # noqa: E501
         # Could be the case when we use parameters from Db and the select statement returns no value. # noqa: E501
@@ -152,11 +171,23 @@ class Client:
 
         return final_result
 
+    def get_sql_list(self, db_fields=[], sql_datas=[]):
+        result = []
+        if not db_fields:
+            return db_fields
+        for d in sql_datas:
+            tmp_result = []
+            for f in db_fields:
+                tmp_result.append({f["destination_key"]: d[f["origin_key"]]})
+            result.append(tmp_result)
+
+        return result
+
     def get_day_relative_to_today_from_params(self, day_params, offset_unity):
 
-        today = datetime.date(datetime.now())
+        today = pendulum.now()
         tmp = {offset_unity: int(day_params["offset_value"])}
-        day = today - timedelta(**tmp)
+        day = today.subtract(**tmp)
         return day
 
     def get_request_params(self):
