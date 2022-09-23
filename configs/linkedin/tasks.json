@@ -1000,6 +1000,152 @@
             "destination": "redshift",
             "request_data_source": "redshift",
             "model": "pivot_member_county",
+            "data_source": {
+                "name": "camapigns",
+                "raw_sql": "select distinct(campaign_id) from {schema}.account_pivot_campaign"
+            },
+            "fields_to_add_to_api_result": [
+                {
+                    "name": "_",
+                    "origin_key": "search_campaign_value",
+                    "destination_key": "facet_id"
+                }
+            ],
+            "query": {
+                "response_datas_key": "elements",
+                "template": "{base}{api_name}?{q}&{search_campaign_value}&{timeGranularity}&{pivot}&{fields}&{projection}&{dateRange_start_day}&{dateRange_start_month}&{dateRange_start_year}&{dateRange_end_day}&{dateRange_end_month}&{dateRange_end_year}",
+                "params": [
+                    {
+                        "name": "base",
+                        "type": "constant",
+                        "output_type": "arg",
+                        "value": "https://api.linkedin.com/v2/"
+                    },
+                    {
+                        "name": "api_name",
+                        "type": "constant",
+                        "output_type": "arg",
+                        "value": "adAnalyticsV2"
+                    },
+                    {
+                        "name": "q",
+                        "type": "constant",
+                        "output_type": "kwarg",
+                        "value": "analytics"
+                    },
+                    {
+                        "name": "search_campaign_value",
+                        "url_key_string": "campaigns",
+                        "type": "db",
+                        "data_source_name": "camapigns",
+                        "source_key": "campaign_id",
+                        "output_type": "kwarg",
+                        "template": "urn:li:sponsoredCampaign:{}"
+                    },
+                    {
+                        "name": "timeGranularity",
+                        "type": "constant",
+                        "output_type": "kwarg",
+                        "value": "MONTHLY"
+                    },
+                    {
+                        "name": "pivot",
+                        "type": "constant",
+                        "output_type": "kwarg",
+                        "value": "MEMBER_COUNTY"
+                    },
+                    {
+                        "name": "fields",
+                        "type": "constant",
+                        "output_type": "kwarg",
+                        "value": "pivotValue,dateRange,impressions,costInUsd,clicks,shares,pivot"
+                    },
+                    {
+                        "name": "projection",
+                        "type": "constant",
+                        "output_type": "kwarg",
+                        "value": "(*,elements*(pivotValue~,dateRange(*),impressions,costInUsd,clicks,shares,pivot))"
+                    },
+                    {
+                        "name": "dateRange_start_day",
+                        "url_key_string": "dateRange.start.day",
+                        "type": "part_of_date_month",
+                        "part_of_date_name": "day",
+                        "offset_type": "from_today",
+                        "offset_value": 1,
+                        "offset_unity": "months",
+                        "position": "start",
+                        "output_type": "kwarg"
+                    },
+                    {
+                        "name": "dateRange_start_month",
+                        "url_key_string": "dateRange.start.month",
+                        "type": "part_of_date_month",
+                        "part_of_date_name": "month",
+                        "offset_type": "from_today",
+                        "offset_value": 1,
+                        "offset_unity": "months",
+                        "position": "start",
+                        "output_type": "kwarg"
+                    },
+                    {
+                        "name": "dateRange_start_year",
+                        "url_key_string": "dateRange.start.year",
+                        "type": "part_of_date_month",
+                        "part_of_date_name": "year",
+                        "offset_type": "from_today",
+                        "offset_value": 1,
+                        "offset_unity": "months",
+                        "position": "start",
+                        "output_type": "kwarg"
+                    },
+                    {
+                        "name": "dateRange_end_day",
+                        "url_key_string": "dateRange.end.day",
+                        "type": "part_of_date_month",
+                        "part_of_date_name": "day",
+                        "offset_type": "from_today",
+                        "offset_value": 1,
+                        "offset_unity": "months",
+                        "position": "end",
+                        "output_type": "kwarg"
+                    },
+                    {
+                        "name": "dateRange_end_month",
+                        "url_key_string": "dateRange.end.month",
+                        "type": "part_of_date_month",
+                        "part_of_date_name": "month",
+                        "offset_type": "from_today",
+                        "offset_value": 1,
+                        "offset_unity": "months",
+                        "position": "end",
+                        "output_type": "kwarg"
+                    },
+                    {
+                        "name": "dateRange_end_year",
+                        "url_key_string": "dateRange.end.year",
+                        "type": "part_of_date_month",
+                        "part_of_date_name": "year",
+                        "offset_type": "from_today",
+                        "offset_value": 1,
+                        "offset_unity": "months",
+                        "position": "end",
+                        "output_type": "kwarg"
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "pivot_member_county_monthly_update_old": {
+            "actions": [
+                "insert"
+            ],
+            "exclude_existing_in_db": false,
+            "source": "linkedin",
+            "destination": "redshift",
+            "request_data_source": "redshift",
+            "model": "pivot_member_county",
             "url": {
                 "base": "https://api.linkedin.com/v2/",
                 "category": "adAnalyticsV2",
