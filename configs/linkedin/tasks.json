@@ -1293,7 +1293,7 @@
             "request_data_source": "redshift",
             "model": "pivot_member_company",
             "data_source": {
-                "name": "camapigns",
+                "name": "campaigns",
                 "raw_sql": "select distinct(campaign_id) from {schema}.account_pivot_campaign"
             },
             "fields_to_add_to_api_result": [
@@ -1310,7 +1310,7 @@
                     {
                         "name": "base",
                         "type": "constant",
-                        "output_type": "arg",
+                        "output_type": "kwarg",
                         "value": "https://api.linkedin.com/v2/"
                     },
                     {
@@ -1329,7 +1329,7 @@
                         "name": "search_campaign_value",
                         "url_key_string": "campaigns",
                         "type": "db",
-                        "data_source_name": "camapigns",
+                        "data_source_name": "campaigns",
                         "source_key": "campaign_id",
                         "output_type": "kwarg",
                         "template": "urn:li:sponsoredCampaign:{}"
