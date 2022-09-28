@@ -107,12 +107,24 @@ def run_in_threads_pool(
             if task[0].result():
                 task_result, endpoint = task[0].result()
                 tmp_result = []
+                # If there is a result_key in task prarams, we use it to retrieve only relevant data.
+                # Otherwise, we use all data received.
                 if result_key:
-                    tmp_result.extend(task_result[result_key])
+                    # Sometimes the value task_result[result_key] can be a list, sometimes a dict
+                    # We test the type and adapt the way we add to tmp_result
+                    #    - type list: We 'extend' tmp_result
+                    #    - type dict: We 'append' to tmp_result
+                    l_result = task_result[result_key]
+                    if type(l_result) is list:
+                        tmp_result.extend(l_result)
+                    if type(l_result) is dict:
+                        tmp_result.append(l_result)
                 else:
                     tmp_result.append(task_result)
 
+                # If there is a pagination function for the task, we do requests until end of pagination has been reached.
                 if pagination_function:
+                    # We retrieve the endpoint with parameters updated depending on pagination result retrieved (start, count, ....)
                     endpoint = pagination_function(endpoint, task_result)
                     while endpoint:
                         int_task = executor.submit(
