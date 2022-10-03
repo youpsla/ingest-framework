@@ -178,6 +178,69 @@
         }
     },
     {
+        "organizations_daily_update": {
+            "comment":"For Younes: It could be that organization_id in pivot_member_company are not in organizations table. This is because we can't retrieve anymore those organizations name for various reasons. Please set a default unknown name instead.",
+            "actions": [
+                "insert",
+                "update"
+            ],
+            "exclude_existing_in_db": true,
+            "destination_unique_keys": [
+                "id"
+            ],
+            "source": "linkedin",
+            "destination": "redshift",
+            "request_data_source": "redshift",
+            "model": "organizations",
+            "update_keys": [
+                "id"
+            ],
+            "data_source": {
+                "name": "organizations_id",
+                "raw_sql": "select distinct(organization_id) from {schema}.pivot_member_company where organization_id not in (select distinct(id) from {schema}.organizations)"
+            },
+            "query": {
+                "response_datas_key": "results",
+                "template": "{base}{api_name}/{service}?{ids}",
+                "params": [
+                    {
+                        "name": "base",
+                        "type": "constant",
+                        "output_type": "arg",
+                        "value": "https://api.linkedin.com/"
+                    },
+                    {
+                        "name": "api_name",
+                        "type": "constant",
+                        "output_type": "arg",
+                        "value": "rest"
+                    },
+                    {
+                        "name": "service",
+                        "type": "constant",
+                        "output_type": "arg",
+                        "value": "organizationsLookup"
+                    },
+                    {
+                        "name": "ids",
+                        "type": "db",
+                        "data_source_name": "organizations_id",
+                        "source_key": "organization_id",
+                        "output_type": "kwarg",
+                        "template": "List({})",
+                        "urlencode": false,
+                        "chunck": true,
+                        "chunck_size": 50
+                    }
+                ]
+            },
+            "request_header": {
+                "Linkedin-Version": "202206",
+                "X-Restli-Protocol-Version": "2.0.0"
+            }
+        }
+    },
+    {
         "creative_sponsored_video_daily_update": {
             "actions": [
                 "insert",
@@ -1310,7 +1373,7 @@
                     {
                         "name": "base",
                         "type": "constant",
-                        "output_type": "kwarg",
+                        "output_type": "arg",
                         "value": "https://api.linkedin.com/v2/"
                     },
                     {
@@ -1356,7 +1419,7 @@
                         "name": "projection",
                         "type": "constant",
                         "output_type": "kwarg",
-                        "value": "(*,elements*(externalWebsiteConversions,dateRange(*),impressions,costInUsd,clicks,shares,costInLocalCurrency,pivot,pivotValue~(localizedName)))"
+                        "value": "(*,elements*(externalWebsiteConversions,dateRange(*),impressions,costInUsd,clicks,shares,costInLocalCurrency,pivot,pivotValue))"
                     },
                     {
                         "name": "dateRange_start_day",

@@ -63,8 +63,7 @@ def get_chunks(source_list, chunk_size=500):
             for offs in range(0, len(source_list), chunk_size)
         ]
         return chunks_lists
-    else:
-        return [source_list]
+    return [source_list]
 
 
 def run_in_threads_pool(
@@ -113,12 +112,12 @@ def run_in_threads_pool(
                     # Sometimes the value task_result[result_key] can be a list, sometimes a dict
                     # We test the type and adapt the way we add to tmp_result
                     #    - type list: We 'extend' tmp_result
-                    #    - type dict: We 'append' to tmp_result
+                    #    - type dict: We 'extend' tmp_result with the values of the dict
                     l_result = task_result[result_key]
                     if type(l_result) is list:
                         tmp_result.extend(l_result)
                     if type(l_result) is dict:
-                        tmp_result.append(l_result)
+                        tmp_result.extend(list(l_result.values()))
                 else:
                     tmp_result.append(task_result)
 

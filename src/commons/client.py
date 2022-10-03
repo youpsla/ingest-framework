@@ -80,11 +80,23 @@ class Client:
 
                 # Case when param is of type "db". A request of data source is done
                 if param["type"] == "db":
-                    tmp_result = Model.get_from_raw_sql(
+                    db_result = Model.get_from_raw_sql(
                         self.task.db_connection,
                         self.task.params["data_source"]["raw_sql"],
                     )
-                    tmp_result = [dict(r) for r in tmp_result]
+                    # Transform OrderedDict into dict
+                    db_result = [dict(r) for r in db_result]
+
+                    if param.get("chunck"):
+                        for d in get_chunks(db_result, param.get("chunck_size", 20)):
+                            key = str(list(d[0].keys())[0])
+                            local_result = {
+                                key: ",".join(
+                                    map(lambda d: str(list(d.values())[0]), d)
+                                )
+                            }
+                            tmp_result.append(local_result)
+
                     tmp_result = [
                         {param["name"]: tr[param["source_key"]]}
                         for tr in tmp_result  # noqa: E501
@@ -213,6 +225,9 @@ class Client:
         task_params,
         db_params,
     ):
+        """This method allow to add datas to the data received from source.
+        This allow data used to build queries to be reused to be inserted in destination (Redshift).
+        """
         result = []
         for fr in futures_results:
             local_result = []
@@ -228,6 +243,7 @@ class Client:
                                 "fields_to_add_to_api_result"
                             ]  # noqa: E501
                         ]
+                    # Sometimes, values returned by the source
                     api_data = (
                         r if isinstance(r, dict) else {task_params["key_for_values"]: r}
                     )

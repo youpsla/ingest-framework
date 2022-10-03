@@ -79,8 +79,13 @@ class EndpointParam:
         self.query_params = query_params
 
         for k, v in self.endpoint_params.items():
-            self.name = k
-            self.value = v
+            setattr(self, k, v)
+
+        self.name = list(self.endpoint_params.keys())[0]
+        self.value = list(self.endpoint_params.values())[0]
+        # for k, v in self.endpoint_params.items():
+        #     self.name = k
+        #     self.value = v
 
         for qp in self.query_params:
             if qp["name"] == self.name:
@@ -117,7 +122,12 @@ class EndpointParam:
         if self.output_type == "arg":
             url_str = self.formatted_value
         if self.output_type == "kwarg":
-            url_str = urlencode({self.formatted_key: self.formatted_value})
+            if getattr(self, "urlencode", False):
+                url_str = urlencode({self.formatted_key: self.formatted_value})
+            else:
+                url_str = "{key}={value}".format(
+                    key=self.formatted_key, value=self.formatted_value
+                )
         return {self.name: url_str}
 
     def get_as_dict(self):

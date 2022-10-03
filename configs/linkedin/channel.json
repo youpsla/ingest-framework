@@ -1,7 +1,7 @@
 {
     "name": "linkedin",
     "daily_tasks_list" : [
-        "creative_url_daily_update"
+        "organizations_daily_update"
     ],
     "bck_daily_tasks_list" : [
         "daily_accounts_update",
@@ -15,13 +15,11 @@
         "creative_sponsored_update_daily_update",
         "pivot_member_organization_full_daily_update",
         "pivot_job_title_daily_full_update",
-        "pivot_member_country_full_daily_update"
+        "pivot_member_country_full_daily_update",
+        "organizations_daily_update"
     ],
     "monthly_tasks_list" : [
-        "pivot_member_country_monthly_update",
-        "pivot_job_title_monthly_update",
-        "pivot_member_organization_monthly_update",
-        "pivot_member_county_monthly_update"
+        "pivot_member_organization_monthly_update"
     ],
     "bck_monthly_tasks_list" : [
         "pivot_member_country_monthly_update",

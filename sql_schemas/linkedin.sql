@@ -239,7 +239,6 @@ create table pivot_member_company
     end_date          timestamp   not null encode az64,
     facet             varchar(50) not null,
     facet_id          integer     not null encode az64,
-    organization_name varchar(255),
     time_granularity  varchar(255)
 );
 
@@ -395,6 +394,20 @@ alter table social_metrics
 grant select on social_metrics to public;
 
 grant select on social_metrics to jabmoro;
+
+
+create table organizations
+(
+    jab_id           integer   default "identity"(4116332, 0, '1,1'::text) encode az64,
+    jab_created_at   timestamp default ('now'::text)::timestamp without time zone encode az64,
+    jab_updated_at   timestamp default ('now'::text)::timestamp without time zone encode az64,
+    id      integer encode az64,
+    name      varchar(255)
+);
+
+grant select on organizations to public;
+
+grant select on organizations to jabmoro;
 
 create table staging
 (

@@ -42,7 +42,7 @@ class Task:
     @property
     def source(self):
         if not self._source:
-            source_name = self.params.get("source", None)
+            source_name = self.params.get("source")
             if source_name:
                 self._source = get_client(
                     self.running_env,
@@ -174,9 +174,7 @@ class Task:
                         )
                         not in existing_ids
                     ]
-                    datas_values = [r.get_db_values_tuple() for r in data_objs]
-                else:
-                    datas_values = [r.get_db_values_tuple() for r in data_objs]
+                datas_values = [r.get_db_values_tuple() for r in data_objs]
 
                 logger.info(
                     f"{self.name} - {self.model.model_name}:"

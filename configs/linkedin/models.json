@@ -1717,6 +1717,22 @@
         }
     },
     {
+        "organizations": {
+            "id": {
+                "type": "raw",
+                "source_path": [
+                    "id"
+                ]
+            },
+            "name": {
+                "type": "raw",
+                "source_path": [
+                    "localizedName"
+                ]
+            }
+        }
+    },
+    {
         "pivot_member_company": {
             "organization_id": {
                 "type": "function",
@@ -1829,13 +1845,6 @@
                 "type": "raw",
                 "source_path": [
                     "facet_id"
-                ]
-            },
-            "organization_name": {
-                "type": "raw",
-                "source_path": [
-                    "pivotValue~",
-                    "localizedName"
                 ]
             },
             "time_granularity": {
