@@ -7,11 +7,8 @@ import pytz
 from src.commons.model import Model
 from src.constants import ENVS_LIST
 from src.utils.endpoint_utils import Endpoint
-from src.utils.various_utils import (
-    get_chunks,
-    run_in_threads_pool,
-    zip_longest_repeat_value,
-)
+from src.utils.various_utils import (get_chunks, run_in_threads_pool,
+                                     zip_longest_repeat_value)
 
 
 class Client:
@@ -87,6 +84,9 @@ class Client:
                     # Transform OrderedDict into dict
                     db_result = [dict(r) for r in db_result]
 
+                    # Split the list returned by db in slice of chunck_size. # noqa: E501
+                    # This is done when we want to send more than one id to the API endpoint. # noqa: E501
+                    # For linkedin, it allow to retrieve organizations names by batch. Then we are not faced to the 10 000 queries daily limit. # noqa: E501
                     if param.get("chunck"):
                         for d in get_chunks(db_result, param.get("chunck_size", 20)):
                             key = str(list(d[0].keys())[0])

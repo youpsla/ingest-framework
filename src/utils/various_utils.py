@@ -148,11 +148,11 @@ def zip_longest_repeat_value(*iterables):
     """Equalize size of iterables to the longuest one. The latest value "short" irerable is repeated.
     Inputs:
         - [1,2,3]
-        - [A]
+        - [A,B]
         - [F]
 
     Output:
-        [[1,2,3], [A,A,A], [F,F,F]]
+        [[1,2,3], [A,B,B], [F,F,F]]
     """
     iterators = [
         iter(i) for i in iterables
