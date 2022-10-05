@@ -193,8 +193,6 @@ class Task:
             # TODO: Manage the case when no quries are done to source because of prefiltering from DB. This is the case for sponsored_video_update # noqa: E501
             if values_dicts_list:
                 self.update(values_dicts_list, self.params["update_keys"])
-            else:
-                pass
 
         if "partial_update" in self.actions:
             for d in source_data:
