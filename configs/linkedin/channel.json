@@ -23,7 +23,11 @@
         "creative_sponsored_update_daily_update"
     ],
     "monthly_tasks_list" : [
-        "pivot_member_organization_monthly_update"
+        "pivot_member_country_monthly_update",
+        "pivot_job_title_monthly_update",
+        "pivot_member_organization_monthly_update",
+        "organizations_monthly_update",
+        "pivot_member_county_monthly_update"
     ],
     "bck_monthly_tasks_list" : [
         "pivot_member_country_monthly_update",
