@@ -7,8 +7,11 @@ import pytz
 from src.commons.model import Model
 from src.constants import ENVS_LIST
 from src.utils.endpoint_utils import Endpoint
-from src.utils.various_utils import (get_chunks, run_in_threads_pool,
-                                     zip_longest_repeat_value)
+from src.utils.various_utils import (
+    get_chunks,
+    run_in_threads_pool,
+    zip_longest_repeat_value,
+)
 
 
 class Client:
@@ -96,11 +99,11 @@ class Client:
                                 )
                             }
                             tmp_result.append(local_result)
-
-                    tmp_result = [
-                        {param["name"]: tr[param["source_key"]]}
-                        for tr in tmp_result  # noqa: E501
-                    ]
+                    else:
+                        tmp_result = [
+                            {param["name"]: tr[param["source_key"]]}
+                            for tr in db_result  # noqa: E501
+                        ]
 
                 # Case when param is of type "timestamp_from_epoch"
                 # Used for buiding date range params.
