@@ -750,7 +750,8 @@
                         "name": "offset",
                         "type": "constant",
                         "output_type": "kwarg",
-                        "value": ""
+                        "value": "",
+                        "force_url_encoding": true
                     }
                 ]
             }
