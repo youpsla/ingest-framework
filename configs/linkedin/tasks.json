@@ -202,7 +202,7 @@
             },
             "query": {
                 "response_datas_key": "results",
-                "template": "{base}{api_name}/{service}?{ids}",
+                "template": "{base}{api_name}/{service}?{organization_id}",
                 "params": [
                     {
                         "name": "base",
@@ -223,8 +223,9 @@
                         "value": "organizationsLookup"
                     },
                     {
-                        "name": "ids",
+                        "name": "organization_id",
                         "type": "db",
+                        "url_key_string": "ids",
                         "data_source_name": "organizations_id",
                         "source_key": "organization_id",
                         "output_type": "kwarg",
