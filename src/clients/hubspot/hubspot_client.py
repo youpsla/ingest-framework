@@ -82,8 +82,8 @@ class HubspotClient(Client):
                 )
             )
 
-        for ptd in [portal_token_list[4]]:
-            # for ptd in portal_token_list[2:]:
+        # for ptd in [portal_token_list[4]]:
+        for ptd in [portal_token_list[2]]:
             portal_id = ptd[0]
             refresh_token_params = {
                 "grant_type": "refresh_token",
@@ -229,9 +229,7 @@ class HubspotClient(Client):
                     final_result.append(r)
             else:
                 pass
-
-        to_return = [{"datas": d} for d in final_result]
-        return to_return
+        return final_result
 
     def do_get_query(
         self,
