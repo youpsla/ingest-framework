@@ -143,8 +143,9 @@ class Task:
             source_data = []
             with open(result_file_path, newline="", encoding="utf-8-sig") as csv_file:
                 tmp = csv.DictReader(csv_file)
-                for t in tmp:
-                    source_data.append({"datas": t})
+                source_data = list(map(lambda t: {"datas": t}, tmp))
+                # for t in tmp:
+                #     source_data.append({"datas": t})
 
         if "transfer" in self.actions:
             self.destination.upload_and_delete_source()
