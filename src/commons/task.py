@@ -134,18 +134,23 @@ class Task:
                 source_data = self.get_data_from_source()
 
         if "download" in self.actions:
+            # source_data is always a list of length 1
             for d in source_data:
                 elem = d["datas"]
                 result_file_path = ReportManager(
                     authorization_data=d["authorization_data"],
                     report_request=elem,
                 ).submit_and_download()
+
             source_data = []
-            with open(result_file_path, newline="", encoding="utf-8-sig") as csv_file:
-                tmp = csv.DictReader(csv_file)
-                source_data = list(map(lambda t: {"datas": t}, tmp))
-                # for t in tmp:
-                #     source_data.append({"datas": t})
+            if result_file_path is not None:
+                with open(
+                    result_file_path, newline="", encoding="utf-8-sig"
+                ) as csv_file:
+                    tmp = csv.DictReader(csv_file)
+                    source_data = list(map(lambda t: {"datas": t}, tmp))
+                    # for t in tmp:
+                    #     source_data.append({"datas": t})
 
         if "transfer" in self.actions:
             self.destination.upload_and_delete_source()
