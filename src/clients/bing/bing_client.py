@@ -31,15 +31,6 @@ class BingAdsClient(Client):
     def __init__(self, task=None, env=None):
         super().__init__(env)
 
-        self.authorization_data = AuthorizationData(
-            account_id=None,
-            customer_id=None,
-            developer_token=DEVELOPER_TOKEN,
-            authentication=None,
-        )
-
-        authenticate(self.authorization_data)
-
         self.output_status_message = output_status_message
         self.task = task
         self.report_request = None
@@ -50,14 +41,12 @@ class BingAdsClient(Client):
         statics_params = self.get_statics_params(query_params)
         return dynamics_params + statics_params
 
-    def get(self, **_ignored):
+    def get(self, task_params):
 
-        params = self.task.params
-        params = params.get("url", None)
-        query_params = params.get("params", None)
+        db_params = self.get_request_params()
+        print(f"Number of requests to run: {len(db_params)}")
 
-        db_params = self.get_request_params(self.task)
-        kwargs = self.get_kwargs(query_params)
+        # endpoint_list = self.get_endpoint_list(task_params, db_params)
 
         result = []
         if self.task.name in [
@@ -68,38 +57,74 @@ class BingAdsClient(Client):
         ]:
             request = ReportRequest(
                 authorization_data=self.authorization_data,
-                service_name=self.task.params["url"]["service_name"],
+                service_name=self.task.params["query"]["service_name"],
                 task=self.task,
+                # kwargs=
                 kwargs=kwargs,
             )
-        else:
+        # else:
+        #     if db_params:
+        #         kwargs = list(db_params.values())[0]
+        #     else:
+        #         kwargs = []
+        #     request = ServiceRequest(
+        #         authorization_data=self.authorization_data,
+        #         service_name=self.task.params["query"]["service_name"],
+        #         task=self.task,
+        #         kwargs=kwargs
+        #         # kwargs=kwargs,
+        #     )
+        if self.task.name == "daily_accounts_update":
+            self.authorization_data = AuthorizationData(
+                account_id=None,
+                customer_id=None,
+                developer_token=DEVELOPER_TOKEN,
+                authentication=None,
+            )
+            authenticate(self.authorization_data)
             request = ServiceRequest(
                 authorization_data=self.authorization_data,
-                service_name=self.task.params["url"]["service_name"],
+                service_name=self.task.params["query"]["service_name"],
                 task=self.task,
-                kwargs=kwargs,
             )
-        if db_params:
-            for param in db_params:
-                request.param = param[0]
-                tmp = request.get()
-                if isinstance(self.task.destination, s3.s3_client.S3Client):
-                    result.append(tmp)
-                else:
-                    if tmp:
-                        for t in tmp:
-                            for i in param[0]:
-                                for k, v in i.items():
-                                    t[k] = v
-                            result.append(t)
+            final_result = request.get()
         else:
-            result = request.get()
+            final_result = []
+            if db_params:
+                result = []
+                for k, v in db_params.items():
+                    self.authorization_data = AuthorizationData(
+                        account_id=v["AccountId"],
+                        customer_id=None,
+                        developer_token=DEVELOPER_TOKEN,
+                        authentication=None,
+                    )
+                    # Delete entries which cannot be passed to the service for the request. used for AccountId which has to be in authentication only.
+                    del v["AccountId"]
 
-        tmp = []
-        for r in result:
-            tmp.append({"datas": r, "authorization_data": self.authorization_data})
+                    authenticate(self.authorization_data)
+                    request = ServiceRequest(
+                        authorization_data=self.authorization_data,
+                        service_name=self.task.params["query"]["service_name"],
+                        task=self.task,
+                        kwargs=v
+                        # kwargs=kwargs,
+                    )
+                    # request.param = param[0]
+                    api_datas = {k: request.get()}
+                    result.append(api_datas)
+                    # Add data to the API response
+                final_result = self.add_request_params_to_api_call_result(
+                    result, task_params, db_params
+                )
 
-        return tmp
+        return final_result
+
+        # tmp = []
+        # for r in result:
+        #     tmp.append({"datas": r, "authorization_data": self.authorization_data})
+
+        # return tmp
 
 
 class ServiceRequest:
@@ -134,33 +159,25 @@ class ServiceRequest:
         if self.task.name == "daily_accounts_update":
             result = self.service.GetAccountsInfo()
             result = recursive_asdict(result)
-            result = nested_get(result, self.task.params["url"]["response_data_key"])
+            result = nested_get(result, self.task.params["query"]["response_datas_key"])
             return result
 
         if self.task.name == "daily_campaigns_update":
 
-            if not self.param:
-                raise ValueError(
-                    "Task 'daily_campaigns_update' need AccountId for querying source."
-                )
-
-            result = self.service.GetCampaignsByAccountId(
-                **self.kwargs[0],
-                **self.param[0],
-            )
+            result = self.service.GetCampaignsByAccountId(**self.kwargs)
 
             result = recursive_asdict(result)
-            result = nested_get(result, self.task.params["url"]["response_data_key"])
+            result = nested_get(result, self.task.params["query"]["response_datas_key"])
             return result
 
         if self.task.name == "daily_adgroups_update":
 
             # TODO: Generic way of managing params here
             result = self.service.GetAdGroupsByCampaignId(
-                **self.param[0],
+                **self.kwargs,
             )
             result = recursive_asdict(result)
-            result = nested_get(result, self.task.params["url"]["response_data_key"])
+            result = nested_get(result, self.task.params["query"]["response_datas_key"])
             return result
 
         if self.task.name == "daily_ads_update":
@@ -178,7 +195,7 @@ class ServiceRequest:
             # TODO: Generic way of managing params here
             result = self.service.GetAdsByAdGroupId(**self.param[0], AdTypes=adTypes)
             result = recursive_asdict(result)
-            result = nested_get(result, self.task.params["url"]["response_data_key"])
+            result = nested_get(result, self.task.params["query"]["response_datas_key"])
             return result
 
         if self.task.name == "daily_medias_update":
@@ -188,7 +205,7 @@ class ServiceRequest:
             )
 
             result = recursive_asdict(result)
-            result = nested_get(result, self.task.params["url"]["response_data_key"])
+            result = nested_get(result, self.task.params["query"]["response_datas_key"])
             return result
 
         if self.task.name == "daily_media_associations_update":
@@ -205,7 +222,7 @@ class ServiceRequest:
             )
 
             result = recursive_asdict(result)
-            result = nested_get(result, self.task.params["url"]["response_data_key"])
+            result = nested_get(result, self.task.params["query"]["response_datas_key"])
             return result
 
         raise ValueError("Unknown task name")

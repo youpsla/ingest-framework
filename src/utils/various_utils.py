@@ -3,6 +3,8 @@ import json
 import os
 from concurrent import futures
 
+from suds.sudsobject import asdict
+
 
 def nested_get(dic, keys):
 
@@ -18,8 +20,21 @@ def nested_get(dic, keys):
 
 
 def recursive_asdict(d):
-    # Need to sort the 5 layers issue. Make task.py really independant from clients. # noqa: E501
-    pass
+    """Convert Suds object into serializable format."""
+    out = {}
+    for k, v in asdict(d).items():
+        if hasattr(v, "__keylist__"):
+            out[k] = recursive_asdict(v)
+        elif isinstance(v, list):
+            out[k] = []
+            for item in v:
+                if hasattr(item, "__keylist__"):
+                    out[k].append(recursive_asdict(item))
+                else:
+                    out[k].append(item)
+        else:
+            out[k] = "%s" % v
+    return out
 
 
 def get_running_env():

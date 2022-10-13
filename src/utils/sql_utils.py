@@ -203,42 +203,42 @@ class SqlQuery:
             comparaison_fields = set(self.values[0].keys()) - set(self.update_keys)
             # comparaison_fields = list(self.values[0].keys())
             # comparaison_fields.remove(*self.update_keys)
-            where_data = " or ".join(
-                [
-                    " != ".join(
-                        (
-                            "{}.{}".format(self.model.model_name, str(f)),
-                            "{}.{}".format(self.stage_table_name, str(f)),
-                        )
-                    )
-                    for f in comparaison_fields
-                ]
-            )
-
-            # SOlutino managing ca se of null value in redshift.
             # where_data = " or ".join(
             #     [
-            #         "("
-            #         + "("
-            #         + " != ".join(
+            #         " != ".join(
             #             (
             #                 "{}.{}".format(self.model.model_name, str(f)),
             #                 "{}.{}".format(self.stage_table_name, str(f)),
             #             )
             #         )
-            #         + ")"
-            #         + " or "
-            #         + "("
-            #         + "{}.{}".format(self.stage_table_name, str(f))
-            #         + " is not null "
-            #         + " and "
-            #         + "{}.{}".format(self.model.model_name, str(f))
-            #         + " is null "
-            #         + ")"
-            #         + ")"
             #         for f in comparaison_fields
             #     ]
             # )
+
+            # Solution managing case of null value in redshift.
+            where_data = " or ".join(
+                [
+                    "("
+                    + "("
+                    + " != ".join(
+                        (
+                            "{}.{}".format(self.model.model_name, str(f)),
+                            "{}.{}".format(self.stage_table_name, str(f)),
+                        )
+                    )
+                    + ")"
+                    + " or "
+                    + "("
+                    + "{}.{}".format(self.stage_table_name, str(f))
+                    + " is not null "
+                    + " and "
+                    + "{}.{}".format(self.model.model_name, str(f))
+                    + " is null "
+                    + ")"
+                    + ")"
+                    for f in comparaison_fields
+                ]
+            )
 
             return where_data
 
@@ -277,42 +277,42 @@ class SqlQuery:
 
         def update_get_and_where(self):
             comparaison_fields = set(self.values[0].keys()) - set(self.update_keys)
-            where_data = " or ".join(
-                [
-                    " != ".join(
-                        (
-                            "{}.{}".format(self.model.model_name, str(f)),
-                            "{}.{}".format(self.stage_table_name, str(f)),
-                        )
-                    )
-                    for f in comparaison_fields
-                ]
-            )
-
-            # SOlutino managing ca se of null value in redshift.
             # where_data = " or ".join(
             #     [
-            #         "("
-            #         + "("
-            #         + " != ".join(
+            #         " != ".join(
             #             (
             #                 "{}.{}".format(self.model.model_name, str(f)),
             #                 "{}.{}".format(self.stage_table_name, str(f)),
             #             )
             #         )
-            #         + ")"
-            #         + " or "
-            #         + "("
-            #         + "{}.{}".format(self.stage_table_name, str(f))
-            #         + " is not null "
-            #         + " and "
-            #         + "{}.{}".format(self.model.model_name, str(f))
-            #         + " is null "
-            #         + ")"
-            #         + ")"
             #         for f in comparaison_fields
             #     ]
             # )
+
+            # Solution managing case of null value in redshift.
+            where_data = " or ".join(
+                [
+                    "("
+                    + "("
+                    + " != ".join(
+                        (
+                            "{}.{}".format(self.model.model_name, str(f)),
+                            "{}.{}".format(self.stage_table_name, str(f)),
+                        )
+                    )
+                    + ")"
+                    + " or "
+                    + "("
+                    + "{}.{}".format(self.stage_table_name, str(f))
+                    + " is not null "
+                    + " and "
+                    + "{}.{}".format(self.model.model_name, str(f))
+                    + " is null "
+                    + ")"
+                    + ")"
+                    for f in comparaison_fields
+                ]
+            )
 
             return where_data
 

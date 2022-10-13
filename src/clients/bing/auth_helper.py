@@ -57,8 +57,8 @@ def authenticate(authorization_data):
     user = get_user_response = customer_service.GetUser(UserId=None).User
     accounts = search_accounts_by_user_id(customer_service, user.Id)
 
-    # For this example we'll use the first account.
-    authorization_data.account_id = accounts["AdvertiserAccount"][0].Id
+    # # For this example we'll use the first account.
+    # authorization_data.account_id = accounts["AdvertiserAccount"][0].Id
     authorization_data.customer_id = accounts["AdvertiserAccount"][0].ParentCustomerId
 
 

@@ -1,7 +1,7 @@
 
 -- DROP SCHEMA bing_development cascade;
 
-CREATE SCHEMA bing_development;
+-- CREATE SCHEMA bing_development;
 
 -- bing_development.accounts definition
 
@@ -15,6 +15,7 @@ CREATE TABLE IF NOT EXISTS bing_development.accounts
 	,number VARCHAR(255)   ENCODE lzo
 	,accountLifeCycleStatus VARCHAR(255)   ENCODE lzo
 	,pauseReason VARCHAR(255)   ENCODE lzo
+	,developer_token VARCHAR(255)   ENCODE lzo
 )
 DISTSTYLE AUTO
 ;

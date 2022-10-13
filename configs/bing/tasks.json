@@ -8,10 +8,10 @@
             "source": "bing",
             "destination": "redshift",
             "model": "accounts",
-            "url": {
+            "query": {
                 "type": "service",
                 "service_name": "CustomerManagementService",
-                "response_data_key": [
+                "response_datas_key": [
                     "AccountInfo"
                 ]
             },
@@ -20,7 +20,7 @@
             ],
             "exclude_existing_in_db": true,
             "exclude_key": "id",
-            "update_key": "id"
+            "update_keys": ["id"]
         }
     },
     {
@@ -29,49 +29,96 @@
                 "insert",
                 "update"
             ],
+            "exclude_existing_in_db": true,
+            "exclude_key": "id",
             "source": "bing",
             "destination": "redshift",
+            "destination_unique_keys": ["id"],
             "request_data_source": "redshift",
             "model": "campaigns",
-            "exclude_existing_in_db": true,
-            "destination_unique_keys": [
-                "id"
+            "update_keys": ["id"],
+            "data_source": {
+                "name": "accounts",
+                "raw_sql": "select id from {schema}.accounts"
+            },
+            "fields_to_add_to_api_result": [
+                {
+                    "name": "account_id",
+                    "origin_key": "AccountId",
+                    "destination_key": "AccountId"
+                }
             ],
-            "exclude_key": "id",
-            "update_key": "id",
-            "url": {
+            "query": {
                 "type": "service",
                 "service_name": "CampaignManagementService",
-                "response_data_key": [
-                    "Campaign"
-                ],
-                "params": {
-                    "db": {
-                        "_": {
-                            "type": "db",
-                            "db_fields": [
-                                {
-                                    "origin_key": "id",
-                                    "destination_key": "AccountId"
-                                }
-                            ],
-                            "filter_model": "accounts",
-                            "all_fields": [
-                                "id"
-                            ]
-                        }
+                "response_datas_key": ["Campaign"],
+                "params": [
+                    {
+                        "name": "AccountId",
+                        "type": "db",
+                        "data_source_name": "accounts",
+                        "source_key": "id",
+                        "output_type": "kwarg"
                     },
-                    "statics": {
-                        "CampaignType": [
-                            "Search Audience DynamicSearchAds Shopping"
-                        ]
+                    {
+                        "name": "CampaignType",
+                        "type": "constant",
+                        "output_type": "kwarg",
+                        "value": "Search Audience DynamicSearchAds Shopping"
                     }
-                }
+                ]
             }
         }
     },
     {
         "daily_adgroups_update": {
+            "actions": [
+                "update"
+            ],
+            "exclude_existing_in_db": true,
+            "exclude_key": "id",
+            "source": "bing",
+            "destination": "redshift",
+            "destination_unique_keys": ["id"],
+            "request_data_source": "redshift",
+            "model": "adgroups",
+            "update_keys": ["id"],
+            "data_source": {
+                "name": "campaigns",
+                "raw_sql": "select id, accountid from {schema}.campaigns"
+            },
+            "fields_to_add_to_api_result": [
+                {
+                    "name": "campaign_id",
+                    "origin_key": "CampaignId",
+                    "destination_key": "CampaignId"
+                }
+            ],
+            "query": {
+                "type": "service",
+                "service_name": "CampaignManagementService",
+                "response_datas_key": ["AdGroup"],
+                "params": [
+                    {
+                        "name": "CampaignId",
+                        "type": "db",
+                        "data_source_name": "campaigns",
+                        "source_key": "id",
+                        "output_type": "kwarg"
+                    },
+                    {
+                        "name": "AccountId",
+                        "type": "db",
+                        "data_source_name": "campaigns",
+                        "source_key": "accountid",
+                        "output_type": "kwarg"
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "daily_adgroups_update_old": {
             "actions": [
                 "insert",
                 "update"
