@@ -1,3 +1,4 @@
+import copy
 import time
 from datetime import datetime
 
@@ -46,8 +47,6 @@ class BingAdsClient(Client):
         db_params = self.get_request_params()
         print(f"Number of requests to run: {len(db_params)}")
 
-        # endpoint_list = self.get_endpoint_list(task_params, db_params)
-
         result = []
         if self.task.name in [
             "daily_user_location_metrics_update",
@@ -55,13 +54,32 @@ class BingAdsClient(Client):
             "daily_geographic_metrics_update",
             "daily_ad_metrics_update",
         ]:
-            request = ReportRequest(
-                authorization_data=self.authorization_data,
-                service_name=self.task.params["query"]["service_name"],
-                task=self.task,
-                # kwargs=
-                kwargs=kwargs,
-            )
+            final_result = []
+            if db_params:
+                original_db_params = {
+                    key: copy.deepcopy(value) for key, value in db_params.items()
+                }
+                for k, v in db_params.items():
+                    self.authorization_data = AuthorizationData(
+                        account_id=None,
+                        customer_id=None,
+                        developer_token=DEVELOPER_TOKEN,
+                        authentication=None,
+                    )
+                    authenticate(self.authorization_data)
+                    request = ReportRequest(
+                        authorization_data=self.authorization_data,
+                        service_name=self.task.params["query"]["service_name"],
+                        task=self.task,
+                        kwargs=v,
+                    ).get()
+                    report_manager = ReportManager(
+                        report_request=request,
+                        authorization_data=self.authorization_data,
+                    )
+                    result_file_path = report_manager.submit_and_download()
+                    # api_datas = {k: request.submit_and_download()}
+                    return result_file_path
         # else:
         #     if db_params:
         #         kwargs = list(db_params.values())[0]
@@ -91,6 +109,12 @@ class BingAdsClient(Client):
         else:
             final_result = []
             if db_params:
+                original_db_params = {
+                    key: copy.deepcopy(value) for key, value in db_params.items()
+                }
+                counter = 0
+                counter_total = len(db_params)
+                print(f"Number of requests to run: {counter_total}")
                 result = []
                 for k, v in db_params.items():
                     self.authorization_data = AuthorizationData(
@@ -100,7 +124,8 @@ class BingAdsClient(Client):
                         authentication=None,
                     )
                     # Delete entries which cannot be passed to the service for the request. used for AccountId which has to be in authentication only.
-                    del v["AccountId"]
+                    if not self.task.name == "daily_campaigns_update":
+                        del v["AccountId"]
 
                     authenticate(self.authorization_data)
                     request = ServiceRequest(
@@ -113,18 +138,15 @@ class BingAdsClient(Client):
                     # request.param = param[0]
                     api_datas = {k: request.get()}
                     result.append(api_datas)
+                    counter += 1
+                    if counter % 10 == 0:
+                        print(f"Requests runned so far: {counter}", end=" ")
                     # Add data to the API response
                 final_result = self.add_request_params_to_api_call_result(
-                    result, task_params, db_params
+                    result, task_params, original_db_params
                 )
 
         return final_result
-
-        # tmp = []
-        # for r in result:
-        #     tmp.append({"datas": r, "authorization_data": self.authorization_data})
-
-        # return tmp
 
 
 class ServiceRequest:
@@ -173,9 +195,7 @@ class ServiceRequest:
         if self.task.name == "daily_adgroups_update":
 
             # TODO: Generic way of managing params here
-            result = self.service.GetAdGroupsByCampaignId(
-                **self.kwargs,
-            )
+            result = self.service.GetAdGroupsByCampaignId(**self.kwargs)
             result = recursive_asdict(result)
             result = nested_get(result, self.task.params["query"]["response_datas_key"])
             return result
@@ -193,7 +213,7 @@ class ServiceRequest:
             adTypes.AdType.append("Text")
 
             # TODO: Generic way of managing params here
-            result = self.service.GetAdsByAdGroupId(**self.param[0], AdTypes=adTypes)
+            result = self.service.GetAdsByAdGroupId(**self.kwargs, AdTypes=adTypes)
             result = recursive_asdict(result)
             result = nested_get(result, self.task.params["query"]["response_datas_key"])
             return result
@@ -201,7 +221,7 @@ class ServiceRequest:
         if self.task.name == "daily_medias_update":
 
             result = self.service.GetMediaMetaDataByAccountId(
-                **self.kwargs[0],
+                **self.kwargs,
             )
 
             result = recursive_asdict(result)
@@ -211,12 +231,15 @@ class ServiceRequest:
         if self.task.name == "daily_media_associations_update":
 
             result = self.service.GetMediaAssociations(
-                MediaEnabledEntities="ResponsiveAd ImageAdExtension",
-                **{
-                    list(self.param[0].keys())[0]: {
-                        "long": [list(self.param[0].values())[0]]
-                    }
-                }
+                # MediaEnabledEntities="ResponsiveAd ImageAdExtension",
+                # **{
+                #     list(self.param[0].keys())[0]: {
+                #         "long": [list(self.param[0].values())[0]]
+                #     }
+                # }
+                # MediaIds={"long": 7559189969605},
+                MediaIds={"long": [self.kwargs["MediaIds"]]},
+                **{k: v for k, v in self.kwargs.items() if k != "MediaIds"}
                 # setattr(scope, list(p.keys())[0], {"long": [list(p.values())[0]]})
                 # **self.param[0],
             )
@@ -399,8 +422,11 @@ class ReportRequest:
 
         scope = self.service.factory.create("AccountThroughAdGroupReportScope")
 
-        for p in self.param:
-            setattr(scope, list(p.keys())[0], {"long": [list(p.values())[0]]})
+        setattr(
+            scope,
+            "AccountIds",
+            {"long": self.kwargs["id"].split(",")},
+        )
         scope.Campaigns = None
         scope.AdGroups = None
         report_request.Scope = scope
@@ -447,8 +473,11 @@ class ReportRequest:
         report_request.Time = self.get_custom_date_range()
         report_request.ReportName = "My User Location Performance Report"
         scope = self.service.factory.create("AccountThroughAdGroupReportScope")
-        for p in self.param:
-            setattr(scope, list(p.keys())[0], {"long": [list(p.values())[0]]})
+        setattr(
+            scope,
+            "AccountIds",
+            {"long": self.kwargs["id"].split(",")},
+        )
         scope.Campaigns = None
         report_request.Scope = scope
 
@@ -491,9 +520,11 @@ class ReportRequest:
         report_request.Time = self.get_custom_date_range()
         report_request.ReportName = "My User Location Performance Report"
         scope = self.service.factory.create("AccountThroughAdGroupReportScope")
-        for p in self.param:
-            setattr(scope, list(p.keys())[0], {"long": [list(p.values())[0]]})
-        # scope.Accounts = None
+        setattr(
+            scope,
+            "AccountIds",
+            {"long": self.kwargs["id"].split(",")},
+        )
         report_request.Scope = scope
 
         report_columns = self.service.factory.create(
@@ -536,8 +567,12 @@ class ReportRequest:
         report_request.Time = self.get_custom_date_range()
         report_request.ReportName = "Ad Performance Report"
         scope = self.service.factory.create("AccountThroughAdGroupReportScope")
-        for p in self.param:
-            setattr(scope, list(p.keys())[0], {"long": [list(p.values())[0]]})
+        setattr(
+            scope,
+            "AccountIds",
+            {"long": self.kwargs["id"].split(",")},
+        )
+        # setattr(scope, "AccountIds", {"long": [self.kwargs["AccountId"]]})
         report_request.Scope = scope
 
         report_columns = self.service.factory.create("ArrayOfAdPerformanceReportColumn")
@@ -575,14 +610,14 @@ class ReportRequest:
         time = self.service.factory.create("ReportTime")
 
         start_date = self.service.factory.create("Date")
-        start_date.Day = date_range[0]["dateRange.start.day"]
-        start_date.Month = date_range[1]["dateRange.start.month"]
-        start_date.Year = date_range[2]["dateRange.start.year"]
+        start_date.Day = date_range["dateRange_start_day"]
+        start_date.Month = date_range["dateRange_start_month"]
+        start_date.Year = date_range["dateRange_start_year"]
 
         end_date = self.service.factory.create("Date")
-        end_date.Day = date_range[3]["dateRange.end.day"]
-        end_date.Month = date_range[4]["dateRange.end.month"]
-        end_date.Year = date_range[5]["dateRange.end.year"]
+        end_date.Day = date_range["dateRange_end_day"]
+        end_date.Month = date_range["dateRange_end_month"]
+        end_date.Year = date_range["dateRange_end_year"]
 
         # You can either use a custom date range or predefined time.
         # time.PredefinedTime = "Yesterday"

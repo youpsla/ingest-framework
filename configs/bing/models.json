@@ -142,7 +142,14 @@
                 "source_path": [
                     "Representations",
                     "MediaRepresentation",
+                    0,
                     "Url"
+                ]
+            },
+            "account_id": {
+                "type": "raw",
+                "source_path": [
+                    "AccountId"
                 ]
             }
         },

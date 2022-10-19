@@ -11,7 +11,10 @@ def nested_get(dic, keys):
     try:
         if keys:
             for key in keys:
-                dic = dic[key]
+                if dic:
+                    dic = dic[key]
+                else:
+                    return None
             return dic
         else:
             return None

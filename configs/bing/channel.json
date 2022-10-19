@@ -1,10 +1,9 @@
 {
     "name": "bing",
     "daily_tasks_list" : [
-        "daily_adgroups_update"
+        "daily_ads_update"
     ],
     "bck_daily_tasks_list" : [
-        "1331509799374177",
         "daily_accounts_update",
         "daily_campaigns_update",
         "daily_adgroups_update",

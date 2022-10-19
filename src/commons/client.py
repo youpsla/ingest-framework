@@ -235,6 +235,10 @@ class Client:
         for fr in futures_results:
             local_result = []
             for k, v in fr.items():
+
+                # When result from source is None, go to next record.
+                if v is None:
+                    continue
                 for r in v:
                     data_to_add_to_results = []
                     if task_params.get(

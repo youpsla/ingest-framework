@@ -1,3 +1,4 @@
+import copy
 import csv
 import json
 import os
@@ -135,12 +136,7 @@ class Task:
 
         if "download" in self.actions:
             # source_data is always a list of length 1
-            for d in source_data:
-                elem = d["datas"]
-                result_file_path = ReportManager(
-                    authorization_data=d["authorization_data"],
-                    report_request=elem,
-                ).submit_and_download()
+            result_file_path = copy.deepcopy(source_data)
 
             source_data = []
             if result_file_path is not None:
@@ -148,7 +144,8 @@ class Task:
                     result_file_path, newline="", encoding="utf-8-sig"
                 ) as csv_file:
                     tmp = csv.DictReader(csv_file)
-                    source_data = list(map(lambda t: {"datas": t}, tmp))
+                    # source_data = list(map(lambda t: {"datas": t}, tmp))
+                    source_data = list(tmp)
                     # for t in tmp:
                     #     source_data.append({"datas": t})
 

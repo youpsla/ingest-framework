@@ -1,6 +1,10 @@
 # TODO: manage logger for having logger output in terminal when running locally + cleanup print statements
 
 
+# TODO: For migrating production
+# Update medias table (Column account_id added.)
+
+
 import json
 import logging
 import os

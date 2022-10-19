@@ -73,6 +73,7 @@
     {
         "daily_adgroups_update": {
             "actions": [
+                "insert",
                 "update"
             ],
             "exclude_existing_in_db": true,
@@ -118,97 +119,51 @@
         }
     },
     {
-        "daily_adgroups_update_old": {
-            "actions": [
-                "insert",
-                "update"
-            ],
-            "source": "bing",
-            "destination": "redshift",
-            "request_data_source": "redshift",
-            "model": "adgroups",
-            "exclude_existing_in_db": true,
-            "destination_unique_keys": [
-                "id"
-            ],
-            "exclude_key": "id",
-            "update_key": "id",
-            "url": {
-                "type": "service",
-                "service_name": "CampaignManagementService",
-                "response_data_key": [
-                    "AdGroup"
-                ],
-                "params": {
-                    "db": {
-                        "_": {
-                            "type": "db",
-                            "db_fields": [
-                                {
-                                    "origin_key": "id",
-                                    "destination_key": "CampaignId"
-                                }
-                            ],
-                            "filter_model": "campaigns",
-                            "all_fields": [
-                                "id"
-                            ]
-                        }
-                    }
-                }
-            }
-        }
-    },
-    {
         "daily_ads_update": {
             "actions": [
                 "insert",
                 "update"
             ],
+            "exclude_existing_in_db": true,
+            "exclude_key": "id",
             "source": "bing",
             "destination": "redshift",
+            "destination_unique_keys": ["id"],
             "request_data_source": "redshift",
             "model": "ads",
-            "exclude_existing_in_db": true,
-            "destination_unique_keys": [
-                "id"
+            "update_keys": ["id"],
+            "data_source": {
+                "name": "adgroups",
+                "raw_sql_old": "select adg.id as adgroupid, cam.accountid as accountid from {schema}.adgroups adg inner join {schema}.campaigns cam on cam.id=adg.campaignid",
+                "raw_sql": "select listagg(adg.id, ',') as adgroupid, cam.accountid as accountid from bing_d{schema}evelopment.adgroups adg inner join {schema}.campaigns cam on cam.id=adg.campaignid group by cam.accountid"
+            },
+            "fields_to_add_to_api_result": [
+                {
+                    "name": "adgroup_id",
+                    "origin_key": "AdGroupId",
+                    "destination_key": "AdGroupId"
+                }
             ],
-            "exclude_key": "id",
-            "update_key": "id",
-            "url": {
+            "query": {
                 "type": "service",
                 "service_name": "CampaignManagementService",
-                "response_data_key": [
-                    "Ad"
-                ],
-                "params": {
-                    "db": {
-                        "_": {
-                            "type": "db",
-                            "db_fields": [
-                                {
-                                    "origin_key": "id",
-                                    "destination_key": "AdGroupId"
-                                }
-                            ],
-                            "filter_model": "adgroups",
-                            "all_fields": [
-                                "id"
-                            ]
-                        }
+                "response_datas_key": ["Ad"],
+                "params": [
+                    {
+                        "name": "AccountId",
+                        "type": "db",
+                        "data_source_name": "adgroups",
+                        "source_key": "accountid",
+                        "output_type": "kwarg"
                     },
-                    "statics": {
-                        "AdTypes": [
-                            "AppInstall",
-                            "DynamicSearch",
-                            "ExpandedText",
-                            "Product",
-                            "ResponsiveAd",
-                            "ResponsiveSearchAd",
-                            "Text"
-                        ]
+                    {
+                        "name": "AdGroupId",
+                        "type": "db",
+                        "data_source_name": "adgroups",
+                        "source_key": "adgroupid",
+                        "output_type": "kwarg"
                     }
-                }
+                ]
             }
         }
     },
@@ -218,72 +173,106 @@
                 "insert",
                 "update"
             ],
-            "source": "bing",
-            "destination": "redshift",
-            "model": "medias",
-            "destination_unique_keys": [
-                "id"
-            ],
             "exclude_existing_in_db": true,
             "exclude_key": "id",
-            "update_key": "id",
-            "url": {
+            "source": "bing",
+            "destination": "redshift",
+            "destination_unique_keys": ["id"],
+            "request_data_source": "redshift",
+            "model": "medias",
+            "update_keys": ["id"],
+            "data_source": {
+                "name": "accounts",
+                "raw_sql": "select id from {schema}.accounts"
+            },
+            "fields_to_add_to_api_result": [
+                {
+                    "name": "accountid",
+                    "origin_key": "AccountId",
+                    "destination_key": "AccountId"
+                }
+            ],
+            "query": {
                 "type": "service",
                 "service_name": "CampaignManagementService",
-                "response_data_key": [
-                    "MediaMetaData"
-                ],
-                "params": {
-                    "statics": {
-                        "MediaEnabledEntities": [
-                            "ResponsiveAd ImageAdExtension"
-                        ],
-                        "PageInfo": [
-                            null
-                        ]
+                "response_datas_key": ["MediaMetaData"],
+                "params": [
+                    {
+                        "name": "AccountId",
+                        "type": "db",
+                        "data_source_name": "accounts",
+                        "source_key": "id",
+                        "output_type": "kwarg"
+                    },
+                    {
+                        "name": "MediaEnabledEntities",
+                        "type": "constant",
+                        "value": "ResponsiveAd ImageAdExtension",
+                        "output_type": "kwarg"
+                    },
+                    {
+                        "name": "PageInfo",
+                        "type": "constant",
+                        "value": null,
+                        "output_type": "kwarg"
                     }
-                }
+                ]
             }
         }
     },
     {
         "daily_media_associations_update": {
             "actions": [
-                "insert"
+                "insert",
+                "update"
             ],
+            "exclude_existing_in_db": true,
+            "exclude_key": "id",
             "source": "bing",
             "destination": "redshift",
-            "model": "media_associations",
-            "exclude_existing_in_db": true,
             "destination_unique_keys": [
                 "entity_id",
                 "media_id"
             ],
-            "url": {
+            "update_keys": ["entity_id", "media_id"],
+            "request_data_source": "redshift",
+            "model": "media_associations",
+            "data_source": {
+                "name": "accounts",
+                "raw_sql": "select id as media_id, account_id from {schema}.medias"
+            },
+            "query": {
                 "type": "service",
                 "service_name": "CampaignManagementService",
-                "response_data_key": [
+                "response_datas_key": [
                     "MediaAssociations",
                     "ArrayOfMediaAssociation",
+                    0,
                     "MediaAssociation"
+                    
                 ],
-                "params": {
-                    "db": {
-                        "_": {
-                            "type": "db",
-                            "db_fields": [
-                                {
-                                    "origin_key": "id",
-                                    "destination_key": "MediaIds"
-                                }
-                            ],
-                            "filter_model": "medias",
-                            "all_fields": [
-                                "id"
-                            ]
-                        }
+                "params": [
+                    {
+                        "name": "AccountId",
+                        "type": "db",
+                        "data_source_name": "accounts",
+                        "source_key": "account_id",
+                        "output_type": "kwarg"
+                    },
+                    {
+                        "name": "MediaIds",
+                        "type": "db",
+                        "data_source_name": "accounts",
+                        "source_key": "media_id",
+                        "output_type": "arg"
+                    },
+                    {
+                        "name": "MediaEnabledEntities",
+                        "type": "constant",
+                        "value": "ResponsiveAd ImageAdExtension",
+                        "output_type": "kwarg"
                     }
-                }
+                ]
             }
         }
     },
@@ -293,32 +282,25 @@
                 "download",
                 "insert"
             ],
+            "exclude_existing_in_db": false,
             "source": "bing",
-            "destination": "s3",
+            "destination": "redshift",
             "request_data_source": "redshift",
             "model": "user_location_metrics",
-            "exclude_existing_in_db":false,
-            "url": {
+            "data_source": {
+                "name": "accounts",
+                "raw_sql": "select id from {schema}.accounts"
+            },
+            "query": {
+                "response_datas_key": "elements",
                 "type": "service",
                 "service_name": "ReportingService",
-                "params": {
-                    "db": {
-                        "_": {
-                            "type": "db",
-                            "db_fields": [
-                                {
-                                    "origin_key": "id",
-                                    "destination_key": "AccountIds"
-                                }
-                            ],
-                            "filter_model": "accounts",
-                            "all_fields": [
-                                "id"
-                            ]
-                        }
-                    },
-                    "statics": {
-                        "AdTypes": [
+                "params": [
+                    {
+                        "name": "AdTypes",
+                        "type": "constant",
+                        "output_type": "arg",
+                        "value": [
                             "AppInstall",
                             "DynamicSearch",
                             "ExpandedText",
@@ -328,59 +310,82 @@
                             "Text"
                         ]
                     },
-                    "dynamics": {
-                        "start_date": {
-                            "type": "group",
-                            "offset_type": "from_today",
-                            "offset_unity": "days",
-                            "offset_value": "1",
-                            "offset_range_position": "start_day",
-                            "url_params": {
-                                "dateRange.start.day": {
-                                    "type": "filter_by",
-                                    "value_type": "date",
-                                    "url_query_parameter_value": "{day}",
-                                    "offset": ""
-                                },
-                                "dateRange.start.month": {
-                                    "type": "filter_by",
-                                    "value_type": "date",
-                                    "url_query_parameter_value": "{month}"
-                                },
-                                "dateRange.start.year": {
-                                    "type": "filter_by",
-                                    "value_type": "date",
-                                    "url_query_parameter_value": "{year}"
-                                }
-                            }
-                        },
-                        "end_date": {
-                            "type": "group",
-                            "offset_type": "from_today",
-                            "offset_unity": "days",
-                            "offset_value": "1",
-                            "offset_range_position": "end_day",
-                            "url_params": {
-                                "dateRange.end.day": {
-                                    "type": "filter_by",
-                                    "value_type": "date",
-                                    "url_query_parameter_value": "{day}",
-                                    "offset": ""
-                                },
-                                "dateRange.end.month": {
-                                    "type": "filter_by",
-                                    "value_type": "date",
-                                    "url_query_parameter_value": "{month}"
-                                },
-                                "dateRange.end.year": {
-                                    "type": "filter_by",
-                                    "value_type": "date",
-                                    "url_query_parameter_value": "{year}"
-                                }
-                            }
-                        }
+                    {
+                        "name": "AccountId",
+                        "type": "db",
+                        "data_source_name": "accounts",
+                        "source_key": "id",
+                        "output_type": "kwarg",
+                        "chunck": true,
+                        "chunck_size": 50
+                    },
+                    {
+                        "name": "dateRange_start_day",
+                        "url_key_string": "dateRange.start.day",
+                        "type": "part_of_date",
+                        "part_of_date_name": "day",
+                        "offset_type": "from_today",
+                        "offset_value": "1",
+                        "offset_unity": "days",
+                        "position": "end",
+                        "output_type": "kwarg"
+                    },
+                    {
+                        "name": "dateRange_start_month",
+                        "url_key_string": "dateRange.start.month",
+                        "type": "part_of_date",
+                        "part_of_date_name": "month",
+                        "offset_type": "from_today",
+                        "offset_value": "1",
+                        "offset_unity": "days",
+                        "position": "end",
+                        "output_type": "kwarg"
+                    },
+                    {
+                        "name": "dateRange_start_year",
+                        "url_key_string": "dateRange.start.year",
+                        "type": "part_of_date",
+                        "part_of_date_name": "year",
+                        "offset_type": "from_today",
+                        "offset_value": "1",
+                        "offset_unity": "days",
+                        "position": "end",
+                        "output_type": "kwarg"
+                    },
+                    {
+                        "name": "dateRange_end_day",
+                        "url_key_string": "dateRange.end.day",
+                        "type": "part_of_date",
+                        "part_of_date_name": "day",
+                        "offset_type": "from_today",
+                        "offset_value": "1",
+                        "offset_unity": "days",
+                        "position": "end",
+                        "output_type": "kwarg"
+                    },
+                    {
+                        "name": "dateRange_end_month",
+                        "url_key_string": "dateRange.end.month",
+                        "type": "part_of_date",
+                        "part_of_date_name": "month",
+                        "offset_type": "from_today",
+                        "offset_value": "1",
+                        "offset_unity": "days",
+                        "position": "end",
+                        "output_type": "kwarg"
+                    },
+                    {
+                        "name": "dateRange_end_year",
+                        "url_key_string": "dateRange.end.year",
+                        "type": "part_of_date",
+                        "part_of_date_name": "year",
+                        "offset_type": "from_today",
+                        "offset_value": "1",
+                        "offset_unity": "days",
+                        "position": "end",
+                        "output_type": "kwarg"
                     }
-                }
+                ]
             }
         }
     },
@@ -390,32 +395,24 @@
                 "download",
                 "insert"
             ],
+            "exclude_existing_in_db": false,
             "source": "bing",
-            "destination": "s3",
+            "destination": "redshift",
             "request_data_source": "redshift",
             "model": "demographic_metrics",
-            "exclude_existing_in_db":false,
-            "url": {
+            "data_source": {
+                "name": "accounts",
+                "raw_sql": "select id from {schema}.accounts"
+            },
+            "query": {
                 "type": "service",
                 "service_name": "ReportingService",
-                "params": {
-                    "db": {
-                        "_": {
-                            "type": "db",
-                            "db_fields": [
-                                {
-                                    "origin_key": "id",
-                                    "destination_key": "AccountIds"
-                                }
-                            ],
-                            "filter_model": "accounts",
-                            "all_fields": [
-                                "id"
-                            ]
-                        }
-                    },
-                    "statics": {
-                        "AdTypes": [
+                "params": [
+                    {
+                        "name": "AdTypes",
+                        "type": "constant",
+                        "output_type": "arg",
+                        "value": [
                             "AppInstall",
                             "DynamicSearch",
                             "ExpandedText",
@@ -425,59 +422,82 @@
                             "Text"
                         ]
                     },
-                    "dynamics": {
-                        "start_date": {
-                            "type": "group",
-                            "offset_type": "from_today",
-                            "offset_unity": "days",
-                            "offset_value": "1",
-                            "offset_range_position": "start_day",
-                            "url_params": {
-                                "dateRange.start.day": {
-                                    "type": "filter_by",
-                                    "value_type": "date",
-                                    "url_query_parameter_value": "{day}",
-                                    "offset": ""
-                                },
-                                "dateRange.start.month": {
-                                    "type": "filter_by",
-                                    "value_type": "date",
-                                    "url_query_parameter_value": "{month}"
-                                },
-                                "dateRange.start.year": {
-                                    "type": "filter_by",
-                                    "value_type": "date",
-                                    "url_query_parameter_value": "{year}"
-                                }
-                            }
-                        },
-                        "end_date": {
-                            "type": "group",
-                            "offset_type": "from_today",
-                            "offset_unity": "days",
-                            "offset_value": "1",
-                            "offset_range_position": "end_day",
-                            "url_params": {
-                                "dateRange.end.day": {
-                                    "type": "filter_by",
-                                    "value_type": "date",
-                                    "url_query_parameter_value": "{day}",
-                                    "offset": ""
-                                },
-                                "dateRange.end.month": {
-                                    "type": "filter_by",
-                                    "value_type": "date",
-                                    "url_query_parameter_value": "{month}"
-                                },
-                                "dateRange.end.year": {
-                                    "type": "filter_by",
-                                    "value_type": "date",
-                                    "url_query_parameter_value": "{year}"
-                                }
-                            }
-                        }
+                    {
+                        "name": "AccountId",
+                        "type": "db",
+                        "data_source_name": "accounts",
+                        "source_key": "id",
+                        "output_type": "kwarg",
+                        "chunck": true,
+                        "chunck_size": 50
+                    },
+                    {
+                        "name": "dateRange_start_day",
+                        "url_key_string": "dateRange.start.day",
+                        "type": "part_of_date",
+                        "part_of_date_name": "day",
+                        "offset_type": "from_today",
+                        "offset_value": "1",
+                        "offset_unity": "days",
+                        "position": "end",
+                        "output_type": "kwarg"
+                    },
+                    {
+                        "name": "dateRange_start_month",
+                        "url_key_string": "dateRange.start.month",
+                        "type": "part_of_date",
+                        "part_of_date_name": "month",
+                        "offset_type": "from_today",
+                        "offset_value": "1",
+                        "offset_unity": "days",
+                        "position": "end",
+                        "output_type": "kwarg"
+                    },
+                    {
+                        "name": "dateRange_start_year",
+                        "url_key_string": "dateRange.start.year",
+                        "type": "part_of_date",
+                        "part_of_date_name": "year",
+                        "offset_type": "from_today",
+                        "offset_value": "1",
+                        "offset_unity": "days",
+                        "position": "end",
+                        "output_type": "kwarg"
+                    },
+                    {
+                        "name": "dateRange_end_day",
+                        "url_key_string": "dateRange.end.day",
+                        "type": "part_of_date",
+                        "part_of_date_name": "day",
+                        "offset_type": "from_today",
+                        "offset_value": "1",
+                        "offset_unity": "days",
+                        "position": "end",
+                        "output_type": "kwarg"
+                    },
+                    {
+                        "name": "dateRange_end_month",
+                        "url_key_string": "dateRange.end.month",
+                        "type": "part_of_date",
+                        "part_of_date_name": "month",
+                        "offset_type": "from_today",
+                        "offset_value": "1",
+                        "offset_unity": "days",
+                        "position": "end",
+                        "output_type": "kwarg"
+                    },
+                    {
+                        "name": "dateRange_end_year",
+                        "url_key_string": "dateRange.end.year",
+                        "type": "part_of_date",
+                        "part_of_date_name": "year",
+                        "offset_type": "from_today",
+                        "offset_value": "1",
+                        "offset_unity": "days",
+                        "position": "end",
+                        "output_type": "kwarg"
                     }
-                }
+                ]
             }
         }
     },
@@ -487,32 +507,24 @@
                 "download",
                 "insert"
             ],
+            "exclude_existing_in_db": false,
             "source": "bing",
-            "destination": "s3",
+            "destination": "redshift",
             "request_data_source": "redshift",
             "model": "geographic_metrics",
-            "exclude_existing_in_db":false,
-            "url": {
+            "data_source": {
+                "name": "accounts",
+                "raw_sql": "select id from {schema}.accounts"
+            },
+            "query": {
                 "type": "service",
                 "service_name": "ReportingService",
-                "params": {
-                    "db": {
-                        "_": {
-                            "type": "db",
-                            "db_fields": [
-                                {
-                                    "origin_key": "id",
-                                    "destination_key": "AccountIds"
-                                }
-                            ],
-                            "filter_model": "accounts",
-                            "all_fields": [
-                                "id"
-                            ]
-                        }
-                    },
-                    "statics": {
-                        "AdTypes": [
+                "params": [
+                    {
+                        "name": "AdTypes",
+                        "type": "constant",
+                        "output_type": "arg",
+                        "value": [
                             "AppInstall",
                             "DynamicSearch",
                             "ExpandedText",
@@ -522,64 +534,199 @@
                             "Text"
                         ]
                     },
-                    "dynamics": {
-                        "start_date": {
-                            "type": "group",
-                            "offset_type": "from_today",
-                            "offset_unity": "days",
-                            "offset_value": "1",
-                            "offset_range_position": "start_day",
-                            "url_params": {
-                                "dateRange.start.day": {
-                                    "type": "filter_by",
-                                    "value_type": "date",
-                                    "url_query_parameter_value": "{day}",
-                                    "offset": ""
-                                },
-                                "dateRange.start.month": {
-                                    "type": "filter_by",
-                                    "value_type": "date",
-                                    "url_query_parameter_value": "{month}"
-                                },
-                                "dateRange.start.year": {
-                                    "type": "filter_by",
-                                    "value_type": "date",
-                                    "url_query_parameter_value": "{year}"
-                                }
-                            }
-                        },
-                        "end_date": {
-                            "type": "group",
-                            "offset_type": "from_today",
-                            "offset_unity": "days",
-                            "offset_value": "1",
-                            "offset_range_position": "end_day",
-                            "url_params": {
-                                "dateRange.end.day": {
-                                    "type": "filter_by",
-                                    "value_type": "date",
-                                    "url_query_parameter_value": "{day}",
-                                    "offset": ""
-                                },
-                                "dateRange.end.month": {
-                                    "type": "filter_by",
-                                    "value_type": "date",
-                                    "url_query_parameter_value": "{month}"
-                                },
-                                "dateRange.end.year": {
-                                    "type": "filter_by",
-                                    "value_type": "date",
-                                    "url_query_parameter_value": "{year}"
-                                }
-                            }
-                        }
+                    {
+                        "name": "AccountId",
+                        "type": "db",
+                        "data_source_name": "accounts",
+                        "source_key": "id",
+                        "output_type": "kwarg",
+                        "chunck": true,
+                        "chunck_size": 50
+                    },
+                    {
+                        "name": "dateRange_start_day",
+                        "url_key_string": "dateRange.start.day",
+                        "type": "part_of_date",
+                        "part_of_date_name": "day",
+                        "offset_type": "from_today",
+                        "offset_value": "1",
+                        "offset_unity": "days",
+                        "position": "end",
+                        "output_type": "kwarg"
+                    },
+                    {
+                        "name": "dateRange_start_month",
+                        "url_key_string": "dateRange.start.month",
+                        "type": "part_of_date",
+                        "part_of_date_name": "month",
+                        "offset_type": "from_today",
+                        "offset_value": "1",
+                        "offset_unity": "days",
+                        "position": "end",
+                        "output_type": "kwarg"
+                    },
+                    {
+                        "name": "dateRange_start_year",
+                        "url_key_string": "dateRange.start.year",
+                        "type": "part_of_date",
+                        "part_of_date_name": "year",
+                        "offset_type": "from_today",
+                        "offset_value": "1",
+                        "offset_unity": "days",
+                        "position": "end",
+                        "output_type": "kwarg"
+                    },
+                    {
+                        "name": "dateRange_end_day",
+                        "url_key_string": "dateRange.end.day",
+                        "type": "part_of_date",
+                        "part_of_date_name": "day",
+                        "offset_type": "from_today",
+                        "offset_value": "1",
+                        "offset_unity": "days",
+                        "position": "end",
+                        "output_type": "kwarg"
+                    },
+                    {
+                        "name": "dateRange_end_month",
+                        "url_key_string": "dateRange.end.month",
+                        "type": "part_of_date",
+                        "part_of_date_name": "month",
+                        "offset_type": "from_today",
+                        "offset_value": "1",
+                        "offset_unity": "days",
+                        "position": "end",
+                        "output_type": "kwarg"
+                    },
+                    {
+                        "name": "dateRange_end_year",
+                        "url_key_string": "dateRange.end.year",
+                        "type": "part_of_date",
+                        "part_of_date_name": "year",
+                        "offset_type": "from_today",
+                        "offset_value": "1",
+                        "offset_unity": "days",
+                        "position": "end",
+                        "output_type": "kwarg"
                     }
-                }
+                ]
             }
         }
     },
     {
         "daily_ad_metrics_update": {
+            "actions": [
+                "download",
+                "insert"
+            ],
+            "exclude_existing_in_db": false,
+            "source": "bing",
+            "destination": "redshift",
+            "request_data_source": "redshift",
+            "model": "ad_metrics",
+            "data_source": {
+                "name": "accounts",
+                "raw_sql": "select id from {schema}.accounts"
+            },
+            "query": {
+                "type": "service",
+                "service_name": "ReportingService",
+                "params": [
+                    {
+                        "name": "AdTypes",
+                        "type": "constant",
+                        "output_type": "arg",
+                        "value": [
+                            "AppInstall",
+                            "DynamicSearch",
+                            "ExpandedText",
+                            "Product",
+                            "ResponsiveAd",
+                            "ResponsiveSearchAd",
+                            "Text"
+                        ]
+                    },
+                    {
+                        "name": "AccountId",
+                        "type": "db",
+                        "data_source_name": "accounts",
+                        "source_key": "id",
+                        "output_type": "kwarg",
+                        "chunck": true,
+                        "chunck_size": 50
+                    },
+                    {
+                        "name": "dateRange_start_day",
+                        "url_key_string": "dateRange.start.day",
+                        "type": "part_of_date",
+                        "part_of_date_name": "day",
+                        "offset_type": "from_today",
+                        "offset_value": "1",
+                        "offset_unity": "days",
+                        "position": "end",
+                        "output_type": "kwarg"
+                    },
+                    {
+                        "name": "dateRange_start_month",
+                        "url_key_string": "dateRange.start.month",
+                        "type": "part_of_date",
+                        "part_of_date_name": "month",
+                        "offset_type": "from_today",
+                        "offset_value": "1",
+                        "offset_unity": "days",
+                        "position": "end",
+                        "output_type": "kwarg"
+                    },
+                    {
+                        "name": "dateRange_start_year",
+                        "url_key_string": "dateRange.start.year",
+                        "type": "part_of_date",
+                        "part_of_date_name": "year",
+                        "offset_type": "from_today",
+                        "offset_value": "1",
+                        "offset_unity": "days",
+                        "position": "end",
+                        "output_type": "kwarg"
+                    },
+                    {
+                        "name": "dateRange_end_day",
+                        "url_key_string": "dateRange.end.day",
+                        "type": "part_of_date",
+                        "part_of_date_name": "day",
+                        "offset_type": "from_today",
+                        "offset_value": "1",
+                        "offset_unity": "days",
+                        "position": "end",
+                        "output_type": "kwarg"
+                    },
+                    {
+                        "name": "dateRange_end_month",
+                        "url_key_string": "dateRange.end.month",
+                        "type": "part_of_date",
+                        "part_of_date_name": "month",
+                        "offset_type": "from_today",
+                        "offset_value": "1",
+                        "offset_unity": "days",
+                        "position": "end",
+                        "output_type": "kwarg"
+                    },
+                    {
+                        "name": "dateRange_end_year",
+                        "url_key_string": "dateRange.end.year",
+                        "type": "part_of_date",
+                        "part_of_date_name": "year",
+                        "offset_type": "from_today",
+                        "offset_value": "1",
+                        "offset_unity": "days",
+                        "position": "end",
+                        "output_type": "kwarg"
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "daily_ad_metrics_update_old": {
             "actions": [
                 "download",
                 "insert"
@@ -673,45 +820,6 @@
                     }
                 }
             }
-        }
-    },
-    {
-        "daily_demographic_metrics_update_s3_to_reshift": {
-            "actions": [
-                "copy"
-            ],
-            "source": "s3",
-            "destination": "redshift",
-            "model": "demographic_metrics",
-            "request_data_source": "redshift",
-            "s3_source_task": "daily_demographic_metrics_update",
-            "url": {}
-        }
-    },
-    {
-        "daily_user_location_metrics_update_s3_to_reshift": {
-            "actions": [
-                "copy"
-            ],
-            "source": "s3",
-            "destination": "redshift",
-            "model": "user_location_metrics",
-            "request_data_source": "redshift",
-            "s3_source_task": "daily_user_location_metrics_update",
-            "url": {}
-        }
-    },
-    {
-        "daily_geographic_metrics_update_s3_to_reshift": {
-            "actions": [
-                "copy"
-            ],
-            "source": "s3",
-            "destination": "redshift",
-            "model": "geographic_metrics",
-            "request_data_source": "redshift",
-            "s3_source_task": "daily_geographic_metrics_update",
-            "url": {}
         }
     }
 ]
