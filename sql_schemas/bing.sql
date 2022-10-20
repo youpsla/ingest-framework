@@ -122,19 +122,6 @@ DISTSTYLE AUTO
 -- ALTER TABLE bing_production.medias owner to jabmo;
 
 
-CREATE TABLE IF NOT EXISTS bing_production.media_associations
-(
-	jab_id INT IDENTITY(1,1)
-	,jab_created_at TIMESTAMP WITHOUT TIME ZONE   ENCODE az64 default sysdate
-	,entity_id BIGINT   ENCODE az64
-	,media_enabled_entity VARCHAR(255)   ENCODE lzo
-	,media_id BIGINT   ENCODE az64
-)
-DISTSTYLE AUTO
-;
--- ALTER TABLE bing_production.media_associations owner to jabmo;
-
-
 CREATE TABLE IF NOT EXISTS bing_production.geographic_metrics
 (
 	jab_id INT IDENTITY(1,1)

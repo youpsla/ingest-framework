@@ -194,26 +194,6 @@
                 ]
             }
         },
-        "media_associations": {
-            "entity_id": {
-                "type": "raw",
-                "source_path": [
-                    "EntityId"
-                ]
-            },
-            "media_enabled_entity": {
-                "type": "raw",
-                "source_path": [
-                    "MediaEnabledEntity"
-                ]
-            },
-            "media_id": {
-                "type": "raw",
-                "source_path": [
-                    "MediaId"
-                ]
-            }
-        },
         "demographic_metrics": {
             "time_period": {
                 "type": "raw",

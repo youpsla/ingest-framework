@@ -12,7 +12,6 @@
         "daily_adgroups_update",
         "daily_ads_update",
         "daily_medias_update",
-        "daily_media_associations_update",
         "daily_ad_metrics_update",
         "daily_user_location_metrics_update",
         "daily_demographic_metrics_update",

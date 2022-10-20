@@ -207,62 +207,6 @@
         }
     },
     {
-        "daily_media_associations_update": {
-            "actions": [
-                "insert",
-                "update"
-            ],
-            "exclude_existing_in_db": true,
-            "exclude_key": "id",
-            "source": "bing",
-            "destination": "redshift",
-            "destination_unique_keys": [
-                "entity_id",
-                "media_id"
-            ],
-            "update_keys": ["entity_id", "media_id"],
-            "request_data_source": "redshift",
-            "model": "media_associations",
-            "data_source": {
-                "name": "accounts",
-                "raw_sql": "select id as media_id, account_id from {schema}.medias"
-            },
-            "query": {
-                "type": "service",
-                "service_name": "CampaignManagementService",
-                "response_datas_key": [
-                    "MediaAssociations",
-                    "ArrayOfMediaAssociation",
-                    0,
-                    "MediaAssociation"
-                    
-                ],
-                "params": [
-                    {
-                        "name": "AccountId",
-                        "type": "db",
-                        "data_source_name": "accounts",
-                        "source_key": "account_id",
-                        "output_type": "kwarg"
-                    },
-                    {
-                        "name": "MediaIds",
-                        "type": "db",
-                        "data_source_name": "accounts",
-                        "source_key": "media_id",
-                        "output_type": "arg"
-                    },
-                    {
-                        "name": "MediaEnabledEntities",
-                        "type": "constant",
-                        "value": "ResponsiveAd ImageAdExtension",
-                        "output_type": "kwarg"
-                    }
-                ]
-            }
-        }
-    },
-    {
         "daily_user_location_metrics_update": {
             "actions": [
                 "download",
