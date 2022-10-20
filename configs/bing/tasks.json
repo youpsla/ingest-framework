@@ -238,7 +238,7 @@
                         "type": "part_of_date",
                         "part_of_date_name": "day",
                         "offset_type": "from_today",
-                        "offset_value": "2",
+                        "offset_value": "1",
                         "offset_unity": "days",
                         "position": "end",
                         "output_type": "kwarg"
@@ -249,7 +249,7 @@
                         "type": "part_of_date",
                         "part_of_date_name": "month",
                         "offset_type": "from_today",
-                        "offset_value": "2",
+                        "offset_value": "1",
                         "offset_unity": "days",
                         "position": "end",
                         "output_type": "kwarg"
@@ -260,7 +260,7 @@
                         "type": "part_of_date",
                         "part_of_date_name": "year",
                         "offset_type": "from_today",
-                        "offset_value": "2",
+                        "offset_value": "1",
                         "offset_unity": "days",
                         "position": "end",
                         "output_type": "kwarg"
@@ -350,7 +350,7 @@
                         "type": "part_of_date",
                         "part_of_date_name": "day",
                         "offset_type": "from_today",
-                        "offset_value": "2",
+                        "offset_value": "1",
                         "offset_unity": "days",
                         "position": "end",
                         "output_type": "kwarg"
@@ -361,7 +361,7 @@
                         "type": "part_of_date",
                         "part_of_date_name": "month",
                         "offset_type": "from_today",
-                        "offset_value": "2",
+                        "offset_value": "1",
                         "offset_unity": "days",
                         "position": "end",
                         "output_type": "kwarg"
@@ -372,7 +372,7 @@
                         "type": "part_of_date",
                         "part_of_date_name": "year",
                         "offset_type": "from_today",
-                        "offset_value": "2",
+                        "offset_value": "1",
                         "offset_unity": "days",
                         "position": "end",
                         "output_type": "kwarg"
@@ -462,7 +462,7 @@
                         "type": "part_of_date",
                         "part_of_date_name": "day",
                         "offset_type": "from_today",
-                        "offset_value": "2",
+                        "offset_value": "1",
                         "offset_unity": "days",
                         "position": "end",
                         "output_type": "kwarg"
@@ -473,7 +473,7 @@
                         "type": "part_of_date",
                         "part_of_date_name": "month",
                         "offset_type": "from_today",
-                        "offset_value": "2",
+                        "offset_value": "1",
                         "offset_unity": "days",
                         "position": "end",
                         "output_type": "kwarg"
@@ -484,7 +484,7 @@
                         "type": "part_of_date",
                         "part_of_date_name": "year",
                         "offset_type": "from_today",
-                        "offset_value": "2",
+                        "offset_value": "1",
                         "offset_unity": "days",
                         "position": "end",
                         "output_type": "kwarg"
@@ -574,7 +574,7 @@
                         "type": "part_of_date",
                         "part_of_date_name": "day",
                         "offset_type": "from_today",
-                        "offset_value": "2",
+                        "offset_value": "1",
                         "offset_unity": "days",
                         "position": "end",
                         "output_type": "kwarg"
@@ -585,7 +585,7 @@
                         "type": "part_of_date",
                         "part_of_date_name": "month",
                         "offset_type": "from_today",
-                        "offset_value": "2",
+                        "offset_value": "1",
                         "offset_unity": "days",
                         "position": "end",
                         "output_type": "kwarg"
@@ -596,7 +596,7 @@
                         "type": "part_of_date",
                         "part_of_date_name": "year",
                         "offset_type": "from_today",
-                        "offset_value": "2",
+                        "offset_value": "1",
                         "offset_unity": "days",
                         "position": "end",
                         "output_type": "kwarg"
