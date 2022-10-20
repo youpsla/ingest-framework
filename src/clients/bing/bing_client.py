@@ -5,11 +5,14 @@ import uuid
 from datetime import datetime
 
 from bingads.v13.bulk import *
-from bingads.v13.reporting.reporting_service_manager import \
-    ReportingServiceManager
-from src.clients.bing.auth_helper import (DEVELOPER_TOKEN, AuthorizationData,
-                                          ServiceClient, authenticate,
-                                          output_status_message)
+from bingads.v13.reporting.reporting_service_manager import ReportingServiceManager
+from src.clients.bing.auth_helper import (
+    DEVELOPER_TOKEN,
+    AuthorizationData,
+    ServiceClient,
+    authenticate,
+    output_status_message,
+)
 from src.commons.client import Client
 from src.utils.various_utils import nested_get, recursive_asdict
 
@@ -60,7 +63,7 @@ class BingAdsClient(Client):
 
         result = []
 
-        if self.task.name in ["daily_ads_update"]:
+        if self.task.name in ["daily_ads_update", "daily_adgroups_update"]:
             final_result = []
             if db_params:
                 original_db_params = {
@@ -85,6 +88,7 @@ class BingAdsClient(Client):
                     # Download all campaigns, ad groups, and ads in the account.
                     task_entities = {
                         "daily_ads_update": ["Ads"],
+                        "daily_adgroups_update": ["AdGroups"],
                     }
                     entities = task_entities[self.task.name]
 
@@ -257,14 +261,6 @@ class ServiceRequest:
 
             result = self.service.GetCampaignsByAccountId(**self.kwargs)
 
-            result = recursive_asdict(result)
-            result = nested_get(result, self.task.params["query"]["response_datas_key"])
-            return result
-
-        if self.task.name == "daily_adgroups_update":
-
-            # TODO: Generic way of managing params here
-            result = self.service.GetAdGroupsByCampaignId(**self.kwargs)
             result = recursive_asdict(result)
             result = nested_get(result, self.task.params["query"]["response_datas_key"])
             return result

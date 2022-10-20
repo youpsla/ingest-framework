@@ -1,10 +1,7 @@
 {
     "name": "bing",
     "daily_tasks_list" : [
-        "daily_ad_metrics_update",
-        "daily_user_location_metrics_update",
-        "daily_demographic_metrics_update",
-        "daily_geographic_metrics_update"
+        "daily_adgroups_update"
     ],
     "bck_daily_tasks_list" : [
         "daily_accounts_update",

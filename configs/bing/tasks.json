@@ -85,33 +85,17 @@
             "model": "adgroups",
             "update_keys": ["id"],
             "data_source": {
-                "name": "campaigns",
-                "raw_sql": "select id, accountid from {schema}.campaigns"
+                "name": "accounts",
+                "raw_sql": "select id from {schema}.accounts"
             },
-            "fields_to_add_to_api_result": [
-                {
-                    "name": "campaign_id",
-                    "origin_key": "CampaignId",
-                    "destination_key": "CampaignId"
-                }
-            ],
             "query": {
                 "type": "service",
-                "service_name": "CampaignManagementService",
-                "response_datas_key": ["AdGroup"],
                 "params": [
-                    {
-                        "name": "CampaignId",
-                        "type": "db",
-                        "data_source_name": "campaigns",
-                        "source_key": "id",
-                        "output_type": "kwarg"
-                    },
                     {
                         "name": "AccountId",
                         "type": "db",
-                        "data_source_name": "campaigns",
-                        "source_key": "accountid",
+                        "data_source_name": "accounts",
+                        "source_key": "id",
                         "output_type": "kwarg"
                     }
                 ]
@@ -134,8 +118,7 @@
             "update_keys": ["id"],
             "data_source": {
                 "name": "adgroups",
-                "raw_sql": "select id from {schema}.accounts",
-
+                "raw_sql": "select id from {schema}.accounts"
             },
             "query": {
                 "type": "service",

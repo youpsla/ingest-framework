@@ -74,7 +74,7 @@
             "name": {
                 "type": "raw",
                 "source_path": [
-                    "Name"
+                    "Ad Group"
                 ]
             },
             "status": {
@@ -86,7 +86,7 @@
             "campaignid": {
                 "type": "raw",
                 "source_path": [
-                    "CampaignId"
+                    "Parent Id"
                 ]
             }
         },
