@@ -424,6 +424,11 @@ class Field:
                     self.transform_function["split_caracter"],
                     self.transform_function["split_position"],
                 )
+            if self.transform_function["type"] == "empty_string_to_none":
+                if self.value == "":
+                    result = None
+                else:
+                    result = self.value
 
         return self.get_sql_escaped(result)
 

@@ -61,6 +61,7 @@ CREATE TABLE IF NOT EXISTS bing_production.ads
 	,status VARCHAR(255)   ENCODE lzo
 	,adgroupid BIGINT   ENCODE az64
 	,display_url VARCHAR(512)   ENCODE lzo
+    ,media_id BIGINT   ENCODE az64
 )
 DISTSTYLE AUTO
 ;

@@ -144,10 +144,7 @@ class Task:
                     result_file_path, newline="", encoding="utf-8-sig"
                 ) as csv_file:
                     tmp = csv.DictReader(csv_file)
-                    # source_data = list(map(lambda t: {"datas": t}, tmp))
                     source_data = list(tmp)
-                    # for t in tmp:
-                    #     source_data.append({"datas": t})
 
         if "transfer" in self.actions:
             self.destination.upload_and_delete_source()
@@ -162,7 +159,6 @@ class Task:
             # Search for new records and insert them.
             if data_objs:
                 if self.params.get("exclude_existing_in_db"):
-                    # if getattr(self.params, "exclude_existing_in_db", None):
                     existing_ids = [
                         "".join(
                             str(r[e])

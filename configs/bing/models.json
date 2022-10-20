@@ -112,6 +112,47 @@
             "adgroupid": {
                 "type": "raw",
                 "source_path": [
+                    "Parent Id"
+                ]
+            },
+            "display_url": {
+                "type": "raw",
+                "source_path": [
+                    "Final Url"
+                ]
+            },
+            "media_id": {
+                "type": "function",
+                "source_path": [
+                    "Landscape Image Media Id"
+                ],
+                "transform_function": {
+                    "type": "empty_string_to_none"
+                }
+            }
+        },
+        "ads_request_version": {
+            "id": {
+                "type": "raw",
+                "source_path": [
+                    "Id"
+                ]
+            },
+            "type": {
+                "type": "raw",
+                "source_path": [
+                    "Type"
+                ]
+            },
+            "status": {
+                "type": "raw",
+                "source_path": [
+                    "Status"
+                ]
+            },
+            "adgroupid": {
+                "type": "raw",
+                "source_path": [
                     "AdGroupId"
                 ]
             },

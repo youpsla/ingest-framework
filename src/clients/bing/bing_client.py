@@ -1,13 +1,10 @@
 import copy
+import csv
 import time
+import uuid
 from datetime import datetime
 
-# Unusual import for preventing circular import.
-# Import module instead of file.
-import src.clients.s3 as s3
-from bingads.v13.reporting.reporting_download_parameters import (
-    ReportingDownloadParameters,
-)
+from bingads.v13.bulk import *
 from bingads.v13.reporting.reporting_service_manager import ReportingServiceManager
 from src.clients.bing.auth_helper import (
     DEVELOPER_TOKEN,
@@ -18,6 +15,10 @@ from src.clients.bing.auth_helper import (
 )
 from src.commons.client import Client
 from src.utils.various_utils import nested_get, recursive_asdict
+
+# Unusual import for preventing circular import.
+# Import module instead of file.
+
 
 # The report file extension type.
 REPORT_FILE_FORMAT = "Csv"
@@ -42,19 +43,90 @@ class BingAdsClient(Client):
         statics_params = self.get_statics_params(query_params)
         return dynamics_params + statics_params
 
+    def get_data_from_file_path_list(self, result_file_path_list):
+        result = []
+        for f in result_file_path_list:
+            with open(f, newline="", encoding="utf-8-sig") as csv_file:
+                tmp = list(csv.DictReader(csv_file))
+                tmp = [
+                    i
+                    for i in tmp
+                    if i["Type"] not in ["Image", "Format Version", "Account"]
+                ]
+                result.extend(list(tmp))
+        return result
+
     def get(self, task_params):
 
         db_params = self.get_request_params()
         print(f"Number of requests to run: {len(db_params)}")
 
         result = []
+
+        if self.task.name in ["daily_ads_update"]:
+            final_result = []
+            if db_params:
+                original_db_params = {
+                    key: copy.deepcopy(value) for key, value in db_params.items()
+                }
+                result_file_path_list = []
+                for k, v in db_params.items():
+                    self.authorization_data = AuthorizationData(
+                        account_id=v["AccountId"],
+                        customer_id=None,
+                        developer_token=DEVELOPER_TOKEN,
+                        authentication=None,
+                    )
+
+                    bulk_service_manager = BulkServiceManager(
+                        authorization_data=self.authorization_data,
+                        poll_interval_in_milliseconds=5000,
+                        environment="production",
+                    )
+
+                    authenticate(self.authorization_data)
+                    # Download all campaigns, ad groups, and ads in the account.
+                    task_entities = {
+                        "daily_ads_update": ["Ads"],
+                    }
+                    entities = task_entities[self.task.name]
+
+                    # DownloadParameters is used for Option A below.
+
+                    download_parameters = DownloadParameters(
+                        # campaign_ids={"Int64": v["id"].split(",")},
+                        campaign_ids=None,
+                        data_scope=["EntityData"],
+                        download_entities=entities,
+                        file_type="Csv",
+                        last_sync_time_in_utc=None,
+                        result_file_directory=FILE_DIRECTORY,
+                        result_file_name="ingest_" + str(uuid.uuid4()) + ".csv",
+                        overwrite_result_file=True,  # Set this value true if you want to overwrite the same file.
+                        timeout_in_milliseconds=TIMEOUT_IN_MILLISECONDS,  # You may optionally cancel the download after a specified time interval.
+                    )
+
+                    output_status_message("-----\nAwaiting Background Completion...")
+                    result_file_path = bulk_service_manager.download_file(
+                        download_parameters
+                    )
+                    result_file_path_list.append(result_file_path)
+                    output_status_message(
+                        "Download result file: {0}".format(result_file_path)
+                    )
+
+                # We aggregate all results in files into one list of dicts for insertion.
+                result = self.get_data_from_file_path_list(
+                    result_file_path_list
+                )  # noqa501
+                return result
+
         if self.task.name in [
             "daily_user_location_metrics_update",
             "daily_demographic_metrics_update",
             "daily_geographic_metrics_update",
             "daily_ad_metrics_update",
         ]:
-            final_result = []
             if db_params:
                 original_db_params = {
                     key: copy.deepcopy(value) for key, value in db_params.items()
@@ -278,26 +350,6 @@ class ReportManager:
         )
         self.report_request = report_request
 
-    def get_reporting_download_parameters(self):
-        reporting_download_parameters = ReportingDownloadParameters(
-            report_request=self.report_request,
-            result_file_directory=FILE_DIRECTORY,
-            result_file_name="staging.csv",
-            overwrite_result_file=True,  # Set this value true if you want to overwrite the same file.
-            timeout_in_milliseconds=TIMEOUT_IN_MILLISECONDS,  # You may optionally cancel the download after a specified time interval.
-        )
-        return reporting_download_parameters
-
-    def background_completion(self, reporting_download_parameters):
-        """You can submit a download request and the ReportingServiceManager will automatically
-        return results. The ReportingServiceManager abstracts the details of checking for result file
-        completion, and you don't have to write any code for results polling."""
-
-        result_file_path = self.reporting_service_manager.download_file(
-            reporting_download_parameters
-        )
-        return result_file_path
-
     def get_result_file_name(self, report_name):
         """Generate the filename of the report
 
@@ -355,7 +407,8 @@ class ReportManager:
 
         result_file_path = reporting_download_operation.download_result_file(
             result_file_directory=FILE_DIRECTORY,
-            result_file_name="staging.csv",
+            # result_file_name="staging.csv",
+            result_file_name=self.get_result_file_name(self.report_request.ReportName),
             decompress=True,
             overwrite=True,  # Set this value true if you want to overwrite the same file.
             timeout_in_milliseconds=TIMEOUT_IN_MILLISECONDS,  # You may optionally cancel the download after a specified time interval.
@@ -418,7 +471,7 @@ class ReportRequest:
         report_request.Format = self.report_file_format
         report_request.ReturnOnlyCompleteData = self.return_only_complete_data
         report_request.Time = self.get_custom_date_range()
-        report_request.ReportName = "My User Location Performance Report"
+        report_request.ReportName = "user_location_performance_report"
 
         scope = self.service.factory.create("AccountThroughAdGroupReportScope")
 
@@ -471,7 +524,7 @@ class ReportRequest:
         report_request.Format = self.report_file_format
         report_request.ReturnOnlyCompleteData = self.return_only_complete_data
         report_request.Time = self.get_custom_date_range()
-        report_request.ReportName = "My User Location Performance Report"
+        report_request.ReportName = "professional_demographics_audience_report"
         scope = self.service.factory.create("AccountThroughAdGroupReportScope")
         setattr(
             scope,
@@ -518,7 +571,7 @@ class ReportRequest:
         report_request.Format = self.report_file_format
         report_request.ReturnOnlyCompleteData = self.return_only_complete_data
         report_request.Time = self.get_custom_date_range()
-        report_request.ReportName = "My User Location Performance Report"
+        report_request.ReportName = "geographic_performance_report"
         scope = self.service.factory.create("AccountThroughAdGroupReportScope")
         setattr(
             scope,
@@ -565,7 +618,7 @@ class ReportRequest:
         report_request.Format = self.report_file_format
         report_request.ReturnOnlyCompleteData = self.return_only_complete_data
         report_request.Time = self.get_custom_date_range()
-        report_request.ReportName = "Ad Performance Report"
+        report_request.ReportName = "ad_performance_report"
         scope = self.service.factory.create("AccountThroughAdGroupReportScope")
         setattr(
             scope,

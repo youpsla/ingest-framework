@@ -134,16 +134,9 @@
             "update_keys": ["id"],
             "data_source": {
                 "name": "adgroups",
-                "raw_sql_old": "select adg.id as adgroupid, cam.accountid as accountid from {schema}.adgroups adg inner join {schema}.campaigns cam on cam.id=adg.campaignid",
-                "raw_sql": "select listagg(adg.id, ',') as adgroupid, cam.accountid as accountid from bing_d{schema}evelopment.adgroups adg inner join {schema}.campaigns cam on cam.id=adg.campaignid group by cam.accountid"
+                "raw_sql": "select id from {schema}.accounts",
+
             },
-            "fields_to_add_to_api_result": [
-                {
-                    "name": "adgroup_id",
-                    "origin_key": "AdGroupId",
-                    "destination_key": "AdGroupId"
-                }
-            ],
             "query": {
                 "type": "service",
                 "service_name": "CampaignManagementService",
@@ -153,14 +146,7 @@
                         "name": "AccountId",
                         "type": "db",
                         "data_source_name": "adgroups",
-                        "source_key": "accountid",
-                        "output_type": "kwarg"
-                    },
-                    {
-                        "name": "AdGroupId",
-                        "type": "db",
-                        "data_source_name": "adgroups",
-                        "source_key": "adgroupid",
+                        "source_key": "id",
                         "output_type": "kwarg"
                     }
                 ]
@@ -325,7 +311,7 @@
                         "type": "part_of_date",
                         "part_of_date_name": "day",
                         "offset_type": "from_today",
-                        "offset_value": "1",
+                        "offset_value": "2",
                         "offset_unity": "days",
                         "position": "end",
                         "output_type": "kwarg"
@@ -336,7 +322,7 @@
                         "type": "part_of_date",
                         "part_of_date_name": "month",
                         "offset_type": "from_today",
-                        "offset_value": "1",
+                        "offset_value": "2",
                         "offset_unity": "days",
                         "position": "end",
                         "output_type": "kwarg"
@@ -347,7 +333,7 @@
                         "type": "part_of_date",
                         "part_of_date_name": "year",
                         "offset_type": "from_today",
-                        "offset_value": "1",
+                        "offset_value": "2",
                         "offset_unity": "days",
                         "position": "end",
                         "output_type": "kwarg"
@@ -437,7 +423,7 @@
                         "type": "part_of_date",
                         "part_of_date_name": "day",
                         "offset_type": "from_today",
-                        "offset_value": "1",
+                        "offset_value": "2",
                         "offset_unity": "days",
                         "position": "end",
                         "output_type": "kwarg"
@@ -448,7 +434,7 @@
                         "type": "part_of_date",
                         "part_of_date_name": "month",
                         "offset_type": "from_today",
-                        "offset_value": "1",
+                        "offset_value": "2",
                         "offset_unity": "days",
                         "position": "end",
                         "output_type": "kwarg"
@@ -459,7 +445,7 @@
                         "type": "part_of_date",
                         "part_of_date_name": "year",
                         "offset_type": "from_today",
-                        "offset_value": "1",
+                        "offset_value": "2",
                         "offset_unity": "days",
                         "position": "end",
                         "output_type": "kwarg"
@@ -549,7 +535,7 @@
                         "type": "part_of_date",
                         "part_of_date_name": "day",
                         "offset_type": "from_today",
-                        "offset_value": "1",
+                        "offset_value": "2",
                         "offset_unity": "days",
                         "position": "end",
                         "output_type": "kwarg"
@@ -560,7 +546,7 @@
                         "type": "part_of_date",
                         "part_of_date_name": "month",
                         "offset_type": "from_today",
-                        "offset_value": "1",
+                        "offset_value": "2",
                         "offset_unity": "days",
                         "position": "end",
                         "output_type": "kwarg"
@@ -571,7 +557,7 @@
                         "type": "part_of_date",
                         "part_of_date_name": "year",
                         "offset_type": "from_today",
-                        "offset_value": "1",
+                        "offset_value": "2",
                         "offset_unity": "days",
                         "position": "end",
                         "output_type": "kwarg"
@@ -661,7 +647,7 @@
                         "type": "part_of_date",
                         "part_of_date_name": "day",
                         "offset_type": "from_today",
-                        "offset_value": "1",
+                        "offset_value": "2",
                         "offset_unity": "days",
                         "position": "end",
                         "output_type": "kwarg"
@@ -672,7 +658,7 @@
                         "type": "part_of_date",
                         "part_of_date_name": "month",
                         "offset_type": "from_today",
-                        "offset_value": "1",
+                        "offset_value": "2",
                         "offset_unity": "days",
                         "position": "end",
                         "output_type": "kwarg"
@@ -683,7 +669,7 @@
                         "type": "part_of_date",
                         "part_of_date_name": "year",
                         "offset_type": "from_today",
-                        "offset_value": "1",
+                        "offset_value": "2",
                         "offset_unity": "days",
                         "position": "end",
                         "output_type": "kwarg"
@@ -722,103 +708,6 @@
                         "output_type": "kwarg"
                     }
                 ]
-            }
-        }
-    },
-    {
-        "daily_ad_metrics_update_old": {
-            "actions": [
-                "download",
-                "insert"
-            ],
-            "source": "bing",
-            "destination": "s3",
-            "request_data_source": "redshift",
-            "model": "ad_metrics",
-            "exclude_existing_in_db":false,
-            "url": {
-                "type": "service",
-                "service_name": "ReportingService",
-                "params": {
-                    "db": {
-                        "_": {
-                            "type": "db",
-                            "db_fields": [
-                                {
-                                    "origin_key": "id",
-                                    "destination_key": "AccountIds"
-                                }
-                            ],
-                            "filter_model": "accounts",
-                            "all_fields": [
-                                "id"
-                            ]
-                        }
-                    },
-                    "statics": {
-                        "AdTypes": [
-                            "AppInstall",
-                            "DynamicSearch",
-                            "ExpandedText",
-                            "Product",
-                            "ResponsiveAd",
-                            "ResponsiveSearchAd",
-                            "Text"
-                        ]
-                    },
-                    "dynamics": {
-                        "start_date": {
-                            "type": "group",
-                            "offset_type": "from_today",
-                            "offset_unity": "days",
-                            "offset_value": "1",
-                            "offset_range_position": "start_day",
-                            "url_params": {
-                                "dateRange.start.day": {
-                                    "type": "filter_by",
-                                    "value_type": "date",
-                                    "url_query_parameter_value": "{day}",
-                                    "offset": ""
-                                },
-                                "dateRange.start.month": {
-                                    "type": "filter_by",
-                                    "value_type": "date",
-                                    "url_query_parameter_value": "{month}"
-                                },
-                                "dateRange.start.year": {
-                                    "type": "filter_by",
-                                    "value_type": "date",
-                                    "url_query_parameter_value": "{year}"
-                                }
-                            }
-                        },
-                        "end_date": {
-                            "type": "group",
-                            "offset_type": "from_today",
-                            "offset_unity": "days",
-                            "offset_value": "1",
-                            "offset_range_position": "end_day",
-                            "url_params": {
-                                "dateRange.end.day": {
-                                    "type": "filter_by",
-                                    "value_type": "date",
-                                    "url_query_parameter_value": "{day}",
-                                    "offset": ""
-                                },
-                                "dateRange.end.month": {
-                                    "type": "filter_by",
-                                    "value_type": "date",
-                                    "url_query_parameter_value": "{month}"
-                                },
-                                "dateRange.end.year": {
-                                    "type": "filter_by",
-                                    "value_type": "date",
-                                    "url_query_parameter_value": "{year}"
-                                }
-                            }
-                        }
-                    }
-                }
             }
         }
     }

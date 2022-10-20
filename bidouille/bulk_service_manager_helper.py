@@ -18,10 +18,10 @@ CAMPAIGN_ID_KEY = -123
 AD_GROUP_ID_KEY = -1234
 
 # The directory for the bulk files.
-FILE_DIRECTORY = "/Users/alain/Projects/tmp/"
+FILE_DIRECTORY = "/tmp/"
 
 # The name of the bulk download file.
-DOWNLOAD_FILE_NAME = "download.csv"
+DOWNLOAD_FILE_NAME = "download_bulk.csv"
 
 # The name of the bulk upload file.
 UPLOAD_FILE_NAME = "upload.csv"
