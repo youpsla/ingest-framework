@@ -430,6 +430,11 @@ class Field:
                 else:
                     result = self.value
 
+        # Sometimes the value to insert in a INT field in Redshift is an empty string. This lead to an error.
+        # We set result to None if result == "". THis produce a null value in redshift.
+        if result == "":
+            result = None
+
         return self.get_sql_escaped(result)
 
     def get_sql_escaped(self, value):

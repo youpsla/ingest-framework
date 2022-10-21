@@ -178,71 +178,6 @@
         }
     },
     {
-        "organizations_monthly_update": {
-            "comment":"For Younes: It could be that organization_id in pivot_member_company are not in organizations table. This is because we can't retrieve anymore those organizations name for various reasons. Please set a default unknown name instead.",
-            "comment_2": "We have to create another task running at a custom schedule to update organizations",
-            "actions": [
-                "insert",
-                "update"
-            ],
-            "exclude_existing_in_db": true,
-            "destination_unique_keys": [
-                "id"
-            ],
-            "source": "linkedin",
-            "destination": "redshift",
-            "request_data_source": "redshift",
-            "model": "organizations",
-            "update_keys": [
-                "id"
-            ],
-            "data_source": {
-                "name": "organizations_id",
-                "raw_sql": "select distinct(organization_id) from {schema}.pivot_member_company where organization_id not in (select distinct(id) from {schema}.organizations)"
-            },
-            "query": {
-                "response_datas_key": "results",
-                "template": "{base}{api_name}/{service}?{organization_id}",
-                "params": [
-                    {
-                        "name": "base",
-                        "type": "constant",
-                        "output_type": "arg",
-                        "value": "https://api.linkedin.com/"
-                    },
-                    {
-                        "name": "api_name",
-                        "type": "constant",
-                        "output_type": "arg",
-                        "value": "rest"
-                    },
-                    {
-                        "name": "service",
-                        "type": "constant",
-                        "output_type": "arg",
-                        "value": "organizationsLookup"
-                    },
-                    {
-                        "name": "organization_id",
-                        "type": "db",
-                        "url_key_string": "ids",
-                        "data_source_name": "organizations_id",
-                        "source_key": "organization_id",
-                        "output_type": "kwarg",
-                        "template": "List({})",
-                        "urlencode": false,
-                        "chunck": true,
-                        "chunck_size": 50
-                    }
-                ]
-            },
-            "request_header": {
-                "Linkedin-Version": "202206",
-                "X-Restli-Protocol-Version": "2.0.0"
-            }
-        }
-    },
-    {
         "creative_sponsored_video_daily_update": {
             "actions": [
                 "insert",
@@ -353,7 +288,7 @@
                         "type": "part_of_date",
                         "part_of_date_name": "day",
                         "offset_type": "from_today",
-                        "offset_value": "2",
+                        "offset_value": 1,
                         "offset_unity": "days",
                         "position": "start",
                         "output_type": "kwarg"
@@ -364,7 +299,7 @@
                         "type": "part_of_date",
                         "part_of_date_name": "month",
                         "offset_type": "from_today",
-                        "offset_value": "2",
+                        "offset_value": 1,
                         "offset_unity": "days",
                         "position": "start",
                         "output_type": "kwarg"
@@ -375,7 +310,7 @@
                         "type": "part_of_date",
                         "part_of_date_name": "year",
                         "offset_type": "from_today",
-                        "offset_value": "2",
+                        "offset_value": 1,
                         "offset_unity": "days",
                         "position": "start",
                         "output_type": "kwarg"
@@ -386,7 +321,7 @@
                         "type": "part_of_date",
                         "part_of_date_name": "day",
                         "offset_type": "from_today",
-                        "offset_value": "1",
+                        "offset_value": 1,
                         "offset_unity": "days",
                         "position": "end",
                         "output_type": "kwarg"
@@ -397,7 +332,7 @@
                         "type": "part_of_date",
                         "part_of_date_name": "month",
                         "offset_type": "from_today",
-                        "offset_value": "1",
+                        "offset_value": 1,
                         "offset_unity": "days",
                         "position": "end",
                         "output_type": "kwarg"
@@ -408,7 +343,7 @@
                         "type": "part_of_date",
                         "part_of_date_name": "year",
                         "offset_type": "from_today",
-                        "offset_value": "1",
+                        "offset_value": 1,
                         "offset_unity": "days",
                         "position": "end",
                         "output_type": "kwarg"
@@ -564,53 +499,6 @@
         }
     },
     {
-        "creative_sponsored_update_daily_update_old": {
-            "actions": [
-                "insert"
-            ],
-            "exclude_existing_in_db": false,
-            "source": "linkedin",
-            "destination": "redshift",
-            "destination_unique_keys": [
-                "id"
-            ],
-            "request_data_source": "redshift",
-            "model": "creative_sponsored_update",
-            "url": {
-                "base": "https://api.linkedin.com/v2/",
-                "category": "adCreativesV2",
-                "q": null,
-                "params": {
-                    "db": {
-                        "search.account.values[0]": {
-                            "type": [
-                                "db",
-                                "args",
-                                "rawsql"
-                            ],
-                            "kwargs_fields": [],
-                            "db_fields": [],
-                            "args_fields": [
-                                "creative_id"
-                            ],
-                            "raw_sql": "select distinct(creative_id) from {schema}.social_metrics where creative_id not in (select creative_id from {schema}.creative_sponsored_update) and creative_type = 'SPONSORED_STATUS_UPDATE'",
-                            "url_query_parameter_template": "/{}"
-                        }
-                    },
-                    "dynamics": {},
-                    "statics": {
-                        "projection": "(id,variables(data(*,com.linkedin.ads.SponsoredUpdateCreativeVariables(*,share~(subject,text(text),content(contentEntities(*(description,entityLocation,title))))))))"
-                    }
-                }
-            },
-            "request": {
-                "header": {
-                    "X-Restli-Protocol-Version": "2.0.0"
-                }
-            }
-        }
-    },
-    {
         "creative_text_ads_daily_update": {
             "actions": [
                 "insert"
@@ -712,6 +600,7 @@
     },
     {
         "creative_url_3_months_daily_update": {
+            "comment": "This task is used to update creatives url due to 3 months of inactivity delay.",
             "actions": [
                 "update"
             ],
@@ -845,7 +734,7 @@
                         "type": "part_of_date",
                         "part_of_date_name": "day",
                         "offset_type": "from_today",
-                        "offset_value": "2",
+                        "offset_value": 1,
                         "offset_unity": "days",
                         "position": "end",
                         "output_type": "kwarg"
@@ -856,7 +745,7 @@
                         "type": "part_of_date",
                         "part_of_date_name": "month",
                         "offset_type": "from_today",
-                        "offset_value": "2",
+                        "offset_value": 1,
                         "offset_unity": "days",
                         "position": "end",
                         "output_type": "kwarg"
@@ -867,7 +756,7 @@
                         "type": "part_of_date",
                         "part_of_date_name": "year",
                         "offset_type": "from_today",
-                        "offset_value": "2",
+                        "offset_value": 1,
                         "offset_unity": "days",
                         "position": "end",
                         "output_type": "kwarg"
@@ -878,7 +767,7 @@
                         "type": "part_of_date",
                         "part_of_date_name": "day",
                         "offset_type": "from_today",
-                        "offset_value": "1",
+                        "offset_value": 1,
                         "offset_unity": "days",
                         "position": "end",
                         "output_type": "kwarg"
@@ -889,7 +778,7 @@
                         "type": "part_of_date",
                         "part_of_date_name": "month",
                         "offset_type": "from_today",
-                        "offset_value": "1",
+                        "offset_value": 1,
                         "offset_unity": "days",
                         "position": "end",
                         "output_type": "kwarg"
@@ -900,12 +789,77 @@
                         "type": "part_of_date",
                         "part_of_date_name": "year",
                         "offset_type": "from_today",
-                        "offset_value": "1",
+                        "offset_value": 1,
                         "offset_unity": "days",
                         "position": "end",
                         "output_type": "kwarg"
                     }
                 ]
+            }
+        }
+    },
+    {
+        "organizations_monthly_update": {
+            "comment":"For Younes: It could be that organization_id in pivot_member_company are not in organizations table. This is because we can't retrieve anymore those organizations name for various reasons. Please set a default unknown name instead.",
+            "comment_2": "We have to create another task running at a custom schedule to update organizations",
+            "actions": [
+                "insert",
+                "update"
+            ],
+            "exclude_existing_in_db": true,
+            "destination_unique_keys": [
+                "id"
+            ],
+            "source": "linkedin",
+            "destination": "redshift",
+            "request_data_source": "redshift",
+            "model": "organizations",
+            "update_keys": [
+                "id"
+            ],
+            "data_source": {
+                "name": "organizations_id",
+                "raw_sql": "select distinct(organization_id) from {schema}.pivot_member_company where organization_id not in (select distinct(id) from {schema}.organizations)"
+            },
+            "query": {
+                "response_datas_key": "results",
+                "template": "{base}{api_name}/{service}?{organization_id}",
+                "params": [
+                    {
+                        "name": "base",
+                        "type": "constant",
+                        "output_type": "arg",
+                        "value": "https://api.linkedin.com/"
+                    },
+                    {
+                        "name": "api_name",
+                        "type": "constant",
+                        "output_type": "arg",
+                        "value": "rest"
+                    },
+                    {
+                        "name": "service",
+                        "type": "constant",
+                        "output_type": "arg",
+                        "value": "organizationsLookup"
+                    },
+                    {
+                        "name": "organization_id",
+                        "type": "db",
+                        "url_key_string": "ids",
+                        "data_source_name": "organizations_id",
+                        "source_key": "organization_id",
+                        "output_type": "kwarg",
+                        "template": "List({})",
+                        "urlencode": false,
+                        "chunck": true,
+                        "chunck_size": 50
+                    }
+                ]
+            },
+            "request_header": {
+                "Linkedin-Version": "202206",
+                "X-Restli-Protocol-Version": "2.0.0"
             }
         }
     },

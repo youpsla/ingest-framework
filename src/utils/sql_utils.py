@@ -339,7 +339,7 @@ class SqlQuery:
         # set_data = ' , '.join(['='.join((str(a[0]),str(a[1]))) for a in zip(fields,values)]) # noqa: E501
         set_data = " , ".join(
             [
-                "=".join((str(k), "'{}'".format(v.replace("'", "''"))))
+                "=".join((str(k), "'{}'".format(v.replace("'", "''") if v else None)))
                 for d in self.values
                 for k, v in d.items()
             ]
