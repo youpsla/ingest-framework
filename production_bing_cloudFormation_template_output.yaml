@@ -7,7 +7,7 @@ Resources:
     Properties:
       Description: DEVELOPMENT - Bing API Ingest Microservice V3
       Handler: bing.src.lambda_f.lambda_handler
-      CodeUri: s3://jabmo-ingest/9a06d244b4ed5d0a4d499ecf5f8478a5
+      CodeUri: s3://jabmo-ingest/5f1bcd8c599f117a8e45c34e752e23e1
       Runtime: python3.8
       Layers:
       - arn:aws:lambda:eu-west-1:467882466042:layer:python-aws-psycopg2:1
@@ -15,16 +15,16 @@ Resources:
       - arn:aws:lambda:eu-west-1:943013980633:layer:SentryPythonServerlessSDK:24
       Role: arn:aws:iam::467882466042:role/Linkedin-lambda-dev-staging-rw
       Timeout: 900
-      MemorySize: 2048
+      MemorySize: 1024
       Environment:
         Variables:
           SENTRY_DNS: https://47e2fc82fc674f428f2b3e931eddace7@o1035237.ingest.sentry.io/6094713
-          RUNNING_ENV: development
+          RUNNING_ENV: production
   ScheduledRuleJabmoBingIngestDaily:
     Type: AWS::Events::Rule
     Properties:
       Description: jabmo-ingest-bing-daily-trigger
-      ScheduleExpression: cron(00 9 * * ? *)
+      ScheduleExpression: cron(00 10 * * ? *)
       State: ENABLED
       Targets:
       - Arn:
