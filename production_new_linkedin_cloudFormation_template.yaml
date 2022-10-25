@@ -1,18 +1,17 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
-Description: LinkedIn API Ingest Microservice V2a
+Description: LinkedIn API Ingest Microservice V2a - Prod
 Resources:
   Function:
     Type: AWS::Serverless::Function
     Properties:
-      Description: LinkedIn API Ingest Microservice V2b - Staging
+      Description: LinkedIn API Ingest Microservice V2b - Prod
       Handler: linkedin.lambda_f.lambda_handler
       CodeUri: .
       Runtime: python3.8
       Layers:
         - arn:aws:lambda:eu-west-1:467882466042:layer:python-aws-psycopg2:1
-        - arn:aws:lambda:eu-west-1:467882466042:layer:python-requests:1
-        - arn:aws:lambda:eu-west-1:467882466042:layer:python-bingads:1
+        - arn:aws:lambda:eu-west-1:467882466042:layer:ingest-external-libraries:5
         - arn:aws:lambda:eu-west-1:943013980633:layer:SentryPythonServerlessSDK:24
       Role: arn:aws:iam::467882466042:role/Linkedin-lambda-prod-rw
       Timeout: 900
