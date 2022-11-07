@@ -1,33 +1,7 @@
 [
     {
-        "contacts_sdk": {
-            "actions": [
-                "insert",
-                "update"
-            ],
-            "exclude_existing_in_db": true,
-            "exclude_key": "email",
-            "source": "hubspot",
-            "destination": "redshift",
-            "destination_unique_keys": [
-                "email"
-            ],
-            "request_data_source": "redshift",
-            "update_keys": "email",
-            "model": "contacts",
-            "url": {
-                "response_data_key": [
-                    "results"
-                ],
-                "params": {},
-                "statics": {
-                    "limit": "1000"
-                }
-            }
-        }
-    },
-    {
         "contacts": {
+            "comment": "This task collect all contacts for a portal_id. She has to be run one time when integrating a new client; For subsequents updates, use contacts_recently_created task.",
             "actions": [
                 "insert",
                 "update"
@@ -41,6 +15,17 @@
             ],
             "model": "contacts",
             "update_keys": ["id","portal_id"],
+            "fields_to_add_to_api_result": [
+                {
+                    "name": "portal_id",
+                    "origin_key": "portal_id",
+                    "destination_key": "portal_id"
+                }
+            ],
+            "data_source": {
+                "name": "accounts",
+                "raw_sql": "select distinct(portal_id) from {schema}.accounts"
+            },
             "query": {
                 "template": "{base}?{count}&{vidOffset}&{email}&{firstname}&{lastname}&{job_title}&{company}&{industry}&{hs_analytics_average_page_views}&{contact_owner}&{address}&{zip}&{city}&{region}&{country}&{hs_email_domain}&{hs_analytics_num_event_completions}&{ip_city}&{ip_country}&{ip_country_code}&{ip_state}&{ip_state_code}&{createdate}",
                 "response_datas_key": "contacts",
@@ -50,6 +35,13 @@
                         "type": "constant",
                         "output_type": "arg",
                         "value": "https://api.hubapi.com/contacts/v1/lists/all/contacts/all"
+                    },
+                    {
+                        "name": "portal_id",
+                        "type": "db",
+                        "data_source_name": "accounts",
+                        "source_key": "portal_id",
+                        "output_type": "arg"
                     },
                     {
                         "name": "count",
@@ -201,6 +193,8 @@
     },
     {
         "contacts_recently_created": {
+            "comment": "This task collect all contacts for a portal_id. She has to be run one time when integrating a new client; For subsequents updates, use contacts_recently_created task.",
+
             "actions": [
                 "insert"
             ],
@@ -211,6 +205,17 @@
             "destination_unique_keys": ["id","portal_id"],
             "model": "contacts",
             "update_keys": ["id","portal_id"],
+            "fields_to_add_to_api_result": [
+                {
+                    "name": "portal_id",
+                    "origin_key": "portal_id",
+                    "destination_key": "portal_id"
+                }
+            ],
+            "data_source": {
+                "name": "accounts",
+                "raw_sql": "select distinct(portal_id) from {schema}.accounts"
+            },
             "query": {
                 "template": "{base}?{count}&{timeOffset}&{email}&{firstname}&{lastname}&{job_title}&{company}&{industry}&{hs_analytics_average_page_views}&{contact_owner}&{address}&{zip}&{city}&{region}&{country}&{hs_email_domain}&{hs_analytics_num_event_completions}&{ip_city}&{ip_country}&{ip_country_code}&{ip_state}&{ip_state_code}",
                 "response_datas_key": "contacts",
@@ -222,10 +227,17 @@
                         "value": "https://api.hubapi.com/contacts/v1/lists/all/contacts/recent"
                     },
                     {
+                        "name": "portal_id",
+                        "type": "db",
+                        "data_source_name": "accounts",
+                        "source_key": "portal_id",
+                        "output_type": "arg"
+                    },
+                    {
                         "name": "count",
                         "type": "constant",
                         "output_type": "kwarg",
-                        "value": 10
+                        "value": 50
                     },
                     {
                         "name": "timeOffset",
@@ -376,6 +388,17 @@
             "destination_unique_keys": ["id","portal_id"],
             "model": "contacts",
             "update_keys": ["id","portal_id"],
+            "fields_to_add_to_api_result": [
+                {
+                    "name": "portal_id",
+                    "origin_key": "portal_id",
+                    "destination_key": "portal_id"
+                }
+            ],
+            "data_source": {
+                "name": "accounts",
+                "raw_sql": "select distinct(portal_id) from {schema}.accounts"
+            },
             "query": {
                 "template": "{base}?{count}&{timeOffset}&{email}&{firstname}&{lastname}&{job_title}&{company}&{industry}&{hs_analytics_average_page_views}&{contact_owner}&{address}&{zip}&{city}&{region}&{country}&{hs_email_domain}&{hs_analytics_num_event_completions}&{ip_city}&{ip_country}&{ip_country_code}&{ip_state}&{ip_state_code}&{createdate}",
                 "response_datas_key": "contacts",
@@ -387,10 +410,17 @@
                         "value": "https://api.hubapi.com/contacts/v1/lists/recently_updated/contacts/recent"
                     },
                     {
+                        "name": "portal_id",
+                        "type": "db",
+                        "data_source_name": "accounts",
+                        "source_key": "portal_id",
+                        "output_type": "arg"
+                    },
+                    {
                         "name": "count",
                         "type": "constant",
                         "output_type": "kwarg",
-                        "value": 10
+                        "value": 50
                     },
                     {
                         "name": "timeOffset",
@@ -548,6 +578,17 @@
             "destination_unique_keys": ["id","portal_id"],
             "model": "companies",
             "update_keys": ["id","portal_id"],
+            "fields_to_add_to_api_result": [
+                {
+                    "name": "portal_id",
+                    "origin_key": "portal_id",
+                    "destination_key": "portal_id"
+                }
+            ],
+            "data_source": {
+                "name": "accounts",
+                "raw_sql": "select distinct(portal_id) from {schema}.accounts"
+            },
             "query": {
                 "template": "{base}?{limit}&{offset}&{domain}&{name}&{hs_analytics_num_page_views}&{hs_analytics_num_visits}&{hs_is_target_account}&{hs_object_id}&{num_associated_contacts}&{hs_parent_company_id}&{website}",
                 "response_datas_key": "companies",
@@ -557,6 +598,13 @@
                         "type": "constant",
                         "output_type": "arg",
                         "value": "https://api.hubapi.com/companies/v2/companies/paged"
+                    },
+                    {
+                        "name": "portal_id",
+                        "type": "db",
+                        "data_source_name": "accounts",
+                        "source_key": "portal_id",
+                        "output_type": "arg"
                     },
                     {
                         "name": "limit",
@@ -641,6 +689,17 @@
             "destination_unique_keys": ["id","portal_id"],
             "model": "companies",
             "update_keys": ["id","portal_id"],
+            "fields_to_add_to_api_result": [
+                {
+                    "name": "portal_id",
+                    "origin_key": "portal_id",
+                    "destination_key": "portal_id"
+                }
+            ],
+            "data_source": {
+                "name": "accounts",
+                "raw_sql": "select portal_id from {schema}.accounts"
+            },
             "query": {
                 "template": "{base}?{count}&{offset}&{since}",
                 "response_datas_key": "results",
@@ -650,6 +709,13 @@
                         "type": "constant",
                         "output_type": "arg",
                         "value": "https://api.hubapi.com/companies/v2/companies/recent/modified"
+                    },
+                    {
+                        "name": "portal_id",
+                        "type": "db",
+                        "data_source_name": "accounts",
+                        "source_key": "portal_id",
+                        "output_type": "arg"
                     },
                     {
                         "name": "count",
@@ -667,52 +733,19 @@
                         "name": "since",
                         "type": "timestamp_from_epoch",
                         "offset_type": "from_today",
-                        "offset_value": "1",
+                        "offset_value": 1,
                         "offset_unity": "days",
                         "position": "start",
                         "output_type": "kwarg"
+                    },
+                    {
+                        "name": "portal_id",
+                        "type": "db",
+                        "data_source_name": "campaigns",
+                        "source_key": "portal_id",
+                        "output_type": "arg"
                     }
                 ]
-            }
-        }
-    },
-    {
-        "events": {
-            "actions": [
-                "insert"
-            ],
-            "exclude_existing_in_db": false,
-            "source": "hubspot",
-            "destination": "redshift",
-            "request_data_source": "redshift",
-            "model": "events",
-            "url": {
-                "type": "service",
-                "response_data_key": [
-                    "results"
-                ],
-                "params": {
-                    "db": {
-                        "_": {
-                            "type": "db",
-                            "args_fields": [],
-                            "kwargs_fields": [
-                                [
-                                    "id",
-                                    "{}",
-                                    "object_id"
-                                ]
-                            ],
-                            "filter_model": "contacts",
-                            "all_fields": [
-                                "id"
-                            ]
-                        }
-                    },
-                    "statics": {
-                        "object_type": "contacts"
-                    }
-                }
             }
         }
     },
@@ -730,6 +763,17 @@
             "request_data_source": "redshift",
             "model": "campaigns",
             "update_keys": ["id","portal_id"],
+            "fields_to_add_to_api_result": [
+                {
+                    "name": "portal_id",
+                    "origin_key": "portal_id",
+                    "destination_key": "portal_id"
+                }
+            ],
+            "data_source": {
+                "name": "accounts",
+                "raw_sql": "select distinct(portal_id) from {schema}.accounts"
+            },
             "query": {
                 "response_datas_key": "campaigns",
                 "template": "{base}?{limit}&{offset}",
@@ -739,6 +783,13 @@
                         "type": "constant",
                         "output_type": "arg",
                         "value": "https://api.hubapi.com/email/public/v1/campaigns"
+                    },
+                    {
+                        "name": "portal_id",
+                        "type": "db",
+                        "data_source_name": "accounts",
+                        "source_key": "portal_id",
+                        "output_type": "arg"
                     },
                     {
                         "name": "limit",
@@ -752,6 +803,13 @@
                         "output_type": "kwarg",
                         "value": "",
                         "force_url_encoding": true
+                    },
+                    {
+                        "name": "portal_id",
+                        "type": "db",
+                        "data_source_name": "campaigns",
+                        "source_key": "portal_id",
+                        "output_type": "arg"
                     }
                 ]
             }
@@ -768,6 +826,7 @@
     },
     {
         "campaign_details": {
+            "comment": "We retrieve only campaigns updated in the last 2 days.",
             "actions": [
                 "insert",
                 "update"
@@ -779,9 +838,16 @@
             "destination_unique_keys": ["id","portal_id"],
             "model": "campaign_details",
             "update_keys": ["id","portal_id"],
+            "fields_to_add_to_api_result": [
+                {
+                    "name": "portal_id",
+                    "origin_key": "portal_id",
+                    "destination_key": "portal_id"
+                }
+            ],
             "data_source": {
                 "name": "campaigns",
-                "raw_sql": "select distinct(id) from {schema}.campaigns where portal_id = 1838475"
+                "raw_sql": "select id, portal_id from {schema}.campaigns where last_updated_time > DATE(GETDATE() - INTERVAL '2 DAY')"
             },
             "query": {
                 "response_datas_key": null,
@@ -798,6 +864,13 @@
                         "type": "db",
                         "data_source_name": "campaigns",
                         "source_key": "id",
+                        "output_type": "arg"
+                    },
+                    {
+                        "name": "portal_id",
+                        "type": "db",
+                        "data_source_name": "campaigns",
+                        "source_key": "portal_id",
                         "output_type": "arg"
                     }
                 ]
@@ -816,8 +889,16 @@
             "destination_unique_keys": ["id","portal_id"],
             "data_source": {
                 "name": "campaigns",
-                "raw_sql": "select id, app_id from {schema}.campaigns"
+                "raw_sql": "select portal_id, id, app_id from {schema}.campaigns"
+
             },
+            "fields_to_add_to_api_result": [
+                {
+                    "name": "portal_id",
+                    "origin_key": "portal_id",
+                    "destination_key": "portal_id"
+                }
+            ],
             "model": "email_events",
             "update_keys": ["id","portal_id"],
             "query": {
@@ -843,6 +924,13 @@
                         "data_source_name": "campaigns",
                         "source_key": "app_id",
                         "output_type": "kwarg"
+                    },
+                    {
+                        "name": "portal_id",
+                        "type": "db",
+                        "data_source_name": "campaigns",
+                        "source_key": "portal_id",
+                        "output_type": "arg"
                     },
                     {
                         "name": "limit",
@@ -872,7 +960,7 @@
                         "name": "endTimestamp",
                         "type": "timestamp_from_epoch",
                         "offset_type": "from_today",
-                        "offset_value": "1",
+                        "offset_value": 1,
                         "offset_unity": "days",
                         "position": "end",
                         "output_type": "kwarg"
@@ -893,8 +981,16 @@
             "destination_unique_keys": ["id","portal_id"],
             "data_source": {
                 "name": "campaigns",
-                "raw_sql": "select id, app_id from {schema}.campaigns  where portal_id = 1838475"
+                "raw_sql": "select portal_id, id, app_id from {schema}.campaigns"
+
             },
+            "fields_to_add_to_api_result": [
+                {
+                    "name": "portal_id",
+                    "origin_key": "portal_id",
+                    "destination_key": "portal_id"
+                }
+            ],
             "model": "email_events",
             "update_keys": ["id","portal_id"],
             "query": {
@@ -920,6 +1016,13 @@
                         "data_source_name": "campaigns",
                         "source_key": "app_id",
                         "output_type": "kwarg"
+                    },
+                    {
+                        "name": "portal_id",
+                        "type": "db",
+                        "data_source_name": "campaigns",
+                        "source_key": "portal_id",
+                        "output_type": "arg"
                     },
                     {
                         "name": "limit",
@@ -949,7 +1052,7 @@
                         "name": "endTimestamp",
                         "type": "timestamp_from_epoch",
                         "offset_type": "from_today",
-                        "offset_value": "1",
+                        "offset_value": 1,
                         "offset_unity": "days",
                         "position": "end",
                         "output_type": "kwarg"
@@ -960,6 +1063,7 @@
     },
     {
         "email_events_forward_since_2022": {
+            "comments":"THe interval in days need to be manually set in the data_soruce parameter et the end of the sql query.",
             "actions": [
                 "insert"
             ],
@@ -970,8 +1074,16 @@
             "destination_unique_keys": ["id","portal_id"],
             "data_source": {
                 "name": "campaigns",
-                "raw_sql": "select id, app_id from {schema}.campaigns"
+                "raw_sql": "select portal_id, id, app_id from {schema}.campaigns"
+
             },
+            "fields_to_add_to_api_result": [
+                {
+                    "name": "portal_id",
+                    "origin_key": "portal_id",
+                    "destination_key": "portal_id"
+                }
+            ],
             "model": "email_events",
             "update_keys": ["id","portal_id"],
             "query": {
@@ -997,6 +1109,13 @@
                         "data_source_name": "campaigns",
                         "source_key": "app_id",
                         "output_type": "kwarg"
+                    },
+                    {
+                        "name": "portal_id",
+                        "type": "db",
+                        "data_source_name": "campaigns",
+                        "source_key": "portal_id",
+                        "output_type": "arg"
                     },
                     {
                         "name": "limit",
@@ -1026,7 +1145,7 @@
                         "name": "endTimestamp",
                         "type": "timestamp_from_epoch",
                         "offset_type": "from_today",
-                        "offset_value": "1",
+                        "offset_value": 1,
                         "offset_unity": "days",
                         "position": "end",
                         "output_type": "kwarg"
@@ -1048,13 +1167,19 @@
             "model": "company_contact_associations",
             "data_source": {
                 "name": "companies",
-                "raw_sql": "select distinct(id) from {schema}.companies"
+                "raw_sql": "select portal_id, id from {schema}.companies"
             },
+
             "fields_to_add_to_api_result": [
                 {
                     "name": "company_id",
                     "origin_key": "company_id",
                     "destination_key": "company_id"
+                },
+                {
+                    "name": "portal_id",
+                    "origin_key": "portal_id",
+                    "destination_key": "portal_id"
                 }
             ],
             "key_for_values": "contact_id",
@@ -1074,6 +1199,13 @@
                         "type": "db",
                         "data_source_name": "companies",
                         "source_key": "id",
+                        "output_type": "arg"
+                    },
+                    {
+                        "name": "portal_id",
+                        "type": "db",
+                        "data_source_name": "companies",
+                        "source_key": "portal_id",
                         "output_type": "arg"
                     },
                     {
@@ -1111,13 +1243,18 @@
             "model": "company_contact_associations",
             "data_source": {
                 "name": "contacts",
-                "raw_sql": "select distinct(id) from {schema}.contacts"
+                "raw_sql": "select portal_id, id from {schema}.contacts"
             },
             "fields_to_add_to_api_result": [
                 {
                     "name": "contact_id",
                     "origin_key": "contact_id",
                     "destination_key": "contact_id"
+                },
+                {
+                    "name": "portal_id",
+                    "origin_key": "portal_id",
+                    "destination_key": "portal_id"
                 }
             ],
             "key_for_values": "company_id",
@@ -1137,6 +1274,13 @@
                         "type": "db",
                         "data_source_name": "contacts",
                         "source_key": "id",
+                        "output_type": "arg"
+                    },
+                    {
+                        "name": "portal_id",
+                        "type": "db",
+                        "data_source_name": "contacts",
+                        "source_key": "portal_id",
                         "output_type": "arg"
                     },
                     {
@@ -1174,13 +1318,18 @@
             "model": "company_contact_associations",
             "data_source": {
                 "name": "contacts",
-                "raw_sql": "select distinct(id) from {schema}.contacts  where DATE(created_at) > DATE(GETDATE() - INTERVAL '2 DAY') AND DATE(created_at) < DATE(GETDATE()) and portal_id = 1838475"
+                "raw_sql": "select id, portal_id from {schema}.contacts  where DATE(created_at) > DATE(GETDATE() - INTERVAL '2 DAY')"
             },
             "fields_to_add_to_api_result": [
                 {
                     "name": "contact_id",
                     "origin_key": "contact_id",
                     "destination_key": "contact_id"
+                },
+                {
+                    "name": "portal_id",
+                    "origin_key": "portal_id",
+                    "destination_key": "portal_id"
                 }
             ],
             "key_for_values": "company_id",
@@ -1200,6 +1349,13 @@
                         "type": "db",
                         "data_source_name": "contacts",
                         "source_key": "id",
+                        "output_type": "arg"
+                    },
+                    {
+                        "name": "portal_id",
+                        "type": "db",
+                        "data_source_name": "contacts",
+                        "source_key": "portal_id",
                         "output_type": "arg"
                     },
                     {
@@ -1237,13 +1393,18 @@
             "model": "company_contact_associations",
             "data_source": {
                 "name": "contacts",
-                "raw_sql": "select distinct(id) from {schema}.contacts  where updated_at > GETDATE() - INTERVAL '1 HOUR' and portal_id = 1838475"
+                "raw_sql": "select portal_id, id from {schema}.contacts  where updated_at > GETDATE() - INTERVAL '2 HOUR'"
             },
             "fields_to_add_to_api_result": [
                 {
                     "name": "contact_id",
                     "origin_key": "contact_id",
                     "destination_key": "contact_id"
+                },
+                {
+                    "name": "portal_id",
+                    "origin_key": "portal_id",
+                    "destination_key": "portal_id"
                 }
             ],
             "key_for_values": "company_id",
@@ -1263,6 +1424,13 @@
                         "type": "db",
                         "data_source_name": "contacts",
                         "source_key": "id",
+                        "output_type": "arg"
+                    },
+                    {
+                        "name": "portal_id",
+                        "type": "db",
+                        "data_source_name": "contacts",
+                        "source_key": "portal_id",
                         "output_type": "arg"
                     },
                     {
@@ -1299,8 +1467,16 @@
             "destination_unique_keys": ["id","portal_id"],
             "data_source": {
                 "name": "campaigns",
-                "raw_sql": "select id, app_id from {schema}.campaigns where last_updated_time > DATE(GETDATE() - INTERVAL '2 DAY') and portal_id = 1838475"
+                "raw_sql": "select portal_id, id, app_id from {schema}.campaigns where last_updated_time > DATE(GETDATE() - INTERVAL '2 DAY')"
+
             },
+            "fields_to_add_to_api_result": [
+                {
+                    "name": "portal_id",
+                    "origin_key": "portal_id",
+                    "destination_key": "portal_id"
+                }
+            ],
             "model": "email_events",
             "update_keys": ["id","portal_id"],
             "query": {
@@ -1329,6 +1505,13 @@
                         "output_type": "kwarg"
                     },
                     {
+                        "name": "portal_id",
+                        "type": "db",
+                        "data_source_name": "campaigns",
+                        "source_key": "portal_id",
+                        "output_type": "arg"
+                    },
+                    {
                         "name": "limit",
                         "type": "constant",
                         "output_type": "kwarg",
@@ -1350,7 +1533,7 @@
                         "name": "startTimestamp",
                         "type": "timestamp_from_epoch",
                         "offset_type": "from_today",
-                        "offset_value": "2",
+                        "offset_value": 2,
                         "offset_unity": "days",
                         "position": "start",
                         "output_type": "kwarg"
@@ -1359,7 +1542,7 @@
                         "name": "endTimestamp",
                         "type": "timestamp_from_epoch",
                         "offset_type": "from_today",
-                        "offset_value": "1",
+                        "offset_value": 1,
                         "offset_unity": "days",
                         "position": "end",
                         "output_type": "kwarg"
@@ -1380,11 +1563,18 @@
             "destination_unique_keys": ["id","portal_id"],
             "data_source": {
                 "name": "campaigns",
-                "raw_sql": "select id, app_id from {schema}.campaigns where last_updated_time > DATE(GETDATE() - INTERVAL '2 DAY') and portal_id = 1838475"
+                "raw_sql": "select portal_id, id, app_id from {schema}.campaigns where last_updated_time > DATE(GETDATE() - INTERVAL '2 DAY')"
 
             },
+            "fields_to_add_to_api_result": [
+                {
+                    "name": "portal_id",
+                    "origin_key": "portal_id",
+                    "destination_key": "portal_id"
+                }
+            ],
             "model": "email_events",
-            "update_keys": ["id","portal_id"],
+            "update_keys": ["portal_id", "id","portal_id"],
             "query": {
                 "template": "{base}?{emailCampaignId}&{appId}&{limit}&{offset}&{startTimestamp}&{endTimestamp}&{eventType}",
                 "response_datas_key": "events",
@@ -1402,6 +1592,13 @@
                         "data_source_name": "campaigns",
                         "source_key": "id",
                         "output_type": "kwarg"
+                    },
+                    {
+                        "name": "portal_id",
+                        "type": "db",
+                        "data_source_name": "campaigns",
+                        "source_key": "portal_id",
+                        "output_type": "arg"
                     },
                     {
                         "name": "appId",
@@ -1432,7 +1629,7 @@
                         "name": "startTimestamp",
                         "type": "timestamp_from_epoch",
                         "offset_type": "from_today",
-                        "offset_value": "2",
+                        "offset_value": 2,
                         "offset_unity": "days",
                         "position": "start",
                         "output_type": "kwarg"
@@ -1441,7 +1638,7 @@
                         "name": "endTimestamp",
                         "type": "timestamp_from_epoch",
                         "offset_type": "from_today",
-                        "offset_value": "1",
+                        "offset_value": 1,
                         "offset_unity": "days",
                         "position": "end",
                         "output_type": "kwarg"
@@ -1462,8 +1659,16 @@
             "destination_unique_keys": ["id","portal_id"],
             "data_source": {
                 "name": "campaigns",
-                "raw_sql": "select id, app_id from {schema}.campaigns where last_updated_time > DATE(GETDATE() - INTERVAL '2 DAY') and portal_id = 1838475"
+                "raw_sql": "select portal_id, id, app_id from {schema}.campaigns where last_updated_time > DATE(GETDATE() - INTERVAL '2 DAY')"
+
             },
+            "fields_to_add_to_api_result": [
+                {
+                    "name": "portal_id",
+                    "origin_key": "portal_id",
+                    "destination_key": "portal_id"
+                }
+            ],
             "model": "email_events",
             "update_keys": ["id","portal_id"],
             "query": {
@@ -1492,6 +1697,13 @@
                         "output_type": "kwarg"
                     },
                     {
+                        "name": "portal_id",
+                        "type": "db",
+                        "data_source_name": "campaigns",
+                        "source_key": "portal_id",
+                        "output_type": "arg"
+                    },
+                    {
                         "name": "limit",
                         "type": "constant",
                         "output_type": "kwarg",
@@ -1513,7 +1725,7 @@
                         "name": "startTimestamp",
                         "type": "timestamp_from_epoch",
                         "offset_type": "from_today",
-                        "offset_value": "2",
+                        "offset_value": 2,
                         "offset_unity": "days",
                         "position": "start",
                         "output_type": "kwarg"
@@ -1522,7 +1734,7 @@
                         "name": "endTimestamp",
                         "type": "timestamp_from_epoch",
                         "offset_type": "from_today",
-                        "offset_value": "1",
+                        "offset_value": 1,
                         "offset_unity": "days",
                         "position": "end",
                         "output_type": "kwarg"

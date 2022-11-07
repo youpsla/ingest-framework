@@ -65,7 +65,7 @@ class Endpoint:
         headers = CaseInsensitiveDict()
         headers["Accept"] = "application/json"
         headers["cache-control"] = "no-cache"
-        headers["Authorization"] = f"Bearer {access_token}"
+        headers["Authorization"] = f"Bearer {access_token or self.access_token}"
 
         if header:
             headers.update(header)
@@ -87,7 +87,7 @@ class EndpointParam:
         #     self.name = k
         #     self.value = v
 
-        for qp in self.query_params:
+        for qp in self.query_params["params"]:
             if qp["name"] == self.name:
                 for k, v in qp.items():
                     setattr(self, k, v)

@@ -4,8 +4,6 @@ import json
 import os
 import time
 
-from src.clients.bing.bing_client import ReportManager
-
 # from src.clients.bing.bing_client import ReportManager
 from src.commons.client_helper import get_client
 from src.commons.model import Model
@@ -16,6 +14,8 @@ from src.utils.various_utils import (
     get_running_env,
     nested_get,
 )
+
+# from src.clients.bing.bing_client import ReportManager
 
 
 class Task:

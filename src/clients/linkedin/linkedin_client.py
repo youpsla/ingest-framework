@@ -8,6 +8,7 @@ from requests.exceptions import ConnectionError, ConnectTimeout, RetryError
 from requests.structures import CaseInsensitiveDict
 from src.clients.aws.aws_tools import Secret
 from src.commons.client import Client
+from src.utils.endpoint_utils import Endpoint
 from src.utils.http_utils import get_http_adapter
 
 
@@ -108,6 +109,59 @@ class LinkedInRefreshToken(Secret):
         return False
 
 
+class LinkedinEndpoint(Endpoint):
+    def __init__(
+        self,
+        params=None,
+        url_template=None,
+        query_params=None,
+        access_token=None,
+    ):
+        # self.query_params = query_params
+        super().__init__(
+            params=params,
+            url_template=url_template,
+            # query_params=self.query_params["params"],
+            query_params=query_params,
+        )
+        self.access_token = access_token
+        self._headers = None
+
+    def build_headers(self, header=None):
+        """# noqa: E501
+        Build the header of the http request
+
+        Use the access_token and optionnal header defined in json.
+
+        Args:
+            header: dict
+
+        Returns:
+            A dict of the build header.
+        """
+        headers = CaseInsensitiveDict()
+        headers["Accept"] = "application/json"
+        headers["cache-control"] = "no-cache"
+        headers["Authorization"] = f"Bearer {self.access_token}"
+
+        # Add custom header from task params
+        task_headers = self.query_params.get("request_header")
+        if task_headers:
+            headers.update(task_headers)
+
+        if header:
+            headers.update(header)
+
+        return headers
+
+    @property
+    def headers(self):
+        if self._headers is None:
+            headers = self.build_headers()
+            self._headers = headers
+        return self._headers
+
+
 def paging_pagination(endpoint, task_result):
     start = task_result["paging"]["start"]
     total = task_result["paging"]["total"]
@@ -139,6 +193,7 @@ class LinkedInClient(Client):
         super().__init__(env)
         self.access_token = LinkedInAccessToken().value
         self.task = task
+        self.http_adapter = get_http_adapter()
 
     def get(self, task_params, header=None):
         """# noqa: E501
@@ -160,14 +215,30 @@ class LinkedInClient(Client):
         """
 
         # Build specific header and authorization stuff if necessary
-        headers = self.build_headers(header=header)
+        # headers = self.build_headers(header=header)
 
         # Get a list of params to use for requests.
         db_params = self.get_request_params()
         print(f"Number of requests to run: {len(db_params)}")
 
+        request_params = [
+            {
+                k: {
+                    "endpoint": LinkedinEndpoint(
+                        params=v,
+                        url_template=task_params["query"]["template"],
+                        # query_params=task_params["query"]["params"],
+                        query_params=task_params["query"],
+                        access_token=self.access_token,
+                    )
+                }
+            }
+            for k, v in db_params.items()
+        ]
+        result = []
+
         # Build endpoints using params previously generated.
-        endpoint_list = self.get_endpoint_list(task_params, db_params)
+        # endpoint_list = self.get_endpoint_list(task_params, db_params)
 
         # Request provider. and get result of all requests.
         if self.task.name not in [
@@ -182,13 +253,13 @@ class LinkedInClient(Client):
             "pivot_job_title_monthly_update",
             "pivot_member_organization_monthly_update",
             "organizations_monthly_update",
+            "creative_url_3_months_daily_update",
         ]:
             pagination_function = paging_pagination
         else:
             pagination_function = None
-        api_datas = self.do_requests(
-            task_params, headers, endpoint_list, pagination_function
-        )
+
+        api_datas = self.do_requests(task_params, request_params, pagination_function)
 
         # Add data to the API response
         result = self.add_request_params_to_api_call_result(
@@ -197,38 +268,7 @@ class LinkedInClient(Client):
 
         return result
 
-    def build_headers(self, header=None):
-        """# noqa: E501
-        Build the header of the http request
-
-        Use the access_token and optionnal header defined in json.
-
-        Args:
-            header: dict
-
-        Returns:
-            A dict of the build header.
-        """
-        headers = CaseInsensitiveDict()
-        headers["Accept"] = "application/json"
-        headers["cache-control"] = "no-cache"
-        headers["Authorization"] = f"Bearer {self.access_token}"
-
-        # Add custom header from task params
-        task_headers = self.task.params.get("request_header", None)
-        if task_headers:
-            headers.update(task_headers)
-
-        if header:
-            headers.update(header)
-
-        return headers
-
-    def do_get_query(
-        self,
-        endpoint="",
-        headers={},
-    ):
+    def do_get_query(self, endpoint=None):
         """# noqa: E501
         Qurey the API endpoint
 
@@ -243,8 +283,8 @@ class LinkedInClient(Client):
         """
         cpt = 1
         try:
-            response = get_http_adapter().get(
-                url=endpoint.get_endpoint_as_string(), headers=headers
+            response = self.http_adapter.get(
+                url=endpoint.get_endpoint_as_string(), headers=endpoint.headers
             )
         except ConnectionError as e:
             print("Error while connecting to db")
@@ -264,13 +304,13 @@ class LinkedInClient(Client):
             print(
                 f"{cpt} attemp(s) failed. Restarting thread after 100 seconds of pause: name={c_thread.name}, idnet={get_ident()}, id={get_native_id()}"  # noqa: E501
             )
-            response = self.do_get_query(endpoint=endpoint, headers=headers)
+            response = self.do_get_query(endpoint=endpoint)
             if cpt == 5:
                 raise TimeoutError("Failed to reach endpoint: {endpoint}")
 
             return None
         except Exception as e:
-            print("Unhandled exception occurs")
+            print("Unhandled e     xception occurs")
             print(e)
             raise ("Error while processing request")
 
@@ -285,6 +325,9 @@ class LinkedInClient(Client):
             elif response.status_code == 401:
                 pass
 
+            # When a cretive doesn't exist anymore in the Liunkedin DB, got a 404 not found error.
+            elif response.status_code == 404:
+                print("Creative not found in Linkedin DB")
             else:
                 print(f"Endpoint: {endpoint}")
                 print(f"{response.reason} - {response.text}")

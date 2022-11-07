@@ -49,8 +49,8 @@ def get_running_env():
 
 def get_schema_name(channel):
     schema_name = channel + "_" + get_running_env()
-    # return schema_name
-    return "new_linkedin"
+    return schema_name
+    # return "new_linkedin"
 
 
 def get_model_params_as_dict(channel, model_name):
@@ -88,7 +88,6 @@ def run_in_threads_pool(
     request_params_list=None,
     source_function=None,
     max_workers=40,
-    headers=None,
     result_key=None,
     pagination_function=None,
 ):
@@ -110,16 +109,13 @@ def run_in_threads_pool(
     result = []
     with futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
         for request_params in request_params_list:
-            threads_list.append(
-                (
-                    executor.submit(
-                        source_function,
-                        endpoint=request_params[0],
-                        headers=headers,
-                    ),
-                    request_params[1],
+            for k, v in request_params.items():
+                threads_list.append(
+                    (
+                        executor.submit(source_function, endpoint=v["endpoint"]),
+                        k,
+                    )
                 )
-            )
         for task in threads_list:
             if task[0].result():
                 task_result, endpoint = task[0].result()
@@ -147,7 +143,6 @@ def run_in_threads_pool(
                         int_task = executor.submit(
                             source_function,
                             endpoint=endpoint,
-                            headers=headers,
                         )
                         task_result, endpoint = int_task.result()
                         if task_result:

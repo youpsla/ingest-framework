@@ -72,8 +72,6 @@ def run_task(channel, task_name, db_connection):
 def main():
     logger.info("### Starting Ingest lambda ###")
     start = time.time()
-    # dd = {}
-    # dudu = dd["dede"]
 
     channel_params = get_channel_params()
 

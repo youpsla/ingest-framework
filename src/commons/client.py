@@ -6,6 +6,7 @@ import pendulum
 import pytz
 from src.commons.model import Model
 from src.constants import ENVS_LIST
+from src.utils.custom_logger import logger
 from src.utils.endpoint_utils import Endpoint
 from src.utils.various_utils import (
     get_chunks,
@@ -49,6 +50,7 @@ class Client:
                 )
             )
         else:
+            logger.info(f"Running environement: {env}")
             return True
 
     def get_request_parameters_lists(self):
@@ -66,11 +68,19 @@ class Client:
             return []
 
         # Get the params of the query
-        query_params = query.get("params", None)
+        logger.info(
+            f"Get query parameters from json file:{self.task.get_params_json_file_path()}"
+        )
+        query_params = query.get("params")
+        if not query_params:
+            logger.info(
+                f"Task {self.task.name} does not have query parameters. Should be a destination only task. Often just a Db request."
+            )
 
         # Get each param and add it ti the result_lists (list of list)
         result_lists = []
         if query_params:
+            logger.info("Start query_params parsing.")
             for param in query_params:
                 tmp_result = []
 
@@ -260,7 +270,11 @@ class Client:
             result.extend(local_result)
         return result
 
-    def get_endpoint_list(self, task_params, db_params):
+    def get_endpoint_list(
+        self,
+        task_params=None,
+        db_params=None,
+    ):
         endpoint_list = [
             (
                 Endpoint(
@@ -272,16 +286,31 @@ class Client:
             )
             for k, v in db_params.items()
         ]
+
+        # request_params = [
+        #     {
+        #         k: {
+        #             "endpoint": Endpoint(
+        #                 params=v,
+        #                 url_template=task_params["query"]["template"],
+        #                 query_params=task_params["query"]["params"],
+        #             ),
+        #             "headers": self.build_headers(
+        #                 header=None, access_token=portal_token_dict[v["portal_id"]]
+        #             ),
+        #         }
+        #     }
+        #     for k, v in db_params.items()
+
         return endpoint_list
 
-    def do_requests(self, task_params, headers, endpoint_list, pagination_function):
+    def do_requests(self, task_params, endpoint_list, pagination_function):
         futures_results = []
         endpoint_list_list = get_chunks(endpoint_list, chunk_size=50)
         for lst in endpoint_list_list:
             chunks_result_list = run_in_threads_pool(
                 request_params_list=lst,
                 source_function=self.do_get_query,
-                headers=headers,
                 result_key=task_params["query"]["response_datas_key"],
                 pagination_function=pagination_function,
             )

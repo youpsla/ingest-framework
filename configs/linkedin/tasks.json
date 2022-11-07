@@ -437,11 +437,11 @@
                         "output_type": "arg",
                         "force_url_encoding": null
                     }
-                ]
-            },
-            "request_header": {
-                "Linkedin-Version": "202206",
-                "X-Restli-Protocol-Version": "2.0.0"
+                ],
+                "request_header": {
+                    "Linkedin-Version": "202206",
+                    "X-Restli-Protocol-Version": "2.0.0"
+                }
             }
         }
     },
@@ -800,7 +800,7 @@
     },
     {
         "organizations_monthly_update": {
-            "comment":"For Younes: It could be that organization_id in pivot_member_company are not in organizations table. This is because we can't retrieve anymore those organizations name for various reasons. Please set a default unknown name instead.",
+            "comment": "For Younes: It could be that organization_id in pivot_member_company are not in organizations table. This is because we can't retrieve anymore those organizations name for various reasons. Please set a default unknown name instead.",
             "comment_2": "We have to create another task running at a custom schedule to update organizations",
             "actions": [
                 "insert",
@@ -855,11 +855,11 @@
                         "chunck": true,
                         "chunck_size": 50
                     }
-                ]
-            },
-            "request_header": {
-                "Linkedin-Version": "202206",
-                "X-Restli-Protocol-Version": "2.0.0"
+                ],
+                "request_header": {
+                    "Linkedin-Version": "202206",
+                    "X-Restli-Protocol-Version": "2.0.0"
+                }
             }
         }
     },

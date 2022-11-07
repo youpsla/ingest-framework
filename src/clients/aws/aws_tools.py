@@ -141,6 +141,104 @@ class Secret:
             return response
 
 
+class SecretsManager:
+    def __init__(self):
+        self.client = boto3.client("secretsmanager")
+        self.secret_name = None
+
+    def get_secret(self, secret_name):
+        """
+        Retrieve the credentials registered in the aws secret manager service
+        for a secret_name given in parameter.
+
+        Raises
+        ------
+        ClientError: if one of these errors happend and throwable parameter is
+                    set to True raise the error otherwise, return an empty dict:
+                    DecryptionFailureException, InternalServiceErrorException,
+                    InvalidParameterException, InvalidRequestException,
+                    ResourceNotFoundException
+
+        Parameters
+        ----------
+        secret_name: str
+            Name of the secret.
+
+        Returns
+        -------
+        _ : dict (or bytes)
+            Containing credentials.
+        """
+        try:
+            get_secret_value_response = self.client.get_secret_value(
+                SecretId=secret_name
+            )
+        except ClientError as e:
+            if e.response["Error"]["Code"] in [
+                "DecryptionFailureException",
+                "InternalServiceErrorException",
+                "InvalidParameterException",
+                "InvalidRequestException",
+                "ResourceNotFoundException",
+            ]:
+                logger.error(e)
+        else:
+            # Decrypts secret using the associated KMS CMK.
+            # Depending on whether the secret is a string or binary, one of
+            # these fields will be populated.
+            if "SecretString" in get_secret_value_response:
+                secret = get_secret_value_response["SecretString"]
+                credentials = json.loads(secret)
+                return credentials
+            else:
+                decoded_binary_secret = base64.b64decode(
+                    get_secret_value_response["SecretBinary"]
+                )
+                return decoded_binary_secret
+
+
+class HubspotSecretsManager(SecretsManager):
+    def __init__(self):
+        super().__init__()
+        self.credentials = None
+
+    def get_hubspot_credentials(self, portal_id):
+        """
+        Retrieve the hubspot credentials from AWS secret manager service.
+
+        Raises
+        ------
+        LookupError: if client_id, secret_id or redirect_uri not in the
+                    credentials retrieved.
+
+        Parameters
+        ----------
+            portal_id: str
+                Client connected with Oauth2 to Jabmo account
+
+        Returns
+        -------
+        credentials : dict
+            client_secret: str
+                Jabmo app's client secret
+        """
+        secret_name = f"hubspot/api/{portal_id}"
+        credentials = self.get_secret(secret_name)
+        if not credentials:
+            raise SystemError("An error occured when trying to retrieve the secret")
+        if "refresh_token" not in credentials:
+            raise LookupError("'refresh_token' must be in '{secret_name}' secret keys")
+        # elif "client_secret" not in credentials:
+        #     raise LookupError("'client_secret' must be in '{secret_name}' secret keys")
+        # elif "redirect_uri" not in credentials:
+        #     raise LookupError("'redirect_uri' must be in '{secret_name}' secret keys")
+        self.credentials = credentials
+
+    def get_refresh_token(self, portal_id):
+        self.get_hubspot_credentials(portal_id)
+        return self.credentials["refresh_token"]
+
+
 if __name__ == "__main__":
     res = search_secrets_by_prefix("hubspot")
     print(res)
