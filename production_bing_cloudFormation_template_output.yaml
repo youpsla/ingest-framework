@@ -1,13 +1,13 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: DEVELOPMENT - Bing API Ingest Microservice V3
+Description: Bing API Ingest Microservice V3 - Prod
 Resources:
   Function:
     Type: AWS::Serverless::Function
     Properties:
-      Description: DEVELOPMENT - Bing API Ingest Microservice V3
+      Description: Bing API Ingest Microservice V3 - Prod
       Handler: bing.src.lambda_f.lambda_handler
-      CodeUri: s3://jabmo-ingest/5f1bcd8c599f117a8e45c34e752e23e1
+      CodeUri: s3://jabmo-ingest/f0ef84afdabe63490cbcfd59c61c5e99
       Runtime: python3.8
       Layers:
       - arn:aws:lambda:eu-west-1:467882466042:layer:python-aws-psycopg2:1
@@ -20,6 +20,7 @@ Resources:
         Variables:
           SENTRY_DNS: https://47e2fc82fc674f428f2b3e931eddace7@o1035237.ingest.sentry.io/6094713
           RUNNING_ENV: production
+          TASK_GROUP: daily_tasks_list
   ScheduledRuleJabmoBingIngestDaily:
     Type: AWS::Events::Rule
     Properties:

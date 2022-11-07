@@ -1,6 +1,15 @@
 {
     "name": "hubspot",
     "daily_tasks_list" : [
+        "companies_recently_updated",
+        "campaigns",
+        "delete_campaigns_with_last_update_time_before_2022_01_01",
+        "campaign_details",
+        "email_events_open_daily",
+        "email_events_click_daily",
+        "email_events_forward_daily"
+    ],
+    "hourly_tasks_list" : [
         "contacts_recently_updated",
         "contact_updated_company_hourly_associations"
     ],

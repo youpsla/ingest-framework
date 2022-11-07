@@ -1,11 +1,11 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
-Description: DEVELOPMENT - Bing API Ingest Microservice V3
+Description: DEVELOPMENT - Bing daily tasks
 Resources:
   Function:
     Type: AWS::Serverless::Function
     Properties:
-      Description: DEVELOPMENT - Bing API Ingest Microservice V3
+      Description: DEVELOPMENT - Bing daily tasks
       Handler: bing.src.lambda_f.lambda_handler
       CodeUri: .
       Runtime: python3.8

@@ -6,10 +6,10 @@
 
 
 import json
-import logging
 import os
 import time
 
+import boto3
 import sentry_sdk
 
 # Temporary solution. This import allow init of some envs variables
@@ -44,6 +44,14 @@ def get_channel_params():
     return f
 
 
+def get_task_group_name():
+    task_group_name = os.environ.get("TASK_GROUP")
+    if not task_group_name:
+        raise Exception("Can't find task group.")
+    # return "daily_tasks_list"
+    return task_group_name
+
+
 def lambda_handler(event, context):
     main()
 
@@ -70,14 +78,16 @@ def main():
 
     channel_params = get_channel_params()
 
+    task_group_list = channel_params[get_task_group_name()]
+
     # Daily tasks run
-    logger.info(f"{CHANNEL} - {channel_params['daily_tasks_list']}")
+    logger.info(f"{CHANNEL} - {task_group_list}")
 
     db_connection = RedshiftClient().db_connection
     with db_connection.cursor() as cursor:
         cursor.execute("BEGIN;")
 
-    for task_name in channel_params["daily_tasks_list"]:
+    for task_name in task_group_list:
         result, _ = run_task(channel_params["name"], task_name, db_connection)
 
     with db_connection.cursor() as cursor:
@@ -89,6 +99,27 @@ def main():
     logger.info(end - start)
 
     logger.info("### Ingest lambda ended ###")
+
+    logger.info("### Ingest lambda ended ###")
+
+    # Invoke deduplicate Lambda
+    logger.info("### Invoke Redshift deduplication Lambda ###")
+    event = {
+        "schemas": ["bing_production"],
+        "tables": [],
+        "do_delete_duplicates": True,
+        "partition_order_by_field": "jab_id",
+        "env": "prod",
+        "mode": "readwrite",
+    }
+
+    lambda_client = boto3.client("lambda")
+    lambda_client.invoke(
+        FunctionName="jabmo-ingest-redshift-deduplicator-Function-jhJwND5R8vnY",  # noqa: E501
+        Payload=json.dumps(event),
+        InvocationType="Event",
+    )
+    logger.info("### Invocation sent###")
 
 
 if __name__ == "__main__":

@@ -21,7 +21,7 @@ Resources:
           WEB_INGEST_PROD_RW_SECRET_NAME: jabmo/db/redshift/web-ingest/prod/rw
           SENTRY_DNS: https://47e2fc82fc674f428f2b3e931eddace7@o1035237.ingest.sentry.io/6094713
           RUNNING_ENV: production
-
+          TASK_GROUP: daily_tasks_list
   ScheduledRuleJabmoLinkedInIngestDaily:
     Type: AWS::Events::Rule
     Properties:
