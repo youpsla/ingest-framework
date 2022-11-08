@@ -1,0 +1,11 @@
+.aws-sam
+__pycache__*
+.pyenv-version
+.vscode
+.DS_Store
+python
+*.zip
+*.pickle
+.ipynb_checkpoints
+.pytest_cache
+tmp/*
