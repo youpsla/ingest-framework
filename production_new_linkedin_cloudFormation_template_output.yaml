@@ -7,13 +7,13 @@ Resources:
     Properties:
       Description: LinkedIn API Ingest Microservice V2b - Prod
       Handler: linkedin.lambda_f.lambda_handler
-      CodeUri: s3://jabmo-ingest/f5aa1b0a38c1f2b9af21a79c87ff4b5a
+      CodeUri: s3://jabmo-ingest/861b5e3ece0da7d06232bf51bb11476b
       Runtime: python3.8
       Layers:
       - arn:aws:lambda:eu-west-1:467882466042:layer:python-aws-psycopg2:1
       - arn:aws:lambda:eu-west-1:467882466042:layer:ingest-external-libraries:5
       - arn:aws:lambda:eu-west-1:943013980633:layer:SentryPythonServerlessSDK:24
-      Role: arn:aws:iam::467882466042:role/Linkedin-lambda-prod-rw
+      Role: arn:aws:iam::467882466042:role/Linkedin-lambda-dev-staging-rw
       Timeout: 900
       MemorySize: 2048
       Environment:

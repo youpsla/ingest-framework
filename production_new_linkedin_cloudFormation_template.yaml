@@ -13,7 +13,7 @@ Resources:
         - arn:aws:lambda:eu-west-1:467882466042:layer:python-aws-psycopg2:1
         - arn:aws:lambda:eu-west-1:467882466042:layer:ingest-external-libraries:5
         - arn:aws:lambda:eu-west-1:943013980633:layer:SentryPythonServerlessSDK:24
-      Role: arn:aws:iam::467882466042:role/Linkedin-lambda-prod-rw
+      Role: arn:aws:iam::467882466042:role/Linkedin-lambda-dev-staging-rw
       Timeout: 900
       MemorySize: 2048
       Environment:
