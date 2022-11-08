@@ -1,0 +1,641 @@
+[
+    {
+        "daily_accounts_update": {
+            "actions": [
+                "insert",
+                "update"
+            ],
+            "source": "bing",
+            "destination": "redshift",
+            "model": "accounts",
+            "query": {
+                "type": "service",
+                "service_name": "CustomerManagementService",
+                "response_datas_key": [
+                    "AccountInfo"
+                ]
+            },
+            "destination_unique_keys": [
+                "id"
+            ],
+            "exclude_existing_in_db": true,
+            "exclude_key": "id",
+            "update_keys": ["id"]
+        }
+    },
+    {
+        "daily_campaigns_update": {
+            "actions": [
+                "insert",
+                "update"
+            ],
+            "exclude_existing_in_db": true,
+            "exclude_key": "id",
+            "source": "bing",
+            "destination": "redshift",
+            "destination_unique_keys": ["id"],
+            "request_data_source": "redshift",
+            "model": "campaigns",
+            "update_keys": ["id"],
+            "data_source": {
+                "name": "accounts",
+                "raw_sql": "select id from {schema}.accounts"
+            },
+            "fields_to_add_to_api_result": [
+                {
+                    "name": "account_id",
+                    "origin_key": "AccountId",
+                    "destination_key": "AccountId"
+                }
+            ],
+            "query": {
+                "type": "service",
+                "service_name": "CampaignManagementService",
+                "response_datas_key": ["Campaign"],
+                "params": [
+                    {
+                        "name": "AccountId",
+                        "type": "db",
+                        "data_source_name": "accounts",
+                        "source_key": "id",
+                        "output_type": "kwarg"
+                    },
+                    {
+                        "name": "CampaignType",
+                        "type": "constant",
+                        "output_type": "kwarg",
+                        "value": "Search Audience DynamicSearchAds Shopping"
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "daily_adgroups_update": {
+            "actions": [
+                "insert",
+                "update"
+            ],
+            "exclude_existing_in_db": true,
+            "exclude_key": "id",
+            "source": "bing",
+            "destination": "redshift",
+            "destination_unique_keys": ["id"],
+            "request_data_source": "redshift",
+            "model": "adgroups",
+            "update_keys": ["id"],
+            "data_source": {
+                "name": "accounts",
+                "raw_sql": "select id from {schema}.accounts"
+            },
+            "query": {
+                "type": "service",
+                "params": [
+                    {
+                        "name": "AccountId",
+                        "type": "db",
+                        "data_source_name": "accounts",
+                        "source_key": "id",
+                        "output_type": "kwarg"
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "daily_ads_update": {
+            "actions": [
+                "insert",
+                "update"
+            ],
+            "exclude_existing_in_db": true,
+            "exclude_key": "id",
+            "source": "bing",
+            "destination": "redshift",
+            "destination_unique_keys": ["id"],
+            "request_data_source": "redshift",
+            "model": "ads",
+            "update_keys": ["id"],
+            "data_source": {
+                "name": "adgroups",
+                "raw_sql": "select id from {schema}.accounts"
+            },
+            "query": {
+                "type": "service",
+                "service_name": "CampaignManagementService",
+                "response_datas_key": ["Ad"],
+                "params": [
+                    {
+                        "name": "AccountId",
+                        "type": "db",
+                        "data_source_name": "adgroups",
+                        "source_key": "id",
+                        "output_type": "kwarg"
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "daily_medias_update": {
+            "actions": [
+                "insert",
+                "update"
+            ],
+            "exclude_existing_in_db": true,
+            "exclude_key": "id",
+            "source": "bing",
+            "destination": "redshift",
+            "destination_unique_keys": ["id"],
+            "request_data_source": "redshift",
+            "model": "medias",
+            "update_keys": ["id"],
+            "data_source": {
+                "name": "accounts",
+                "raw_sql": "select id from {schema}.accounts"
+            },
+            "fields_to_add_to_api_result": [
+                {
+                    "name": "accountid",
+                    "origin_key": "AccountId",
+                    "destination_key": "AccountId"
+                }
+            ],
+            "query": {
+                "type": "service",
+                "service_name": "CampaignManagementService",
+                "response_datas_key": ["MediaMetaData"],
+                "params": [
+                    {
+                        "name": "AccountId",
+                        "type": "db",
+                        "data_source_name": "accounts",
+                        "source_key": "id",
+                        "output_type": "kwarg"
+                    },
+                    {
+                        "name": "MediaEnabledEntities",
+                        "type": "constant",
+                        "value": "ResponsiveAd ImageAdExtension",
+                        "output_type": "kwarg"
+                    },
+                    {
+                        "name": "PageInfo",
+                        "type": "constant",
+                        "value": null,
+                        "output_type": "kwarg"
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "daily_user_location_metrics_update": {
+            "actions": [
+                "download",
+                "insert"
+            ],
+            "exclude_existing_in_db": false,
+            "source": "bing",
+            "destination": "redshift",
+            "request_data_source": "redshift",
+            "model": "user_location_metrics",
+            "data_source": {
+                "name": "accounts",
+                "raw_sql": "select id from {schema}.accounts"
+            },
+            "query": {
+                "response_datas_key": "elements",
+                "type": "service",
+                "service_name": "ReportingService",
+                "params": [
+                    {
+                        "name": "AdTypes",
+                        "type": "constant",
+                        "output_type": "arg",
+                        "value": [
+                            "AppInstall",
+                            "DynamicSearch",
+                            "ExpandedText",
+                            "Product",
+                            "ResponsiveAd",
+                            "ResponsiveSearchAd",
+                            "Text"
+                        ]
+                    },
+                    {
+                        "name": "AccountId",
+                        "type": "db",
+                        "data_source_name": "accounts",
+                        "source_key": "id",
+                        "output_type": "kwarg",
+                        "chunck": true,
+                        "chunck_size": 50
+                    },
+                    {
+                        "name": "dateRange_start_day",
+                        "url_key_string": "dateRange.start.day",
+                        "type": "part_of_date",
+                        "part_of_date_name": "day",
+                        "offset_type": "from_today",
+                        "offset_value": "1",
+                        "offset_unity": "days",
+                        "position": "end",
+                        "output_type": "kwarg"
+                    },
+                    {
+                        "name": "dateRange_start_month",
+                        "url_key_string": "dateRange.start.month",
+                        "type": "part_of_date",
+                        "part_of_date_name": "month",
+                        "offset_type": "from_today",
+                        "offset_value": "1",
+                        "offset_unity": "days",
+                        "position": "end",
+                        "output_type": "kwarg"
+                    },
+                    {
+                        "name": "dateRange_start_year",
+                        "url_key_string": "dateRange.start.year",
+                        "type": "part_of_date",
+                        "part_of_date_name": "year",
+                        "offset_type": "from_today",
+                        "offset_value": "1",
+                        "offset_unity": "days",
+                        "position": "end",
+                        "output_type": "kwarg"
+                    },
+                    {
+                        "name": "dateRange_end_day",
+                        "url_key_string": "dateRange.end.day",
+                        "type": "part_of_date",
+                        "part_of_date_name": "day",
+                        "offset_type": "from_today",
+                        "offset_value": "1",
+                        "offset_unity": "days",
+                        "position": "end",
+                        "output_type": "kwarg"
+                    },
+                    {
+                        "name": "dateRange_end_month",
+                        "url_key_string": "dateRange.end.month",
+                        "type": "part_of_date",
+                        "part_of_date_name": "month",
+                        "offset_type": "from_today",
+                        "offset_value": "1",
+                        "offset_unity": "days",
+                        "position": "end",
+                        "output_type": "kwarg"
+                    },
+                    {
+                        "name": "dateRange_end_year",
+                        "url_key_string": "dateRange.end.year",
+                        "type": "part_of_date",
+                        "part_of_date_name": "year",
+                        "offset_type": "from_today",
+                        "offset_value": "1",
+                        "offset_unity": "days",
+                        "position": "end",
+                        "output_type": "kwarg"
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "daily_demographic_metrics_update": {
+            "actions": [
+                "download",
+                "insert"
+            ],
+            "exclude_existing_in_db": false,
+            "source": "bing",
+            "destination": "redshift",
+            "request_data_source": "redshift",
+            "model": "demographic_metrics",
+            "data_source": {
+                "name": "accounts",
+                "raw_sql": "select id from {schema}.accounts"
+            },
+            "query": {
+                "type": "service",
+                "service_name": "ReportingService",
+                "params": [
+                    {
+                        "name": "AdTypes",
+                        "type": "constant",
+                        "output_type": "arg",
+                        "value": [
+                            "AppInstall",
+                            "DynamicSearch",
+                            "ExpandedText",
+                            "Product",
+                            "ResponsiveAd",
+                            "ResponsiveSearchAd",
+                            "Text"
+                        ]
+                    },
+                    {
+                        "name": "AccountId",
+                        "type": "db",
+                        "data_source_name": "accounts",
+                        "source_key": "id",
+                        "output_type": "kwarg",
+                        "chunck": true,
+                        "chunck_size": 50
+                    },
+                    {
+                        "name": "dateRange_start_day",
+                        "url_key_string": "dateRange.start.day",
+                        "type": "part_of_date",
+                        "part_of_date_name": "day",
+                        "offset_type": "from_today",
+                        "offset_value": "1",
+                        "offset_unity": "days",
+                        "position": "end",
+                        "output_type": "kwarg"
+                    },
+                    {
+                        "name": "dateRange_start_month",
+                        "url_key_string": "dateRange.start.month",
+                        "type": "part_of_date",
+                        "part_of_date_name": "month",
+                        "offset_type": "from_today",
+                        "offset_value": "1",
+                        "offset_unity": "days",
+                        "position": "end",
+                        "output_type": "kwarg"
+                    },
+                    {
+                        "name": "dateRange_start_year",
+                        "url_key_string": "dateRange.start.year",
+                        "type": "part_of_date",
+                        "part_of_date_name": "year",
+                        "offset_type": "from_today",
+                        "offset_value": "1",
+                        "offset_unity": "days",
+                        "position": "end",
+                        "output_type": "kwarg"
+                    },
+                    {
+                        "name": "dateRange_end_day",
+                        "url_key_string": "dateRange.end.day",
+                        "type": "part_of_date",
+                        "part_of_date_name": "day",
+                        "offset_type": "from_today",
+                        "offset_value": "1",
+                        "offset_unity": "days",
+                        "position": "end",
+                        "output_type": "kwarg"
+                    },
+                    {
+                        "name": "dateRange_end_month",
+                        "url_key_string": "dateRange.end.month",
+                        "type": "part_of_date",
+                        "part_of_date_name": "month",
+                        "offset_type": "from_today",
+                        "offset_value": "1",
+                        "offset_unity": "days",
+                        "position": "end",
+                        "output_type": "kwarg"
+                    },
+                    {
+                        "name": "dateRange_end_year",
+                        "url_key_string": "dateRange.end.year",
+                        "type": "part_of_date",
+                        "part_of_date_name": "year",
+                        "offset_type": "from_today",
+                        "offset_value": "1",
+                        "offset_unity": "days",
+                        "position": "end",
+                        "output_type": "kwarg"
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "daily_geographic_metrics_update": {
+            "actions": [
+                "download",
+                "insert"
+            ],
+            "exclude_existing_in_db": false,
+            "source": "bing",
+            "destination": "redshift",
+            "request_data_source": "redshift",
+            "model": "geographic_metrics",
+            "data_source": {
+                "name": "accounts",
+                "raw_sql": "select id from {schema}.accounts"
+            },
+            "query": {
+                "type": "service",
+                "service_name": "ReportingService",
+                "params": [
+                    {
+                        "name": "AdTypes",
+                        "type": "constant",
+                        "output_type": "arg",
+                        "value": [
+                            "AppInstall",
+                            "DynamicSearch",
+                            "ExpandedText",
+                            "Product",
+                            "ResponsiveAd",
+                            "ResponsiveSearchAd",
+                            "Text"
+                        ]
+                    },
+                    {
+                        "name": "AccountId",
+                        "type": "db",
+                        "data_source_name": "accounts",
+                        "source_key": "id",
+                        "output_type": "kwarg",
+                        "chunck": true,
+                        "chunck_size": 50
+                    },
+                    {
+                        "name": "dateRange_start_day",
+                        "url_key_string": "dateRange.start.day",
+                        "type": "part_of_date",
+                        "part_of_date_name": "day",
+                        "offset_type": "from_today",
+                        "offset_value": "1",
+                        "offset_unity": "days",
+                        "position": "end",
+                        "output_type": "kwarg"
+                    },
+                    {
+                        "name": "dateRange_start_month",
+                        "url_key_string": "dateRange.start.month",
+                        "type": "part_of_date",
+                        "part_of_date_name": "month",
+                        "offset_type": "from_today",
+                        "offset_value": "1",
+                        "offset_unity": "days",
+                        "position": "end",
+                        "output_type": "kwarg"
+                    },
+                    {
+                        "name": "dateRange_start_year",
+                        "url_key_string": "dateRange.start.year",
+                        "type": "part_of_date",
+                        "part_of_date_name": "year",
+                        "offset_type": "from_today",
+                        "offset_value": "1",
+                        "offset_unity": "days",
+                        "position": "end",
+                        "output_type": "kwarg"
+                    },
+                    {
+                        "name": "dateRange_end_day",
+                        "url_key_string": "dateRange.end.day",
+                        "type": "part_of_date",
+                        "part_of_date_name": "day",
+                        "offset_type": "from_today",
+                        "offset_value": "1",
+                        "offset_unity": "days",
+                        "position": "end",
+                        "output_type": "kwarg"
+                    },
+                    {
+                        "name": "dateRange_end_month",
+                        "url_key_string": "dateRange.end.month",
+                        "type": "part_of_date",
+                        "part_of_date_name": "month",
+                        "offset_type": "from_today",
+                        "offset_value": "1",
+                        "offset_unity": "days",
+                        "position": "end",
+                        "output_type": "kwarg"
+                    },
+                    {
+                        "name": "dateRange_end_year",
+                        "url_key_string": "dateRange.end.year",
+                        "type": "part_of_date",
+                        "part_of_date_name": "year",
+                        "offset_type": "from_today",
+                        "offset_value": "1",
+                        "offset_unity": "days",
+                        "position": "end",
+                        "output_type": "kwarg"
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "daily_ad_metrics_update": {
+            "actions": [
+                "download",
+                "insert"
+            ],
+            "exclude_existing_in_db": false,
+            "source": "bing",
+            "destination": "redshift",
+            "request_data_source": "redshift",
+            "model": "ad_metrics",
+            "data_source": {
+                "name": "accounts",
+                "raw_sql": "select id from {schema}.accounts"
+            },
+            "query": {
+                "type": "service",
+                "service_name": "ReportingService",
+                "params": [
+                    {
+                        "name": "AdTypes",
+                        "type": "constant",
+                        "output_type": "arg",
+                        "value": [
+                            "AppInstall",
+                            "DynamicSearch",
+                            "ExpandedText",
+                            "Product",
+                            "ResponsiveAd",
+                            "ResponsiveSearchAd",
+                            "Text"
+                        ]
+                    },
+                    {
+                        "name": "AccountId",
+                        "type": "db",
+                        "data_source_name": "accounts",
+                        "source_key": "id",
+                        "output_type": "kwarg",
+                        "chunck": true,
+                        "chunck_size": 50
+                    },
+                    {
+                        "name": "dateRange_start_day",
+                        "url_key_string": "dateRange.start.day",
+                        "type": "part_of_date",
+                        "part_of_date_name": "day",
+                        "offset_type": "from_today",
+                        "offset_value": "1",
+                        "offset_unity": "days",
+                        "position": "end",
+                        "output_type": "kwarg"
+                    },
+                    {
+                        "name": "dateRange_start_month",
+                        "url_key_string": "dateRange.start.month",
+                        "type": "part_of_date",
+                        "part_of_date_name": "month",
+                        "offset_type": "from_today",
+                        "offset_value": "1",
+                        "offset_unity": "days",
+                        "position": "end",
+                        "output_type": "kwarg"
+                    },
+                    {
+                        "name": "dateRange_start_year",
+                        "url_key_string": "dateRange.start.year",
+                        "type": "part_of_date",
+                        "part_of_date_name": "year",
+                        "offset_type": "from_today",
+                        "offset_value": "1",
+                        "offset_unity": "days",
+                        "position": "end",
+                        "output_type": "kwarg"
+                    },
+                    {
+                        "name": "dateRange_end_day",
+                        "url_key_string": "dateRange.end.day",
+                        "type": "part_of_date",
+                        "part_of_date_name": "day",
+                        "offset_type": "from_today",
+                        "offset_value": "1",
+                        "offset_unity": "days",
+                        "position": "end",
+                        "output_type": "kwarg"
+                    },
+                    {
+                        "name": "dateRange_end_month",
+                        "url_key_string": "dateRange.end.month",
+                        "type": "part_of_date",
+                        "part_of_date_name": "month",
+                        "offset_type": "from_today",
+                        "offset_value": "1",
+                        "offset_unity": "days",
+                        "position": "end",
+                        "output_type": "kwarg"
+                    },
+                    {
+                        "name": "dateRange_end_year",
+                        "url_key_string": "dateRange.end.year",
+                        "type": "part_of_date",
+                        "part_of_date_name": "year",
+                        "offset_type": "from_today",
+                        "offset_value": "1",
+                        "offset_unity": "days",
+                        "position": "end",
+                        "output_type": "kwarg"
+                    }
+                ]
+            }
+        }
+    }
+]
