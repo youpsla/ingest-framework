@@ -23,5 +23,5 @@ def get_client(env, client_name, task, db_connection=None):
         return client
     else:
         raise ValueError(
-            "client_name is not valid. Must be in ['s3', 'bing', 'reshift', 'linkedin', 'hubspot']"
+            "client_name is not valid. Must be in ['s3', 'bing', 'reshift', 'linkedin', 'hubspot']"  # noqa: E501
         )

@@ -3,7 +3,7 @@ import sys
 
 from src.utils.various_utils import get_schema_name
 
-#### User defined variables ####
+# User defined variables #
 CHANNEL = "linkedin"
 ###############################
 os.environ["INGEST_CURRENT_CHANNEL"] = CHANNEL

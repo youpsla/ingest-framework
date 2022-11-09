@@ -2,6 +2,7 @@ import os
 
 from psycopg2 import ProgrammingError, extras
 from psycopg2.extras import RealDictCursor
+
 from src.utils.custom_logger import logger
 from src.utils.various_utils import get_schema_name
 
@@ -200,20 +201,9 @@ class SqlQuery:
             return result
 
         def update_get_and_where(self):
-            comparaison_fields = set(self.values[0].keys()) - set(self.update_keys)
-            # comparaison_fields = list(self.values[0].keys())
-            # comparaison_fields.remove(*self.update_keys)
-            # where_data = " or ".join(
-            #     [
-            #         " != ".join(
-            #             (
-            #                 "{}.{}".format(self.model.model_name, str(f)),
-            #                 "{}.{}".format(self.stage_table_name, str(f)),
-            #             )
-            #         )
-            #         for f in comparaison_fields
-            #     ]
-            # )
+            comparaison_fields = set(self.values[0].keys()) - set(
+                self.update_keys
+            )  # noqa: E501
 
             # Solution managing case of null value in redshift.
             where_data = " or ".join(
@@ -276,18 +266,9 @@ class SqlQuery:
             return result
 
         def update_get_and_where(self):
-            comparaison_fields = set(self.values[0].keys()) - set(self.update_keys)
-            # where_data = " or ".join(
-            #     [
-            #         " != ".join(
-            #             (
-            #                 "{}.{}".format(self.model.model_name, str(f)),
-            #                 "{}.{}".format(self.stage_table_name, str(f)),
-            #             )
-            #         )
-            #         for f in comparaison_fields
-            #     ]
-            # )
+            comparaison_fields = set(self.values[0].keys()) - set(
+                self.update_keys
+            )  # noqa: E501
 
             # Solution managing case of null value in redshift.
             where_data = " or ".join(
@@ -339,7 +320,12 @@ class SqlQuery:
         # set_data = ' , '.join(['='.join((str(a[0]),str(a[1]))) for a in zip(fields,values)]) # noqa: E501
         set_data = " , ".join(
             [
-                "=".join((str(k), "'{}'".format(v.replace("'", "''") if v else None)))
+                "=".join(
+                    (
+                        str(k),
+                        "'{}'".format(v.replace("'", "''") if v else None),
+                    )  # noqa: E501
+                )  # noqa: E501
                 for d in self.values
                 for k, v in d.items()
             ]

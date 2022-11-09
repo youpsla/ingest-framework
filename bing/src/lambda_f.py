@@ -1,4 +1,4 @@
-# TODO: manage logger for having logger output in terminal when running locally + cleanup print statements
+# TODO: manage logger for having logger output in terminal when running locally + cleanup print statements # noqa: E501
 
 
 # TODO: For migrating production
@@ -11,11 +11,11 @@ import time
 
 import boto3
 import sentry_sdk
+from sentry_sdk.integrations.aws_lambda import AwsLambdaIntegration
 
 # Temporary solution. This import allow init of some envs variables
 # TODO: Envs management needs better system.
 from configs.globals import CHANNEL
-from sentry_sdk.integrations.aws_lambda import AwsLambdaIntegration
 
 # Import redshift here for being able to rollback()/commit() transaction.
 from src.clients.redshift.redshift_client import RedshiftClient
@@ -35,7 +35,9 @@ sentry_sdk.init(
 
 def get_params_json_file_path():
     app_home = os.environ["APPLICATION_HOME"]
-    return os.path.realpath(os.path.join(app_home, "configs", CHANNEL, "channel.json"))
+    return os.path.realpath(
+        os.path.join(app_home, "configs", CHANNEL, "channel.json")
+    )  # noqa: E501
 
 
 def get_channel_params():
@@ -93,7 +95,9 @@ def main():
     with db_connection.cursor() as cursor:
         cursor.execute("COMMIT;")
         # Transfer from tmp dir to s3
-    logger.info("All tasks have runned successfully. Daily Worflow ended with success.")
+    logger.info(
+        "All tasks have runned successfully. Daily Worflow ended with success."
+    )  # noqa: E501
 
     end = time.time()
     logger.info(end - start)

@@ -1,5 +1,4 @@
-# TODO: manage logger for having logger output in terminal when running locally + cleanup print statements
-# TODO Alain: Finish creative_sponsored_update_daily_update , api throttle limit reached.
+# TODO: manage logger for having logger output in terminal when running locally + cleanup print statements # noqa: E501
 
 import datetime
 import json
@@ -8,11 +7,11 @@ import time
 
 import boto3
 import sentry_sdk
+from sentry_sdk.integrations.aws_lambda import AwsLambdaIntegration
 
 # Temporary solution. This import allow init of some envs variables
 # TODO: Envs management needs better system.
 from configs.globals import CHANNEL
-from sentry_sdk.integrations.aws_lambda import AwsLambdaIntegration
 
 # Import redshift here for being able to rollback()/commit() transaction.
 from src.clients.redshift.redshift_client import RedshiftClient
@@ -31,7 +30,9 @@ def activate_sentry():
 
 def get_params_json_file_path():
     app_home = os.environ["APPLICATION_HOME"]
-    return os.path.realpath(os.path.join(app_home, "configs", CHANNEL, "channel.json"))
+    return os.path.realpath(
+        os.path.join(app_home, "configs", CHANNEL, "channel.json")
+    )  # noqa: E501
 
 
 def get_channel_params():
@@ -95,11 +96,15 @@ def main():
         monthly_tasks_list = channel_params.get("monthly_tasks_list", None)
         if monthly_tasks_list:
             for task_name in monthly_tasks_list:
-                result, _ = run_task(channel_params["name"], task_name, db_connection)
+                result, _ = run_task(
+                    channel_params["name"], task_name, db_connection
+                )  # noqa: E501
 
     with db_connection.cursor() as cursor:
         cursor.execute("COMMIT;")
-    logger.info("All tasks have runned successfully. Daily Worflow ended with success.")
+    logger.info(
+        "All tasks have runned successfully. Daily Worflow ended with success."
+    )  # noqa: E501
 
     end = time.time()
     logger.info(end - start)
