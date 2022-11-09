@@ -4,6 +4,7 @@ from datetime import date, datetime, timedelta
 
 import pendulum
 import pytz
+
 from src.commons.model import Model
 from src.constants import ENVS_LIST
 from src.utils.custom_logger import logger
@@ -117,6 +118,18 @@ class Client:
 
                 # Case when param is of type "timestamp_from_epoch"
                 # Used for buiding date range params.
+
+                if param["type"] == "timestamp_from_epoch_exact_time":
+                    target_day = self.get_day_relative_to_today_from_params(
+                        day_params=param,
+                        offset_unity=param["offset_unity"],
+                    )
+
+                    # Transform to timestamp
+                    target_timestamp = int(datetime.timestamp(target_day)) * 1000
+
+                    tmp_result = [{param["name"]: target_timestamp}]
+
                 if param["type"] == "timestamp_from_epoch":
                     target_day = self.get_day_relative_to_today_from_params(
                         day_params=param,
