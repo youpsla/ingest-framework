@@ -6,11 +6,12 @@ from datetime import datetime
 
 from bingads.v13.bulk import *
 from bingads.v13.reporting.reporting_service_manager import ReportingServiceManager
+
 from src.clients.bing.auth_helper import (
-    DEVELOPER_TOKEN,
     AuthorizationData,
     ServiceClient,
     authenticate,
+    get_authorization_data,
     output_status_message,
 )
 from src.commons.client import Client
@@ -71,12 +72,7 @@ class BingAdsClient(Client):
                 }
                 result_file_path_list = []
                 for k, v in db_params.items():
-                    self.authorization_data = AuthorizationData(
-                        account_id=v["AccountId"],
-                        customer_id=None,
-                        developer_token=DEVELOPER_TOKEN,
-                        authentication=None,
-                    )
+                    self.authorization_data = get_authorization_data(v["AccountId"])
 
                     bulk_service_manager = BulkServiceManager(
                         authorization_data=self.authorization_data,
@@ -133,12 +129,8 @@ class BingAdsClient(Client):
                     key: copy.deepcopy(value) for key, value in db_params.items()
                 }
                 for k, v in db_params.items():
-                    self.authorization_data = AuthorizationData(
-                        account_id=None,
-                        customer_id=None,
-                        developer_token=DEVELOPER_TOKEN,
-                        authentication=None,
-                    )
+                    # self.authorization_data = get_authorization_data(v["AccountId"])
+                    self.authorization_data = get_authorization_data()
                     authenticate(self.authorization_data)
                     request = ReportRequest(
                         authorization_data=self.authorization_data,
@@ -166,12 +158,7 @@ class BingAdsClient(Client):
         #         # kwargs=kwargs,
         #     )
         if self.task.name == "daily_accounts_update":
-            self.authorization_data = AuthorizationData(
-                account_id=None,
-                customer_id=None,
-                developer_token=DEVELOPER_TOKEN,
-                authentication=None,
-            )
+            self.authorization_data = get_authorization_data()
             authenticate(self.authorization_data)
             request = ServiceRequest(
                 authorization_data=self.authorization_data,
@@ -190,12 +177,8 @@ class BingAdsClient(Client):
                 print(f"Number of requests to run: {counter_total}")
                 result = []
                 for k, v in db_params.items():
-                    self.authorization_data = AuthorizationData(
-                        account_id=v["AccountId"],
-                        customer_id=None,
-                        developer_token=DEVELOPER_TOKEN,
-                        authentication=None,
-                    )
+                    self.authorization_data = get_authorization_data(v["AccountId"])
+                    authenticate(self.authorization_data)
                     # Delete entries which cannot be passed to the service for the request. used for AccountId which has to be in authentication only.
                     if not self.task.name == "daily_campaigns_update":
                         del v["AccountId"]

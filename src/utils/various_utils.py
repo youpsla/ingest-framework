@@ -49,8 +49,8 @@ def get_running_env():
 
 def get_schema_name(channel):
     schema_name = channel + "_" + get_running_env()
-    # return schema_name
-    return "new_linkedin"
+    return schema_name
+    # return "new_linkedin"
 
 
 def get_model_params_as_dict(channel, model_name):
