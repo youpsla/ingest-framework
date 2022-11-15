@@ -3,16 +3,16 @@ import time
 from collections import ChainMap
 from threading import current_thread, get_ident, get_native_id
 
+from hubspot.auth.oauth.api.tokens_api import TokensApi
+from hubspot.auth.oauth.exceptions import ApiException
 from requests.exceptions import ConnectionError, ConnectTimeout, RetryError
 from requests.structures import CaseInsensitiveDict
+
 from src.clients.aws.aws_tools import Secret, search_secrets_by_prefix
 from src.commons.client import Client
 from src.utils.endpoint_utils import Endpoint
 from src.utils.http_utils import get_http_adapter
 from src.utils.various_utils import get_chunks, run_in_threads_pool
-
-from hubspot.auth.oauth.api.tokens_api import TokensApi
-from hubspot.auth.oauth.exceptions import ApiException
 
 
 def contacts_pagination(endpoint, task_result):
@@ -49,7 +49,7 @@ def contacts_recently_created_updated_pagination(endpoint, task_result):
     time_offset = task_result.get("time-offset", None)
     if time_offset:
         now = int(time.time())
-        now_minus_one_hour_and_ten_minuts = now - 4200
+        now_minus_one_hour_and_ten_minuts = now - 1000
         offset_limit_in_ms = now_minus_one_hour_and_ten_minuts * 1000
         if time_offset < offset_limit_in_ms:
             return None

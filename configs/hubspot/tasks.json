@@ -733,7 +733,7 @@
                         "name": "since",
                         "type": "timestamp_from_epoch_exact_time",
                         "offset_type": "from_today",
-                        "offset_value": 7200,
+                        "offset_value": 1000,
                         "offset_unity": "seconds",
                         "position": "start",
                         "output_type": "kwarg"
@@ -1393,7 +1393,7 @@
             "model": "company_contact_associations",
             "data_source": {
                 "name": "contacts",
-                "raw_sql": "select portal_id, id from {schema}.contacts  where updated_at > GETDATE() - INTERVAL '2 HOUR'"
+                "raw_sql": "select portal_id, id from {schema}.contacts  where updated_at > GETDATE() - INTERVAL '20 MINUTE'"
             },
             "fields_to_add_to_api_result": [
                 {
