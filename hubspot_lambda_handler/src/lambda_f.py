@@ -6,11 +6,11 @@ import time
 
 import boto3
 import sentry_sdk
+from sentry_sdk.integrations.aws_lambda import AwsLambdaIntegration
 
 # Temporary solution. This import allow init of some envs variables
 # TODO: Envs management needs better system.
 from configs.globals import CHANNEL
-from sentry_sdk.integrations.aws_lambda import AwsLambdaIntegration
 
 # Import redshift here for being able to rollback()/commit() transaction.
 from src.clients.redshift.redshift_client import RedshiftClient
@@ -51,9 +51,8 @@ def get_channel_params():
 
 def get_task_group_name():
     task_group_name = os.environ.get("TASK_GROUP")
-    # if not task_group_name:
-    #     raise Exception("Can't find task group.")
-    return "daily_tasks_list"
+    if not task_group_name:
+        raise Exception("Can't find task group.")
     return task_group_name
 
 
