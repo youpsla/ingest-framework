@@ -15,6 +15,10 @@ Parameters:
     Type: String
     Description: This is the cron expression of hubspot contact daily ingest
     Default: "cron(30 8 * * ? *)"
+  CronJabmoHubspoHourlyContacts:
+    Type: String
+    Description: This is the cron expression of hubspot contact hourly ingest
+    Default: "cron(00 * * * ? *)"
 Conditions:
   IsProd: !Equals [!Ref Environment, "prod"]
 Resources:
@@ -42,16 +46,27 @@ Resources:
 #########
 # Rules
 #########
-  IngestFrameworkECSTaskDefinitionRule:
+  IngestFrameworkECSContactDailyRule:
     Type: AWS::Events::Rule
     Properties:
-      Description: "ScheduledRule for IngestFrameworkLauncher"
+      Description: "ScheduledRule for Ingest Framework for contact daily"
       ScheduleExpression: !Ref CronJabmoHubspotDailyContacts
       State: !If [IsProd, ENABLED, DISABLED]
       Targets:
         - Arn: !GetAtt IngestFrameworkLauncher.Arn
           Id: "IngestFrameworkLauncher"
-          Input: !Sub '{"task_parameters":{"cluster":"ingest-framework-cluster-${Environment}","launchType":"FARGATE","taskDefinition":"ingest-framework-task-definition-${Environment}","count":1,"platformVersion":"LATEST","networkConfiguration":{"awsvpcConfiguration":{"subnets":["subnet-6501a53f","subnet-572e5b1f","subnet-bea63cd8"],"assignPublicIp":"ENABLED",},},"overrides":{"containerOverrides":[{"name":"ingest-framework-container-${Environment}","environment":[{"name":"PROVIDER","value":"hubspot"},{"name":"SENTRY_DSN","value":"${SentryDsn}"},{"name":"ENVIRONMENT","value":"${Environment}"},],},],},},"env":"${Environment}",}'
+          Input: !Sub '{"task_parameters":{"cluster":"ingest-framework-cluster-${Environment}","launchType":"FARGATE","taskDefinition":"ingest-framework-task-definition-${Environment}","count":1,"platformVersion":"LATEST","networkConfiguration":{"awsvpcConfiguration":{"subnets":["subnet-6501a53f","subnet-572e5b1f","subnet-bea63cd8"],"assignPublicIp":"ENABLED",},},"overrides":{"containerOverrides":[{"name":"ingest-framework-container-${Environment}","environment":[{"name":"PROVIDER","value":"hubspot"},{"name":"SENTRY_DSN","value":"${SentryDsn}"},{"name":"RUNNING_ENV","value":"${Environment}"},{"name":"TASK_GROUP","value":"daily_tasks_list"},{"name": "AWS_DEFAULT_REGION", "value": "${AWS::Region}"},],},],},},"env":"${Environment}",}'
+
+  IngestFrameworkECSContacHourlyRule:
+    Type: AWS::Events::Rule
+    Properties:
+      Description: "ScheduledRule for Ingest Framework for contact daily"
+      ScheduleExpression: !Ref CronJabmoHubspoHourlyContacts
+      State: !If [IsProd, ENABLED, DISABLED]
+      Targets:
+        - Arn: !GetAtt IngestFrameworkLauncher.Arn
+          Id: "IngestFrameworkLauncher"
+          Input: !Sub '{"task_parameters":{"cluster":"ingest-framework-cluster-${Environment}","launchType":"FARGATE","taskDefinition":"ingest-framework-task-definition-${Environment}","count":1,"platformVersion":"LATEST","networkConfiguration":{"awsvpcConfiguration":{"subnets":["subnet-6501a53f","subnet-572e5b1f","subnet-bea63cd8"],"assignPublicIp":"ENABLED",},},"overrides":{"containerOverrides":[{"name":"ingest-framework-container-${Environment}","environment":[{"name":"PROVIDER","value":"hubspot"},{"name":"SENTRY_DSN","value":"${SentryDsn}"},{"name":"RUNNING_ENV","value":"${Environment}"},{"name":"TASK_GROUP","value":"hourly_tasks_list"},{"name": "AWS_DEFAULT_REGION", "value": "${AWS::Region}"},],},],},},"env":"${Environment}",}'
 
 #######
 # ROLE
@@ -243,12 +258,12 @@ Resources:
               awslogs-stream-prefix: ecs
       Cpu: 256
       Family: !Sub "ingest-framework-task-definition-${Environment}"
-      ExecutionRoleArn: !GetAtt TaskRole.Arn
+      ExecutionRoleArn: !GetAtt IngestFrameworkTaskRole.Arn
       Memory: 512
       NetworkMode: awsvpc
       RequiresCompatibilities:
         - FARGATE
-      TaskRoleArn: !GetAtt TaskRole.Arn
+      TaskRoleArn: !GetAtt IngestFrameworkTaskRole.Arn
       Tags:
         - Key: Environment
           Value: !Ref Environment
