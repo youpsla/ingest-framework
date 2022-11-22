@@ -14,8 +14,6 @@ import boto3
 import sentry_sdk
 from sentry_sdk.integrations.aws_lambda import AwsLambdaIntegration
 
-# Temporary solution. This import allow init of some envs variables
-# TODO: Envs management needs better system.
 from configs.globals import PROVIDER
 
 # Import redshift here for being able to rollback()/commit() transaction.

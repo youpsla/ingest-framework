@@ -3,6 +3,7 @@ import os
 from psycopg2 import ProgrammingError, extras
 from psycopg2.extras import RealDictCursor
 
+from configs.globals import PROVIDER
 from src.utils.custom_logger import logger
 from src.utils.various_utils import get_schema_name
 
@@ -36,8 +37,7 @@ class SqlQuery:
 
     @property
     def schema_name(self):
-        channel = os.environ["PROVIDER"]
-        return get_schema_name(channel)
+        return get_schema_name(PROVIDER)
 
     @property
     def raw_sql(self):
