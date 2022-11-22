@@ -10,7 +10,7 @@ from sentry_sdk.integrations.aws_lambda import AwsLambdaIntegration
 
 # Temporary solution. This import allow init of some envs variables
 # TODO: Envs management needs better system.
-from configs.globals import CHANNEL
+from configs.globals import PROVIDER
 
 # Import redshift here for being able to rollback()/commit() transaction.
 from src.clients.redshift.redshift_client import RedshiftClient
@@ -39,7 +39,7 @@ if os.environ.get("AWS_EXECUTION_ENV") is not None and get_running_env() in [
 def get_params_json_file_path():
     app_home = os.environ["APPLICATION_HOME"]
     return os.path.realpath(
-        os.path.join(app_home, "configs", CHANNEL, "channel.json")
+        os.path.join(app_home, "configs", PROVIDER, "channel.json")
     )  # noqa: E501
 
 

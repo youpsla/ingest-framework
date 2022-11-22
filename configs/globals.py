@@ -4,11 +4,11 @@ import sys
 from src.utils.various_utils import get_schema_name
 
 # User defined variables #
-CHANNEL = "hubspot"
+PROVIDER = "hubspot"
 ###############################
-os.environ["INGEST_CURRENT_CHANNEL"] = CHANNEL
+os.environ["INGEST_CURRENT_PROVIDER"] = PROVIDER
 
-SCHEMA_NAME = get_schema_name(CHANNEL)
+SCHEMA_NAME = get_schema_name(PROVIDER)
 
 
 if os.environ.get("AWS_EXECUTION_ENV") is None:

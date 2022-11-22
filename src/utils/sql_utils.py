@@ -36,7 +36,7 @@ class SqlQuery:
 
     @property
     def schema_name(self):
-        channel = os.environ["INGEST_CURRENT_CHANNEL"]
+        channel = os.environ["PROVIDER"]
         return get_schema_name(channel)
 
     @property
