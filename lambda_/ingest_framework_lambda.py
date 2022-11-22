@@ -31,7 +31,7 @@ def lambda_handler(event, context):
     ----------
     event: dict
         env: str
-            Environment name ("prod", "uat" or "dev").
+            Environment name ("production", "staging" or "development").
     context: dict
         empty
     """
@@ -42,8 +42,8 @@ def lambda_handler(event, context):
                         f"Running task {environment} environment:\n"
                         f"{task_parameters}"
                     )
-        accepted_environment = ["prod", "uat", "dev"]
-        if environment not in ["prod", "uat", "dev"]:
+        accepted_environment = ["production", "staging", "development"]
+        if environment not in ["production", "staging", "development"]:
             raise ValueError(
                         f"'env' variable should be in {accepted_environment}"
                     )
