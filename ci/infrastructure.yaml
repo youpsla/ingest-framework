@@ -20,7 +20,7 @@ Parameters:
     Description: This is the cron expression of hubspot contact hourly ingest
     Default: "cron(00 * * * ? *)"
 Conditions:
-  IsProd: !Equals [!Ref Environment, "prod"]
+  IsProd: !Equals [!Ref Environment, "production"]
 Resources:
 
 #########
