@@ -3,7 +3,7 @@
 # Parameters
 # 1.) environment name
 
-if [[ "$1" =~ ^(dev|uat|prod)$ ]]; then
+if [[ "$1" =~ ^(development|staging|production)$ ]]; then
     CALLER_IDENTITY=$(aws sts get-caller-identity --query "Account" --output text)
     BUCKET_NAME=jabmo-ingest
     TS=$(date +"%s")
@@ -45,9 +45,9 @@ if [[ "$1" =~ ^(dev|uat|prod)$ ]]; then
     echo "Pushing the image to $CALLER_IDENTITY.dkr.ecr.eu-west-1.amazonaws.com/ingest-framework-repository-$1"
     docker push $CALLER_IDENTITY.dkr.ecr.eu-west-1.amazonaws.com/ingest-framework-repository-$1:$1
 else
-    echo "##########################"
+    echo "##############################################"
     echo -e "'$1' parameter not valid"
-    echo "Should be dev, uat or prod"
-    echo "##########################"
+    echo "Should be development, staging or production"
+    echo "##############################################"
     exit
 fi

@@ -4,7 +4,7 @@ Description: Ingest Framework infrastructure
 Parameters:
   Environment:
     Type: String
-    Default: dev
+    Default: development
   SentryDsn:
     Type: String
     Default: ""
