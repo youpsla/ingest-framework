@@ -1,4 +1,4 @@
-AWSTemplateFormatVersion: '2010-09-09'
+AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
 Description: Ingest Framework infrastructure
 Parameters:
@@ -46,27 +46,29 @@ Resources:
 #########
 # Rules
 #########
-  IngestFrameworkECSContactDailyRule:
+  IngestFrameworkHubspotContactDailyCron:
     Type: AWS::Events::Rule
     Properties:
+      Name: !Sub "cron-ingest-framework-hubspot-contact-daily-${Environment}"
       Description: "ScheduledRule for Ingest Framework for contact daily"
       ScheduleExpression: !Ref CronJabmoHubspotDailyContacts
       State: !If [IsProd, ENABLED, DISABLED]
       Targets:
         - Arn: !GetAtt IngestFrameworkLauncher.Arn
           Id: "IngestFrameworkLauncher"
-          Input: !Sub '{"task_parameters":{"cluster":"ingest-framework-cluster-${Environment}","launchType":"FARGATE","taskDefinition":"ingest-framework-task-definition-${Environment}","count":1,"platformVersion":"LATEST","networkConfiguration":{"awsvpcConfiguration":{"subnets":["subnet-6501a53f","subnet-572e5b1f","subnet-bea63cd8"],"assignPublicIp":"ENABLED",},},"overrides":{"containerOverrides":[{"name":"ingest-framework-container-${Environment}","environment":[{"name":"PROVIDER","value":"hubspot"},{"name":"SENTRY_DSN","value":"${SentryDsn}"},{"name":"RUNNING_ENV","value":"${Environment}"},{"name":"TASK_GROUP","value":"daily_tasks_list"},{"name": "AWS_DEFAULT_REGION", "value": "${AWS::Region}"},],},],},},"env":"${Environment}",}'
+          Input: !Sub '{"task_parameters":{"cluster":"ingest-framework-cluster-${Environment}","launchType":"FARGATE","taskDefinition":"ingest-framework-task-definition-${Environment}","count":1,"platformVersion":"LATEST","networkConfiguration":{"awsvpcConfiguration":{"subnets":["subnet-6501a53f","subnet-572e5b1f","subnet-bea63cd8"],"assignPublicIp":"ENABLED"}},"overrides":{"containerOverrides":[{"name":"ingest-framework-container-${Environment}","environment":[{"name":"PROVIDER","value":"hubspot"},{"name":"SENTRY_DSN","value":"${SentryDsn}"},{"name":"RUNNING_ENV","value":"${Environment}"},{"name":"TASK_GROUP","value":"daily_tasks_list"},{"name":"AWS_DEFAULT_REGION","value":"${AWS::Region}"}]}]}},"env":"${Environment}"}'
 
-  IngestFrameworkECSContacHourlyRule:
+  IngestFrameworkHubspotContacHourlyCron:
     Type: AWS::Events::Rule
     Properties:
+      Name: !Sub "cron-ingest-framework-hubspot-contact-hourly-${Environment}"
       Description: "ScheduledRule for Ingest Framework for contact daily"
       ScheduleExpression: !Ref CronJabmoHubspoHourlyContacts
       State: !If [IsProd, ENABLED, DISABLED]
       Targets:
         - Arn: !GetAtt IngestFrameworkLauncher.Arn
           Id: "IngestFrameworkLauncher"
-          Input: !Sub '{"task_parameters":{"cluster":"ingest-framework-cluster-${Environment}","launchType":"FARGATE","taskDefinition":"ingest-framework-task-definition-${Environment}","count":1,"platformVersion":"LATEST","networkConfiguration":{"awsvpcConfiguration":{"subnets":["subnet-6501a53f","subnet-572e5b1f","subnet-bea63cd8"],"assignPublicIp":"ENABLED",},},"overrides":{"containerOverrides":[{"name":"ingest-framework-container-${Environment}","environment":[{"name":"PROVIDER","value":"hubspot"},{"name":"SENTRY_DSN","value":"${SentryDsn}"},{"name":"RUNNING_ENV","value":"${Environment}"},{"name":"TASK_GROUP","value":"hourly_tasks_list"},{"name": "AWS_DEFAULT_REGION", "value": "${AWS::Region}"},],},],},},"env":"${Environment}",}'
+          Input: !Sub '{"task_parameters":{"cluster":"ingest-framework-cluster-${Environment}","launchType":"FARGATE","taskDefinition":"ingest-framework-task-definition-${Environment}","count":1,"platformVersion":"LATEST","networkConfiguration":{"awsvpcConfiguration":{"subnets":["subnet-6501a53f","subnet-572e5b1f","subnet-bea63cd8"],"assignPublicIp":"ENABLED"}},"overrides":{"containerOverrides":[{"name":"ingest-framework-container-${Environment}","environment":[{"name":"PROVIDER","value":"hubspot"},{"name":"SENTRY_DSN","value":"${SentryDsn}"},{"name":"RUNNING_ENV","value":"${Environment}"},{"name":"TASK_GROUP","value":"hourly_tasks_list"},{"name":"AWS_DEFAULT_REGION","value":"${AWS::Region}"}]}]}},"env":"${Environment}"}'
 
 #######
 # ROLE
@@ -87,7 +89,7 @@ Resources:
       Policies:
         - PolicyName: allowLambdaLogs
           PolicyDocument:
-            Version: '2012-10-17'
+            Version: "2012-10-17"
             Statement:
               - Effect: Allow
                 Action:
