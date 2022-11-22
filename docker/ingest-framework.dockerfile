@@ -11,9 +11,10 @@ WORKDIR /var/task
 
 COPY requirements.txt /
 
+RUN pip install -r /requirements.txt
+
 COPY . .
 
-RUN pip install -r /requirements.txt
 RUN cp /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 CMD ["sh", "launch.sh"]
