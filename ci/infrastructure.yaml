@@ -262,10 +262,10 @@ Resources:
               awslogs-group: !Ref CloudWatchLogsGroup
               awslogs-region: !Ref AWS::Region
               awslogs-stream-prefix: ecs
-      Cpu: 256
+      Cpu: 2048
       Family: !Sub "ingest-framework-task-definition-${Environment}"
       ExecutionRoleArn: !GetAtt IngestFrameworkTaskRole.Arn
-      Memory: 512
+      Memory: 4096
       NetworkMode: awsvpc
       RequiresCompatibilities:
         - FARGATE
