@@ -166,6 +166,10 @@ Resources:
                   - !Sub "arn:aws:secretsmanager:*:${AWS::AccountId}:secret:linkedin/ads/api/client*"
                   - !Sub "arn:aws:secretsmanager:*:${AWS::AccountId}:secret:linkedin/ads/api/refresh-token*"
                   - !Sub "arn:aws:secretsmanager:*:${AWS::AccountId}:secret:ingest-framework/prod/bing/*"
+              - Effect: Allow
+                Action:
+                  - secretsmanager:ListSecrets
+                Resource: "*"
         - PolicyName: !Sub "AllowInvokeRedshiftDeduplicator-${Environment}"
           PolicyDocument:
             Version: "2012-10-17"
