@@ -22,7 +22,7 @@ from src.utils.various_utils import get_running_env
 
 def activate_sentry():
     sentry_sdk.init(
-        dsn=os.environ["SENTRY_DNS"],
+        dsn=os.environ["SENTRY_DSN"],
         integrations=[AwsLambdaIntegration(timeout_warning=True)],
         traces_sample_rate=1.0,
     )

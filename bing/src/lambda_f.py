@@ -26,7 +26,7 @@ from src.utils.custom_logger import logger
 # logging.getLogger("suds.transport.http").setLevel(logging.DEBUG)
 
 sentry_sdk.init(
-    dsn=os.environ["SENTRY_DNS"],
+    dsn=os.environ["SENTRY_DSN"],
     integrations=[AwsLambdaIntegration(timeout_warning=True)],
     traces_sample_rate=1.0,
 )
