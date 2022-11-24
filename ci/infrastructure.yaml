@@ -43,6 +43,23 @@ Resources:
         Variables:
           SENTRY_DSN: !Ref SentryDsn
 
+  IngestFrameworkRedshiftDeduplicator:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "IngestFrameworkRedshiftDeduplicator-${Environment}"
+      Description: Launch the redshift deduplicator
+      Handler: lambda_.redshift_deduplicator_lambda.lambda_handler
+      CodeUri: ..
+      Runtime: python3.8
+      Layers:
+        - arn:aws:lambda:eu-west-1:943013980633:layer:SentryPythonServerlessSDK:24
+      Timeout: 900
+      MemorySize: 2048
+      Role: !GetAtt IngestFrameworkLambdaExecutionRole.Arn
+      Environment:
+        Variables:
+          SENTRY_DSN: !Ref SentryDsn
+
 #########
 # Rules
 #########
@@ -177,8 +194,7 @@ Resources:
               - Effect: Allow
                 Action:
                   - lambda:InvokeFunction
-                Resource:
-                  - !Sub "arn:aws:lambda:*:${AWS::AccountId}:function:jabmo-ingest-redshift-deduplicator*"
+                Resource: !GetAtt IngestFrameworkRedshiftDeduplicator.Arn
         - PolicyName: !Sub "allowCloudWatch-${Environment}"
           PolicyDocument:
             Version: "2012-10-17"
