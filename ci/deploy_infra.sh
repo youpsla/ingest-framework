@@ -23,9 +23,8 @@ if [[ "$1" =~ ^(development|staging|production)$ ]]; then
     sam deploy -t ci/infrastructure.yaml \
         --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM \
         --parameter-overrides \
-            RedshiftWebIngestRw=jabmo/db/redshift/web-ingest/$1/rw \
             Environment=$1 \
-            SentryDsn=https://47e2fc82fc674f428f2b3e931eddace7@o1035237.ingest.sentry.io/6094713\
+            SentryDsn=https://7d1f0e5cbe354444b48783dcd88e0a15@o1035237.ingest.sentry.io/4504213650014208\
             StackVersion=$STACK_VERSION \
         --confirm-changeset \
         --use-json \

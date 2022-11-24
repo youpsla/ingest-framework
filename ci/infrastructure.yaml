@@ -38,7 +38,7 @@ Resources:
         - arn:aws:lambda:eu-west-1:943013980633:layer:SentryPythonServerlessSDK:24
       Timeout: 10
       MemorySize: 128
-      Role: !GetAtt IngestFrameworkLambdaExecutionRole.Arn
+      Role: !GetAtt IngestFrameworkLauncherLambdaExecutionRole.Arn
       Environment:
         Variables:
           SENTRY_DSN: !Ref SentryDsn
@@ -53,9 +53,10 @@ Resources:
       Runtime: python3.8
       Layers:
         - arn:aws:lambda:eu-west-1:943013980633:layer:SentryPythonServerlessSDK:24
+        - arn:aws:lambda:eu-west-1:467882466042:layer:python-aws-psycopg2:1
       Timeout: 900
       MemorySize: 2048
-      Role: !GetAtt IngestFrameworkLambdaExecutionRole.Arn
+      Role: !GetAtt IngestFrameworkRedshiftDeduplicatorExecutionRole.Arn
       Environment:
         Variables:
           SENTRY_DSN: !Ref SentryDsn
@@ -73,7 +74,7 @@ Resources:
       Targets:
         - Arn: !GetAtt IngestFrameworkLauncher.Arn
           Id: "IngestFrameworkLauncher"
-          Input: !Sub '{"task_parameters":{"cluster":"ingest-framework-cluster-${Environment}","launchType":"FARGATE","taskDefinition":"ingest-framework-task-definition-${Environment}","count":1,"platformVersion":"LATEST","networkConfiguration":{"awsvpcConfiguration":{"subnets":["subnet-6501a53f","subnet-572e5b1f","subnet-bea63cd8"],"assignPublicIp":"ENABLED"}},"overrides":{"containerOverrides":[{"name":"ingest-framework-container-${Environment}","environment":[{"name":"PROVIDER","value":"hubspot"},{"name":"SENTRY_DSN","value":"${SentryDsn}"},{"name":"RUNNING_ENV","value":"${Environment}"},{"name":"TASK_GROUP","value":"daily_tasks_list"},{"name":"AWS_DEFAULT_REGION","value":"${AWS::Region}"}]}]}},"env":"${Environment}"}'
+          Input: !Sub '{"task_parameters":{"cluster":"ingest-framework-cluster-${Environment}","launchType":"FARGATE","taskDefinition":"ingest-framework-task-definition-${Environment}","count":1,"platformVersion":"LATEST","networkConfiguration":{"awsvpcConfiguration":{"subnets":["subnet-6501a53f","subnet-572e5b1f","subnet-bea63cd8"],"assignPublicIp":"ENABLED"}},"overrides":{"containerOverrides":[{"name":"ingest-framework-container-${Environment}","environment":[{"name":"PROVIDER","value":"hubspot"},{"name":"SENTRY_DSN","value":"${SentryDsn}"},{"name":"RUNNING_ENV","value":"${Environment}"},{"name":"TASK_GROUP","value":"daily_tasks_list"},{"name":"AWS_DEFAULT_REGION","value":"${AWS::Region}"},{"name":"LAMBDA_DEDUPLICATOR_FUNCTION_ARN","value":"${IngestFrameworkRedshiftDeduplicator.Arn}"}]}]}},"env":"${Environment}"}'
 
   IngestFrameworkHubspotContacHourlyCron:
     Type: AWS::Events::Rule
@@ -85,15 +86,15 @@ Resources:
       Targets:
         - Arn: !GetAtt IngestFrameworkLauncher.Arn
           Id: "IngestFrameworkLauncher"
-          Input: !Sub '{"task_parameters":{"cluster":"ingest-framework-cluster-${Environment}","launchType":"FARGATE","taskDefinition":"ingest-framework-task-definition-${Environment}","count":1,"platformVersion":"LATEST","networkConfiguration":{"awsvpcConfiguration":{"subnets":["subnet-6501a53f","subnet-572e5b1f","subnet-bea63cd8"],"assignPublicIp":"ENABLED"}},"overrides":{"containerOverrides":[{"name":"ingest-framework-container-${Environment}","environment":[{"name":"PROVIDER","value":"hubspot"},{"name":"SENTRY_DSN","value":"${SentryDsn}"},{"name":"RUNNING_ENV","value":"${Environment}"},{"name":"TASK_GROUP","value":"hourly_tasks_list"},{"name":"AWS_DEFAULT_REGION","value":"${AWS::Region}"}]}]}},"env":"${Environment}"}'
+          Input: !Sub '{"task_parameters":{"cluster":"ingest-framework-cluster-${Environment}","launchType":"FARGATE","taskDefinition":"ingest-framework-task-definition-${Environment}","count":1,"platformVersion":"LATEST","networkConfiguration":{"awsvpcConfiguration":{"subnets":["subnet-6501a53f","subnet-572e5b1f","subnet-bea63cd8"],"assignPublicIp":"ENABLED"}},"overrides":{"containerOverrides":[{"name":"ingest-framework-container-${Environment}","environment":[{"name":"PROVIDER","value":"hubspot"},{"name":"SENTRY_DSN","value":"${SentryDsn}"},{"name":"RUNNING_ENV","value":"${Environment}"},{"name":"TASK_GROUP","value":"hourly_tasks_list"},{"name":"AWS_DEFAULT_REGION","value":"${AWS::Region}"},{"name":"LAMBDA_DEDUPLICATOR_FUNCTION_ARN","value":"${IngestFrameworkRedshiftDeduplicator.Arn}"}]}]}},"env":"${Environment}"}'
 
 #######
 # ROLE
 #######
-  IngestFrameworkLambdaExecutionRole:
+  IngestFrameworkLauncherLambdaExecutionRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: !Sub "IngestFrameworkLambdaRole-${Environment}"
+      RoleName: !Sub "IngestFrameworkLauncherLambdaExecutionRole-${Environment}"
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement:
@@ -120,6 +121,55 @@ Resources:
                 Action:
                   - ecs:RunTask
                 Resource: !Sub "arn:aws:ecs:*:${AWS::AccountId}:task-definition/ingest-framework-*"
+        - PolicyName: !Sub "allowIamRoleTask-${Environment}"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - iam:GetRole
+                  - iam:PassRole
+                Resource: "*"
+      Tags:
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Version
+          Value: !Ref StackVersion
+
+  IngestFrameworkRedshiftDeduplicatorExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "IngestFrameworkRedshiftDeduplicator-${Environment}"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Policies:
+        - PolicyName: allowLambdaLogs
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:*
+                Resource: arn:aws:logs:*:*:*
+        - PolicyName: !Sub "allowECSStartTask-${Environment}"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - secretsmanager:GetSecretValue
+                Resource:
+                  - !Sub "arn:aws:secretsmanager:*:${AWS::AccountId}:secret:jabmo/db/redshift/web-ingest/prod/rw*"
+                  - !Sub "arn:aws:secretsmanager:*:${AWS::AccountId}:secret:jabmo/db/redshift/web-ingest/prod/ro*"
+                  - !Sub "arn:aws:secretsmanager:*:${AWS::AccountId}:secret:jabmo/db/redshift/web-ingest/dev/rw*"
+                  - !Sub "arn:aws:secretsmanager:*:${AWS::AccountId}:secret:jabmo/db/redshift/web-ingest/dev/ro*"
         - PolicyName: !Sub "allowIamRoleTask-${Environment}"
           PolicyDocument:
             Version: "2012-10-17"

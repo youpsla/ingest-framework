@@ -117,7 +117,7 @@ def main():
 
     lambda_client = boto3.client("lambda")
     lambda_client.invoke(
-        FunctionName="jabmo-ingest-redshift-deduplicator-Function-jhJwND5R8vnY",  # noqa: E501
+        FunctionName=os.environ["LAMBDA_DEDUPLICATOR_FUNCTION_ARN"],
         Payload=json.dumps(event),
         InvocationType="Event",
     )
