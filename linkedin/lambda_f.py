@@ -49,12 +49,6 @@ def get_task_group_name():
     return task_group_name
 
 
-def lambda_handler(event, context):
-    if get_running_env() in ["production", "staging"]:
-        activate_sentry()
-    main()
-
-
 def run_task(channel, task_name, db_connection):
     """Runs a task
 
@@ -71,8 +65,10 @@ def run_task(channel, task_name, db_connection):
     return result, destination
 
 
-def main():
+def lambda_handler(event, context):
     logger.info("### Starting Ingest lambda ###")
+    if get_running_env() in ["production", "staging"]:
+        activate_sentry()
     start = time.time()
 
     channel_params = get_channel_params()
@@ -113,7 +109,7 @@ def main():
 
     # Invoke deduplicate Lambda
     logger.info("### Invoke Redshift deduplication Lambda ###")
-    event = {
+    payload = {
         "schemas": ["new_linkedin"],
         "tables": [],
         "do_delete_duplicates": True,
@@ -125,11 +121,11 @@ def main():
     lambda_client = boto3.client("lambda")
     lambda_client.invoke(
         FunctionName=os.environ["LAMBDA_DEDUPLICATOR_FUNCTION_ARN"],
-        Payload=json.dumps(event),
+        Payload=json.dumps(payload),
         InvocationType="Event",
     )
     logger.info("### Invocation sent###")
 
 
 if __name__ == "__main__":
-    main()
+    lambda_handler(None, None)
