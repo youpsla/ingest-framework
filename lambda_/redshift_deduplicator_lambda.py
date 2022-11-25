@@ -62,9 +62,10 @@ def get_db_connection(env, mode):
     port = xxx
     dbname = xxx
     """
-    client = boto3.client('secretsmanager')
+    client = boto3.client("secretsmanager")
+    local_env = "dev" if env == "development" else "prod"
     secret_values = client.get_secret_value(
-        SecretId=DB_SECRET_NAMES["redshift"][env][mode],
+        SecretId=DB_SECRET_NAMES["redshift"][local_env][mode],
     )
     secret_string = json.loads(secret_values["SecretString"])
 
@@ -91,8 +92,7 @@ def get_all_column_list(cursor, schema, source_table):
         result: list
         A list of columns name.
     """
-    cursor.execute(SQL_GET_COLUMNS.format(
-        schema=schema, source_table=source_table))
+    cursor.execute(SQL_GET_COLUMNS.format(schema=schema, source_table=source_table))
     result = cursor.fetchall()
     result = [r[3] for r in result]
     return result
@@ -189,8 +189,9 @@ def delete_duplicates(cursor, schema, table):
     if ids_to_delete:
         cursor.execute(
             SQL_DELETE_IDS_FROM_ORIGIN_TABLE.format(
-                schema=schema, table=table, ids_to_delete=", ".join(
-                    ids_to_delete)))
+                schema=schema, table=table, ids_to_delete=", ".join(ids_to_delete)
+            )
+        )
 
 
 def lambda_handler(event, context):
@@ -199,19 +200,24 @@ def lambda_handler(event, context):
     tables = event.get("tables", None)
     do_delete_duplicates = event.get("do_delete_duplicates", None)
     partition_order_by_field = event.get("partition_order_by_field", None)
-    env = event.get("env", "dev")
+    env = event.get("env", "development")
     mode = event.get("mode", "readonly")
 
-    main(schemas, tables, do_delete_duplicates,
-         partition_order_by_field, env, mode)
+    main(schemas, tables, do_delete_duplicates, partition_order_by_field, env, mode)
 
 
 def get_number_of_duplicates():
     pass
 
 
-def main(schemas=None, tables=None, do_delete_duplicates=False,
-         partition_order_by_field=None, env="dev", mode="readonly"):
+def main(
+    schemas=None,
+    tables=None,
+    do_delete_duplicates=False,
+    partition_order_by_field=None,
+    env="development",
+    mode="readonly",
+):
     """Set the attribute of type Field to self (Model).
 
     Args:
@@ -237,10 +243,14 @@ def main(schemas=None, tables=None, do_delete_duplicates=False,
                 data_columns = get_data_columns(cursor, schema, table)
 
                 sql = SQL_CREATE_TMP_TABLE.format(
-                    schema=schema, all_columns=all_columns,
-                    data_columns=data_columns, table=table,
+                    schema=schema,
+                    all_columns=all_columns,
+                    data_columns=data_columns,
+                    table=table,
                     partition_order_by_field=f" order by {partition_order_by_field} asc"
-                    if partition_order_by_field else "",)
+                    if partition_order_by_field
+                    else "",
+                )
                 cursor.execute(sql)
                 sql = SQL_COUNT_SOURCE_TABLE.format(
                     source_schema_table=".".join((schema, table))
@@ -275,10 +285,10 @@ def main(schemas=None, tables=None, do_delete_duplicates=False,
 if __name__ == "__main__":
     event = {
         "schemas": ["new_linkedin"],
-        "tables": [],
-        "do_delete_duplicates": True,
-        "partition_order_by_field": "jab_id",
-        "env": "prod",
-        "mode": "readwrite"
+        "tables": [],  # If empty, all tables are selected. Otherwise, onbly table names as str.
+        "do_delete_duplicates": True,  # If False, only output logs.
+        "partition_order_by_field": "jab_id",  # Do not touch !!!! Has to be an UNIQUE.
+        "env": "production",
+        "mode": "readwrite",  # Do not touch.
     }
-    lambda_handler(event, '')
+    lambda_handler(event, "")

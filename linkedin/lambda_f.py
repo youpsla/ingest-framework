@@ -17,7 +17,7 @@ from configs.globals import PROVIDER
 from src.clients.redshift.redshift_client import RedshiftClient
 from src.commons.task import Task
 from src.utils.custom_logger import logger
-from src.utils.various_utils import get_running_env
+from src.utils.various_utils import get_running_env, get_schema_name
 
 
 def activate_sentry():
@@ -110,11 +110,11 @@ def lambda_handler(event, context):
     # Invoke deduplicate Lambda
     logger.info("### Invoke Redshift deduplication Lambda ###")
     payload = {
-        "schemas": ["new_linkedin"],
+        "schemas": [get_schema_name(PROVIDER)],
         "tables": [],
         "do_delete_duplicates": True,
         "partition_order_by_field": "jab_id",
-        "env": "prod",
+        "env": get_running_env(),
         "mode": "readwrite",
     }
 
