@@ -1,5 +1,3 @@
-# TODO: manage logger for having logger output in terminal when running locally + cleanup print statements # noqa: E501
-
 import datetime
 import json
 import os
@@ -9,10 +7,7 @@ import boto3
 import sentry_sdk
 from sentry_sdk.integrations.aws_lambda import AwsLambdaIntegration
 
-# Temporary solution. This import allow init of some envs variables
-# TODO: Envs management needs better system.
 from configs.globals import PROVIDER
-
 # Import redshift here for being able to rollback()/commit() transaction.
 from src.clients.redshift.redshift_client import RedshiftClient
 from src.commons.task import Task
@@ -32,7 +27,7 @@ def get_params_json_file_path():
     app_home = os.environ["APPLICATION_HOME"]
     return os.path.realpath(
         os.path.join(app_home, "configs", PROVIDER, "channel.json")
-    )  # noqa: E501
+    )
 
 
 def get_channel_params():
@@ -45,17 +40,11 @@ def get_task_group_name():
     task_group_name = os.environ.get("TASK_GROUP")
     if not task_group_name:
         raise Exception("Can't find task group.")
-    # return "daily_tasks_list"
     return task_group_name
 
 
 def run_task(channel, task_name, db_connection):
     """Runs a task
-
-    Returns:
-        result: str
-        Can be "success" or "error" depending on the task run result.
-        A dict with params
     """
     result, destination = Task(
         channel=channel,
@@ -75,7 +64,6 @@ def lambda_handler(event, context):
 
     task_group_list = channel_params[get_task_group_name()]
 
-    # Daily tasks run
     logger.info(f"Daily tasks run: {task_group_list}")
 
     db_connection = RedshiftClient().db_connection
@@ -87,20 +75,19 @@ def lambda_handler(event, context):
 
     today = datetime.datetime.now()
     run_monthly = True if today.day == 1 else False
-    # run_monthly = True
     if run_monthly:
         monthly_tasks_list = channel_params.get("monthly_tasks_list", None)
         if monthly_tasks_list:
             for task_name in monthly_tasks_list:
                 result, _ = run_task(
                     channel_params["name"], task_name, db_connection
-                )  # noqa: E501
+                )
 
     with db_connection.cursor() as cursor:
         cursor.execute("COMMIT;")
     logger.info(
         "All tasks have runned successfully. Daily Worflow ended with success."
-    )  # noqa: E501
+    )
 
     end = time.time()
     logger.info(end - start)
