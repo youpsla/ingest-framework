@@ -617,7 +617,7 @@
             ],
             "data_source": {
                 "name": "creatives_id",
-                "raw_sql": "select distinct(creative_id) from {schema}.social_metrics"
+                "raw_sql": "select distinct(creative_id) from {schema}.creative_url"
             },
             "fields_to_add_to_api_result": [
                 {
