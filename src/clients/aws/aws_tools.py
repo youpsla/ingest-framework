@@ -38,7 +38,7 @@ def search_secrets_by_prefix(prefix):
 
 class Secret:
     def __init__(self, name):
-        self.secretsmanager_client = SecretManagerClient().client
+        self.secretsmanager = SecretsManager()
         self.name = name
 
     def get_value(self):
@@ -47,7 +47,7 @@ class Secret:
             raise ValueError
 
         try:
-            get_secret_value_response = self.secretsmanager_client.get_secret_value(
+            get_secret_value_response = self.secretsmanager.client.get_secret_value(
                 SecretId=self.name
             )
         except ClientError as e:
@@ -109,7 +109,7 @@ class Secret:
         else:
             return response
 
-    def put_value(self, name, secret_value, stages=None):
+    def put_value(self, secret_value, stages=None):
         """
         Puts a value into an existing secret. When no stages are specified, the
         value is set as the current ('AWSCURRENT') stage and the previous value is
@@ -132,7 +132,10 @@ class Secret:
                 kwargs["SecretBinary"] = secret_value
             if stages is not None:
                 kwargs["VersionStages"] = stages
-            response = self.secretsmanager_client.put_secret_value(**kwargs)
+
+            secret_manager_client = SecretManagerClient().client
+            response = secret_manager_client.put_secret_value(**kwargs)
+            # response = self.secretsmanager_client.put_secret_value(**kwargs)
             logger.info("Value put in secret %s.", self.name)
         except ClientError:
             logger.exception("Couldn't put value in secret %s.", self.name)

@@ -1,32 +1,36 @@
-import os
+import json
 import sys
 import webbrowser
-from shutil import copyfile
 
-from bingads.authorization import (
-    AuthorizationData,
-    OAuthDesktopMobileAuthCodeGrant,
-    OAuthWebAuthCodeGrant,
-)
+from bingads.authorization import AuthorizationData, OAuthWebAuthCodeGrant
 from bingads.exceptions import *
 from bingads.service_client import ServiceClient
 from suds import WebFault
 
+from src.clients.aws.aws_tools import Secret
+from src.clients.bing.constants import (
+    API_CREDENTIALS_SECRET_NAME,
+    BING_ENV,
+    DEVELOPER_TOKEN_SECRET_NAME,
+    REFRESH_TOKEN_SECRET_NAME,
+)
+
 # Required
-CLIENT_ID = "029dd780-9575-46e8-a4a1-cfa64b94c4b2"
-DEVELOPER_TOKEN = "11026H63C9605309"
-ENVIRONMENT = "production"
-CLIENT_SECRET = "ErL7Q~pcKVQXPjMnwHfM3cCGgSGUcvFylpfPt"
-REDIRECT_URL = "https://login.microsoftonline.com/common/oauth2/nativeclient"
+# CLIENT_ID = "029dd780-9575-46e8-a4a1-cfa64b94c4b2"
+# DEVELOPER_TOKEN = "11026H63C9605309"
+# ENVIRONMENT = "production"
+# CLIENT_SECRET = "ErL7Q~pcKVQXPjMnwHfM3cCGgSGUcvFylpfPt"
+# REDIRECT_URL = "https://login.microsoftonline.com/common/oauth2/nativeclient"
+# REFRESH_TOKEN = "0.ARAAyu2f7DtshEiXv9wti3dXqIDXnQJ1lehGpKHPpkuUxLIQAAY.AgABAAIAAAD--DLA3VO7QrddgJg7WevrAgDs_wQA9P9ZsUtiUUw4-PCZyWYSVy-0cj7M9cFc8GGsFU544DWh8ohChRfox0cPIFIxTTjT5qaxCnH7v_rCvrk6hCSKoaf8k-0JMdG4nnpmSCm570vPXfdioBpotWJbhjnvFNdED0ptNPONnZh8I8RhZ-XRaBEGuoTx9FMCVRogaHO7PInAjmptq7QL1mHo05T0SwrgIVaR4ebYVF4jo4z8heoLJrV1dn2vuOsn_3aqv3bZ5cAwOC1dAQZxYHM5N5hao7ow5JxputfRVKpNhRhGdSJWWGsi4nAMFrl9afGR7uvbrczA202FyuApC5u43hwW7WL9hV4L5gOdoTMmhO8-A4MJTJ8u94iulwOu4-7qte4xqzpqnikX6DdPQUqpy4W2-mEVFu8hd2_xO3BrnKrZhhPTJaLLgJ40BBWmDwka5zDqRZqneJD0H1Xrq8HjZiD6B_GWzNFcV9gtdXMBShc5N6S9g5zCf_dOpfcJXjuN_9zWcD0JswFIqoNlaJETYzHcg03z7tnYClbKKyeioX5TMtJMic3s5xGC_Q3n_qMmuVPvlzeYe5qyuKRdQGPs9KNd4dcSVA4Wjm1d_zZEiQE1IAWyviurgnWdNbvqlit5Mr0vofNBr3yBL6lKYVTkL2kgQHv0tzhYvSM0srXQdHKffU3h2UfQZb06YHjPVglbSvVbuQGHJ7PhOxZuVbJarfRTJKG0WlEoAO8q5m0ECm-2ywy_SdZwbf5ZNFSBIR6sS42YMIA90WrH3WY1-DESYXbe8g&state=ClientStateGoesHere&session_state=71115bd7-f085-41b3-862b-82ad0c87771e"
 
 
-LOCAL_REFRESH_TOKEN = "tmp/refresh.txt"
-# Trick to allow usage on AWS Lambda as only /tmp is writable
-if os.environ.get("AWS_EXECUTION_ENV") is not None:
-    copyfile(LOCAL_REFRESH_TOKEN, "/tmp/refresh.txt")
-    REFRESH_TOKEN = "/tmp/refresh.txt"
-else:
-    REFRESH_TOKEN = LOCAL_REFRESH_TOKEN
+# LOCAL_REFRESH_TOKEN = "tmp/refresh.txt"
+# # Trick to allow usage on AWS Lambda as only /tmp is writable
+# if os.environ.get("AWS_EXECUTION_ENV") is not None:
+#     copyfile(LOCAL_REFRESH_TOKEN, "/tmp/refresh.txt")
+#     REFRESH_TOKEN = "/tmp/refresh.txt"
+# else:
+#     REFRESH_TOKEN = LOCAL_REFRESH_TOKEN
 
 
 # Optional
@@ -35,18 +39,37 @@ CLIENT_STATE = "ClientStateGoesHere"
 # Optionally you can include logging to output traffic, for example the SOAP request and response.
 import logging
 
+rt = "0.ARAAyu2f7DtshEiXv9wti3dXqIDXnQJ1lehGpKHPpkuUxLIQAAY.AgABAAEAAAD--DLA3VO7QrddgJg7WevrAgDs_wQA9P-xvDTA00X1gmYqQVdTqd-6Y6mHYpeClAwapKSxireTY0uFBefTXr3by7PKpkQjbK_L9bx0hdPtzaLDVlk5Y3FpENccSXwSI3M3p77-8NNifKO2gutINObOmDHkBV44VcLm5OXFEdKXpMo1hhuVnIrXsPjJB21Bh-QXhbmkDy0vuyZH3RMZu-p-OZaYxx1OnfWcJswww0G3pYo7fJvfhteijV6BiVDdJN5xwEl2UAB1dLMDfMtSTI-eTRoc1b9kTsWFEXw8LS6QIh6E_hX5gaOGVZLCHmiEqkqF5pb2nS3xk9t6UzBy7PsnmrChqH9MPI6csdkDODjofiQDlAzR3EctdUAIAKB6whtN77iZOxfHdRE3cFV7gw1i0gPNgaNNDDUccO1k15dMWkXuHxssef8LCiJrxxOXbjNFqHPLwAtGVg1We4fj3CETM5IuIKxJeMZjOcoMgoLyuL-oGPDcvm6SvWYqvmjLTBsOlMnVrIwlQujvV7rxAssHfv9gpJrJ3WScrBRwSHZilRbSnC659hyF6j1_LlAnbJL5tg-jjBVrC9qTjIl3DWAsum3JcI-L1DPcMXt-yWCNQPIG-fxzTcLX-uMxjcQGFKFI__CcdaWxIClF3D6z9pynOCUW_dR1j3CgoE9XOqglEJwOXtcpeT5t_iGRRLvIv6kYi-n51qTJaMsuKwfXMIaM8ZbTVUjgONRo22ogn6FQDRL-yK8_iEe24pndT47tLbBA1DCD6T35OVKvuNVT43r4yDEvB3J2reqSC3VNaACr3A9ABVKaTq2CbDDpQeNQDEa9qct-GTnc51p2C8Cy4VbGnrS3uDCX"
+
 # logging.basicConfig(level=logging.INFO)
 # logging.getLogger("suds.client").setLevel(logging.DEBUG)
 # logging.getLogger("suds.transport.http").setLevel(logging.DEBUG)
 
 
+def get_authorization_data(account_id=None):
+
+    developer_token = Secret(DEVELOPER_TOKEN_SECRET_NAME).get_value()["developer_token"]
+
+    authorization_data = AuthorizationData(
+        account_id=account_id,
+        customer_id=None,
+        developer_token=developer_token,
+        authentication=None,
+    )
+
+    return authorization_data
+
+
 def authenticate(authorization_data):
+
+    # secret_manager = BingSecretsManager()
+    # environment = Secret(API_CREDENTIALS_SECRET_NAME).get_value()["env"]
 
     customer_service = ServiceClient(
         service="CustomerManagementService",
         version=13,
         authorization_data=authorization_data,
-        environment=ENVIRONMENT,
+        environment=BING_ENV,
     )
 
     # You should authenticate for Bing Ads API service operations with a Microsoft Account.
@@ -54,7 +77,7 @@ def authenticate(authorization_data):
 
     # Set to an empty user identifier to get the current authenticated Microsoft Advertising user,
     # and then search for all accounts the user can access.
-    user = get_user_response = customer_service.GetUser(UserId=None).User
+    user = customer_service.GetUser(UserId=None).User
     accounts = search_accounts_by_user_id(customer_service, user.Id)
 
     # # For this example we'll use the first account.
@@ -64,16 +87,9 @@ def authenticate(authorization_data):
 
 def authenticate_with_oauth(authorization_data):
 
-    # authentication = OAuthDesktopMobileAuthCodeGrant(
-    #     client_id=CLIENT_ID, env=ENVIRONMENT
-    # )
+    api_credentials = Secret(API_CREDENTIALS_SECRET_NAME).get_value()
 
-    authentication = OAuthWebAuthCodeGrant(
-        client_id=CLIENT_ID,
-        client_secret=CLIENT_SECRET,
-        redirection_uri=REDIRECT_URL,
-        env=ENVIRONMENT,
-    )
+    authentication = OAuthWebAuthCodeGrant(**api_credentials)
 
     # It is recommended that you specify a non guessable 'state' request parameter to help prevent
     # cross site request forgery (CSRF).
@@ -84,22 +100,36 @@ def authenticate_with_oauth(authorization_data):
 
     # Register the callback function to automatically save the refresh token anytime it is refreshed.
     # Uncomment this line if you want to store your refresh token. Be sure to save your refresh token securely.
-    authorization_data.authentication.token_refreshed_callback = save_refresh_token
+    # authorization_data.authentication.token_refreshed_callback = save_refresh_token
 
-    refresh_token = get_refresh_token()
+    # refresh_token = get_refresh_token()
+    refresh_token_secret = Secret(REFRESH_TOKEN_SECRET_NAME)
+    refresh_token_secret_value = refresh_token_secret.get_value()
+    refresh_token = refresh_token_secret_value.get("refresh_token")
 
+    if not refresh_token:
+        raise Exception("We need a refresh_token in secrets.")
+
+    # Getting a new refresh token is the only way to know iof the current one has exdpired or not. # noqa: E501
+    # "and the only way for an app to know if a refresh token is valid is to attempt to redeem it by making a token request"
+    # from https://learn.microsoft.com/en-us/advertising/guides/authentication-oauth-get-tokens?view=bingads-13#request-accesstoken
     try:
-        # If we have a refresh token let's refresh it
-        if refresh_token is not None:
+        oauth_tokens = (
             authorization_data.authentication.request_oauth_tokens_by_refresh_token(
                 refresh_token
             )
-        else:
-            request_user_consent(authorization_data)
+        )
     except OAuthTokenRequestException:
         # The user could not be authenticated or the grant is expired.
         # The user must first sign in and if needed grant the client application access to the requested scope.
-        request_user_consent(authorization_data)
+        raise Exception(
+            "Can't retrieve new refresh_token. Need to be retrieve manually."
+        )
+
+    # Get the new refresh_token and stor it in secrets.
+    new_refresh_token_secret_value = {"refresh_token": oauth_tokens.refresh_token}
+    new_refresh_token_secret_value_json = json.dumps(new_refresh_token_secret_value)
+    refresh_token_secret.put_value(new_refresh_token_secret_value_json)
 
 
 def request_user_consent(authorization_data):
@@ -141,7 +171,7 @@ def get_refresh_token():
     """
     file = None
     try:
-        file = open(REFRESH_TOKEN)
+        file = open("/tmp/refresh_token.txt")
         line = file.readline()
         file.close()
         return line if line else None
@@ -155,7 +185,8 @@ def save_refresh_token(oauth_tokens):
     """
     Stores a refresh token locally. Be sure to save your refresh token securely.
     """
-    with open(REFRESH_TOKEN, "w+") as file:
+    with open("/tmp/refresh_token.txt", "w+") as file:
+        print("dodo")
         file.write(oauth_tokens.refresh_token)
         file.close()
     return None

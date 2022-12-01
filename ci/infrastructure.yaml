@@ -1,0 +1,391 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: Ingest Framework infrastructure
+Parameters:
+  Environment:
+    Type: String
+    Default: development
+  SentryDsn:
+    Type: String
+    Default: ""
+  StackVersion:
+    Type: String
+    Description: The version of the stack, where the lambda.zip is uploaded
+  CronJabmoHubspotDailyContacts:
+    Type: String
+    Description: This is the cron expression of hubspot contact daily ingest
+    Default: "cron(30 8 * * ? *)"
+  CronJabmoHubspoHourlyContacts:
+    Type: String
+    Description: This is the cron expression of hubspot contact hourly ingest
+    Default: "cron(00 * * * ? *)"
+  CronJabmoLinkedinDaily:
+    Type: String
+    Description: This is the cron expression of linkedin daily ingest
+    Default: "cron(00 07 * * ? *)"
+Conditions:
+  IsProd: !Equals [!Ref Environment, "production"]
+Resources:
+
+#########
+# Lambda
+#########
+  IngestFrameworkLauncher:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "IngestFrameworkLauncher-${Environment}"
+      Description: Launch the ECS IngestFramework
+      Handler: lambda_.ingest_framework_lambda.lambda_handler
+      CodeUri: ..
+      Runtime: python3.8
+      Layers:
+        - arn:aws:lambda:eu-west-1:943013980633:layer:SentryPythonServerlessSDK:24
+      Timeout: 10
+      MemorySize: 128
+      Role: !GetAtt IngestFrameworkLauncherLambdaExecutionRole.Arn
+      Environment:
+        Variables:
+          SENTRY_DSN: !Ref SentryDsn
+
+  IngestFrameworkRedshiftDeduplicator:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "IngestFrameworkRedshiftDeduplicator-${Environment}"
+      Description: Launch the redshift deduplicator
+      Handler: lambda_.redshift_deduplicator_lambda.lambda_handler
+      CodeUri: ..
+      Runtime: python3.8
+      Layers:
+        - arn:aws:lambda:eu-west-1:943013980633:layer:SentryPythonServerlessSDK:24
+        - arn:aws:lambda:eu-west-1:467882466042:layer:python-aws-psycopg2:1
+      Timeout: 900
+      MemorySize: 2048
+      Role: !GetAtt IngestFrameworkRedshiftDeduplicatorExecutionRole.Arn
+      Environment:
+        Variables:
+          SENTRY_DSN: !Ref SentryDsn
+
+#########
+# Rules
+#########
+  IngestFrameworkHubspotContactDailyCron:
+    Type: AWS::Events::Rule
+    Properties:
+      Name: !Sub "cron-ingest-framework-hubspot-contact-daily-${Environment}"
+      Description: "ScheduledRule for Ingest Framework for hubspot contact daily"
+      ScheduleExpression: !Ref CronJabmoHubspotDailyContacts
+      State: !If [IsProd, ENABLED, DISABLED]
+      Targets:
+        - Arn: !GetAtt IngestFrameworkLauncher.Arn
+          Id: "IngestFrameworkLauncher"
+          Input: !Sub '{"task_parameters":{"cluster":"ingest-framework-cluster-${Environment}","launchType":"FARGATE","taskDefinition":"ingest-framework-task-definition-${Environment}","count":1,"platformVersion":"LATEST","networkConfiguration":{"awsvpcConfiguration":{"subnets":["subnet-6501a53f","subnet-572e5b1f","subnet-bea63cd8"],"assignPublicIp":"ENABLED"}},"overrides":{"containerOverrides":[{"name":"ingest-framework-container-${Environment}","environment":[{"name":"PROVIDER","value":"hubspot"},{"name":"SENTRY_DSN","value":"${SentryDsn}"},{"name":"RUNNING_ENV","value":"${Environment}"},{"name":"TASK_GROUP","value":"daily_tasks_list"},{"name":"AWS_DEFAULT_REGION","value":"${AWS::Region}"},{"name":"LAMBDA_DEDUPLICATOR_FUNCTION_ARN","value":"${IngestFrameworkRedshiftDeduplicator.Arn}"}]}]}},"env":"${Environment}"}'
+
+  IngestFrameworkHubspotContacHourlyCron:
+    Type: AWS::Events::Rule
+    Properties:
+      Name: !Sub "cron-ingest-framework-hubspot-contact-hourly-${Environment}"
+      Description: "ScheduledRule for Ingest Framework for hubspot contact hourly"
+      ScheduleExpression: !Ref CronJabmoHubspoHourlyContacts
+      State: !If [IsProd, ENABLED, DISABLED]
+      Targets:
+        - Arn: !GetAtt IngestFrameworkLauncher.Arn
+          Id: "IngestFrameworkLauncher"
+          Input: !Sub '{"task_parameters":{"cluster":"ingest-framework-cluster-${Environment}","launchType":"FARGATE","taskDefinition":"ingest-framework-task-definition-${Environment}","count":1,"platformVersion":"LATEST","networkConfiguration":{"awsvpcConfiguration":{"subnets":["subnet-6501a53f","subnet-572e5b1f","subnet-bea63cd8"],"assignPublicIp":"ENABLED"}},"overrides":{"containerOverrides":[{"name":"ingest-framework-container-${Environment}","environment":[{"name":"PROVIDER","value":"hubspot"},{"name":"SENTRY_DSN","value":"${SentryDsn}"},{"name":"RUNNING_ENV","value":"${Environment}"},{"name":"TASK_GROUP","value":"hourly_tasks_list"},{"name":"AWS_DEFAULT_REGION","value":"${AWS::Region}"},{"name":"LAMBDA_DEDUPLICATOR_FUNCTION_ARN","value":"${IngestFrameworkRedshiftDeduplicator.Arn}"}]}]}},"env":"${Environment}"}'
+
+  IngestFrameworkLinkedinDailyCron:
+    Type: AWS::Events::Rule
+    Properties:
+      Name: !Sub "cron-ingest-framework-linkedin-daily-${Environment}"
+      Description: "ScheduledRule for Ingest Framework for LinkedIn daily"
+      ScheduleExpression: !Ref CronJabmoLinkedinDaily
+      State: !If [IsProd, ENABLED, DISABLED]
+      Targets:
+        - Arn: !GetAtt IngestFrameworkLauncher.Arn
+          Id: "IngestFrameworkLauncher"
+          Input: !Sub '{"task_parameters":{"cluster":"ingest-framework-cluster-${Environment}","launchType":"FARGATE","taskDefinition":"ingest-framework-task-definition-${Environment}","count":1,"platformVersion":"LATEST","networkConfiguration":{"awsvpcConfiguration":{"subnets":["subnet-6501a53f","subnet-572e5b1f","subnet-bea63cd8"],"assignPublicIp":"ENABLED"}},"overrides":{"containerOverrides":[{"name":"ingest-framework-container-${Environment}","environment":[{"name":"PROVIDER","value":"linkedin"},{"name":"SENTRY_DSN","value":"${SentryDsn}"},{"name":"RUNNING_ENV","value":"${Environment}"},{"name":"TASK_GROUP","value":"daily_tasks_list"},{"name":"AWS_DEFAULT_REGION","value":"${AWS::Region}"},{"name":"LAMBDA_DEDUPLICATOR_FUNCTION_ARN","value":"${IngestFrameworkRedshiftDeduplicator.Arn}"}]}]}},"env":"${Environment}"}'
+
+#######
+# ROLE
+#######
+  IngestFrameworkLauncherLambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "IngestFrameworkLauncherLambdaExecutionRole-${Environment}"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Policies:
+        - PolicyName: allowLambdaLogs
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:*
+                Resource: arn:aws:logs:*:*:*
+        - PolicyName: !Sub "allowECSStartTask-${Environment}"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - ecs:RunTask
+                Resource: !Sub "arn:aws:ecs:*:${AWS::AccountId}:task-definition/ingest-framework-*"
+        - PolicyName: !Sub "allowIamRoleTask-${Environment}"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - iam:GetRole
+                  - iam:PassRole
+                Resource: "*"
+      Tags:
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Version
+          Value: !Ref StackVersion
+
+  IngestFrameworkRedshiftDeduplicatorExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "IngestFrameworkRedshiftDeduplicator-${Environment}"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Policies:
+        - PolicyName: allowLambdaLogs
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:*
+                Resource: arn:aws:logs:*:*:*
+        - PolicyName: !Sub "allowECSStartTask-${Environment}"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - secretsmanager:GetSecretValue
+                Resource:
+                  - !Sub "arn:aws:secretsmanager:*:${AWS::AccountId}:secret:jabmo/db/redshift/web-ingest/prod/rw*"
+                  - !Sub "arn:aws:secretsmanager:*:${AWS::AccountId}:secret:jabmo/db/redshift/web-ingest/prod/ro*"
+                  - !Sub "arn:aws:secretsmanager:*:${AWS::AccountId}:secret:jabmo/db/redshift/web-ingest/dev/rw*"
+                  - !Sub "arn:aws:secretsmanager:*:${AWS::AccountId}:secret:jabmo/db/redshift/web-ingest/dev/ro*"
+        - PolicyName: !Sub "allowIamRoleTask-${Environment}"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - iam:GetRole
+                  - iam:PassRole
+                Resource: "*"
+      Tags:
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Version
+          Value: !Ref StackVersion
+
+  IngestFrameworkTaskRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "IngestFrameworkTaskRole-${Environment}"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ecs-tasks.amazonaws.com
+                - ecs.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Policies:
+        - PolicyName: !Sub "ECSTaskIAMRole-${Environment}"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - ecr:GetAuthorizationToken
+                  - ecr:BatchCheckLayerAvailability
+                  - ecr:GetDownloadUrlForLayer
+                  - ecr:BatchGetImage
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: "*"
+        - PolicyName: !Sub "SecretManagerPolicy-${Environment}"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - secretsmanager:Get*
+                  - secretsmanager:Describe*
+                  - secretsmanager:ListSecretVersionIds
+                  - secretsmanager:Put*
+                Resource:
+                  - !Sub "arn:aws:secretsmanager:*:${AWS::AccountId}:secret:jabmo/hubspot/api"
+                  - !Sub "arn:aws:secretsmanager:*:${AWS::AccountId}:secret:hubspot/api/*"
+                  - !Sub "arn:aws:secretsmanager:*:${AWS::AccountId}:secret:jabmo/db/redshift/web-ingest/prod/rw*"
+                  - !Sub "arn:aws:secretsmanager:*:${AWS::AccountId}:secret:jabmo/db/redshift/web-ingest/prod/ro*"
+                  - !Sub "arn:aws:secretsmanager:*:${AWS::AccountId}:secret:jabmo/db/redshift/web-ingest/dev/rw*"
+                  - !Sub "arn:aws:secretsmanager:*:${AWS::AccountId}:secret:jabmo/db/redshift/web-ingest/dev/ro*"
+                  - !Sub "arn:aws:secretsmanager:*:${AWS::AccountId}:secret:linkedin/ads/api/client*"
+                  - !Sub "arn:aws:secretsmanager:*:${AWS::AccountId}:secret:linkedin/ads/api/refresh-token*"
+                  - !Sub "arn:aws:secretsmanager:*:${AWS::AccountId}:secret:ingest-framework/prod/bing/*"
+              - Effect: Allow
+                Action:
+                  - secretsmanager:ListSecrets
+                Resource: "*"
+        - PolicyName: !Sub "AllowInvokeRedshiftDeduplicator-${Environment}"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - lambda:InvokeFunction
+                Resource: !GetAtt IngestFrameworkRedshiftDeduplicator.Arn
+        - PolicyName: !Sub "allowCloudWatch-${Environment}"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - cloudwatch:*
+                Resource: "*"
+      Tags:
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Version
+          Value: !Ref StackVersion
+
+#################
+# Security Group
+#################
+  InstanceSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: !Sub "Allow http to client host ${Environment}"
+      VpcId: vpc-a3bf96c5
+      SecurityGroupEgress:
+      - IpProtocol: "-1"
+        CidrIp: 0.0.0.0/0
+      Tags:
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Version
+          Value: !Ref StackVersion
+
+##################
+# CloudWatch Logs
+##################
+  CloudWatchLogsGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/ecs/${AWS::StackName}"
+      RetentionInDays: 365
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
+
+######
+# ECR
+######
+  IngestFrameworkRepository:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: !Sub "ingest-framework-repository-${Environment}"
+      Tags:
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Version
+          Value: !Ref StackVersion
+
+#######
+# ECS
+#######
+  IngestFrameworkECSCluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: !Sub "ingest-framework-cluster-${Environment}"
+      ClusterSettings:
+        - Name: containerInsights
+          Value: enabled
+      Tags:
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Version
+          Value: !Ref StackVersion
+
+  IngestFrameworkECSTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      ContainerDefinitions:
+        - Name: !Sub "ingest-framework-container-${Environment}"
+          Image: !Sub "${AWS::AccountId}.dkr.ecr.eu-west-1.amazonaws.com/ingest-framework-repository-${Environment}:${Environment}"
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !Ref CloudWatchLogsGroup
+              awslogs-region: !Ref AWS::Region
+              awslogs-stream-prefix: ecs
+      Cpu: 2048
+      Family: !Sub "ingest-framework-task-definition-${Environment}"
+      ExecutionRoleArn: !GetAtt IngestFrameworkTaskRole.Arn
+      Memory: 4096
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+        - FARGATE
+      TaskRoleArn: !GetAtt IngestFrameworkTaskRole.Arn
+      Tags:
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Version
+          Value: !Ref StackVersion
+
+
+  WebIngestDataECSService:
+    Type: AWS::ECS::Service
+    Properties:
+      Cluster: !GetAtt IngestFrameworkECSCluster.Arn
+      DeploymentController:
+        Type: ECS
+      DesiredCount: 0
+      LaunchType: FARGATE
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          SecurityGroups:
+            - !GetAtt InstanceSecurityGroup.GroupId
+          Subnets:
+            - subnet-6501a53f
+            - subnet-572e5b1f
+            - subnet-bea63cd8
+      ServiceName: !Sub "ingest-framework-service-${Environment}"
+      TaskDefinition: !Ref IngestFrameworkECSTaskDefinition
+
+#######
+# Outputs
+#######
+Outputs:
+  IngestFrameworkRepositoryArn:
+    Value: !GetAtt IngestFrameworkRepository.Arn
+    Export:
+      Name: !Sub "IngestFrameworkRepositoryArn-${Environment}"
+  StackVersion:
+    Value: !Ref StackVersion

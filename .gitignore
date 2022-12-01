@@ -9,3 +9,4 @@ python
 .ipynb_checkpoints
 .pytest_cache
 tmp/*
+.env

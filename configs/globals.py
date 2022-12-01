@@ -1,15 +1,7 @@
 import os
 import sys
 
-from src.utils.various_utils import get_schema_name
-
-#### User defined variables ####
-CHANNEL = "linkedin"
-###############################
-os.environ["INGEST_CURRENT_CHANNEL"] = CHANNEL
-
-SCHEMA_NAME = get_schema_name(CHANNEL)
-
+PROVIDER = os.environ["PROVIDER"]
 
 if os.environ.get("AWS_EXECUTION_ENV") is None:
     local_home = "/Users/Alain/Projects/jabmo/ingest"

@@ -1,4 +1,4 @@
-# TODO: manage logger for having logger output in terminal when running locally + cleanup print statements
+# TODO: manage logger for having logger output in terminal when running locally + cleanup print statements # noqa: E501
 
 
 # TODO: For migrating production
@@ -6,28 +6,28 @@
 
 
 import json
+import logging
 import os
 import time
 
 import boto3
 import sentry_sdk
-
-# Temporary solution. This import allow init of some envs variables
-# TODO: Envs management needs better system.
-from configs.globals import CHANNEL
 from sentry_sdk.integrations.aws_lambda import AwsLambdaIntegration
+
+from configs.globals import PROVIDER
 
 # Import redshift here for being able to rollback()/commit() transaction.
 from src.clients.redshift.redshift_client import RedshiftClient
 from src.commons.task import Task
 from src.utils.custom_logger import logger
+from src.utils.various_utils import get_running_env, get_schema_name
 
 # logging.basicConfig(level=logging.INFO)
 # logging.getLogger("suds.client").setLevel(logging.DEBUG)
 # logging.getLogger("suds.transport.http").setLevel(logging.DEBUG)
 
 sentry_sdk.init(
-    dsn=os.environ["SENTRY_DNS"],
+    dsn=os.environ["SENTRY_DSN"],
     integrations=[AwsLambdaIntegration(timeout_warning=True)],
     traces_sample_rate=1.0,
 )
@@ -35,7 +35,9 @@ sentry_sdk.init(
 
 def get_params_json_file_path():
     app_home = os.environ["APPLICATION_HOME"]
-    return os.path.realpath(os.path.join(app_home, "configs", CHANNEL, "channel.json"))
+    return os.path.realpath(
+        os.path.join(app_home, "configs", PROVIDER, "channel.json")
+    )  # noqa: E501
 
 
 def get_channel_params():
@@ -81,7 +83,7 @@ def main():
     task_group_list = channel_params[get_task_group_name()]
 
     # Daily tasks run
-    logger.info(f"{CHANNEL} - {task_group_list}")
+    logger.info(f"{PROVIDER} - {task_group_list}")
 
     db_connection = RedshiftClient().db_connection
     with db_connection.cursor() as cursor:
@@ -93,7 +95,9 @@ def main():
     with db_connection.cursor() as cursor:
         cursor.execute("COMMIT;")
         # Transfer from tmp dir to s3
-    logger.info("All tasks have runned successfully. Daily Worflow ended with success.")
+    logger.info(
+        "All tasks have runned successfully. Daily Worflow ended with success."
+    )  # noqa: E501
 
     end = time.time()
     logger.info(end - start)
@@ -105,17 +109,17 @@ def main():
     # Invoke deduplicate Lambda
     logger.info("### Invoke Redshift deduplication Lambda ###")
     event = {
-        "schemas": ["bing_production"],
+        "schemas": [get_schema_name(PROVIDER)],
         "tables": [],
         "do_delete_duplicates": True,
         "partition_order_by_field": "jab_id",
-        "env": "prod",
+        "env": get_running_env(),
         "mode": "readwrite",
     }
 
     lambda_client = boto3.client("lambda")
     lambda_client.invoke(
-        FunctionName="jabmo-ingest-redshift-deduplicator-Function-jhJwND5R8vnY",  # noqa: E501
+        FunctionName=os.environ["LAMBDA_DEDUPLICATOR_FUNCTION_ARN"],
         Payload=json.dumps(event),
         InvocationType="Event",
     )

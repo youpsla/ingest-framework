@@ -15,12 +15,48 @@ Resources:
         - arn:aws:lambda:eu-west-1:943013980633:layer:SentryPythonServerlessSDK:24
       Role: arn:aws:iam::467882466042:role/Linkedin-lambda-dev-staging-rw
       Timeout: 900
-      MemorySize: 1024
+      MemorySize: 2048
       Environment:
         Variables:
           SENTRY_DNS: https://47e2fc82fc674f428f2b3e931eddace7@o1035237.ingest.sentry.io/6094713
           RUNNING_ENV: production
           TASK_GROUP: daily_tasks_list
+
+  IngestFrameworkBingApiCredentials:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Description: Ingest Framework Bing Api Credentials
+      Name: !Sub "ingest-framework/prod/bing/api-credentials"
+      SecretString: "{\"client_id\": 0, \"client_secret\": 0, \"redirection_uri\": 0}"
+      Tags:
+        - Key: Environment
+          Value: prod
+        - Key: Application
+          Value: ingest-framework
+
+  IngestFrameworkBingDeveloperToken:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Description: Ingest Framework Bing Developer Token
+      Name: !Sub "ingest-framework/prod/bing/developer-token"
+      SecretString: "{\"developer_token\": 0}"
+      Tags:
+        - Key: Environment
+          Value: prod
+        - Key: Application
+          Value: ingest-framework
+
+  IngestFrameworkBingRefreshToken:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Description: Ingest Framework Bing Refresh Token
+      Name: !Sub "ingest-framework/prod/bing/refresh-token"
+      SecretString: "{\"refresh_token\": 0}"
+      Tags:
+        - Key: Environment
+          Value: prod
+        - Key: Application
+          Value: ingest-framework
 
   ScheduledRuleJabmoBingIngestDaily:
     Type: AWS::Events::Rule

@@ -1,5 +1,4 @@
-# TODO: manage logger for having logger output in terminal when running locally + cleanup print statements
-# TODO Alain: Finish creative_sponsored_update_daily_update , api throttle limit reached.
+# TODO: manage logger for having logger output in terminal when running locally + cleanup print statements # noqa: E501
 
 import datetime
 import json
@@ -8,22 +7,22 @@ import time
 
 import boto3
 import sentry_sdk
+from sentry_sdk.integrations.aws_lambda import AwsLambdaIntegration
 
 # Temporary solution. This import allow init of some envs variables
 # TODO: Envs management needs better system.
-from configs.globals import CHANNEL
-from sentry_sdk.integrations.aws_lambda import AwsLambdaIntegration
+from configs.globals import PROVIDER
 
 # Import redshift here for being able to rollback()/commit() transaction.
 from src.clients.redshift.redshift_client import RedshiftClient
 from src.commons.task import Task
 from src.utils.custom_logger import logger
-from src.utils.various_utils import get_running_env
+from src.utils.various_utils import get_running_env, get_schema_name
 
 
 def activate_sentry():
     sentry_sdk.init(
-        dsn=os.environ["SENTRY_DNS"],
+        dsn=os.environ["SENTRY_DSN"],
         integrations=[AwsLambdaIntegration(timeout_warning=True)],
         traces_sample_rate=1.0,
     )
@@ -31,7 +30,9 @@ def activate_sentry():
 
 def get_params_json_file_path():
     app_home = os.environ["APPLICATION_HOME"]
-    return os.path.realpath(os.path.join(app_home, "configs", CHANNEL, "channel.json"))
+    return os.path.realpath(
+        os.path.join(app_home, "configs", PROVIDER, "channel.json")
+    )  # noqa: E501
 
 
 def get_channel_params():
@@ -46,12 +47,6 @@ def get_task_group_name():
         raise Exception("Can't find task group.")
     # return "daily_tasks_list"
     return task_group_name
-
-
-def lambda_handler(event, context):
-    if get_running_env() in ["production", "staging"]:
-        activate_sentry()
-    main()
 
 
 def run_task(channel, task_name, db_connection):
@@ -70,8 +65,10 @@ def run_task(channel, task_name, db_connection):
     return result, destination
 
 
-def main():
+def lambda_handler(event, context):
     logger.info("### Starting Ingest lambda ###")
+    if get_running_env() in ["production", "staging"]:
+        activate_sentry()
     start = time.time()
 
     channel_params = get_channel_params()
@@ -95,11 +92,15 @@ def main():
         monthly_tasks_list = channel_params.get("monthly_tasks_list", None)
         if monthly_tasks_list:
             for task_name in monthly_tasks_list:
-                result, _ = run_task(channel_params["name"], task_name, db_connection)
+                result, _ = run_task(
+                    channel_params["name"], task_name, db_connection
+                )  # noqa: E501
 
     with db_connection.cursor() as cursor:
         cursor.execute("COMMIT;")
-    logger.info("All tasks have runned successfully. Daily Worflow ended with success.")
+    logger.info(
+        "All tasks have runned successfully. Daily Worflow ended with success."
+    )  # noqa: E501
 
     end = time.time()
     logger.info(end - start)
@@ -108,23 +109,23 @@ def main():
 
     # Invoke deduplicate Lambda
     logger.info("### Invoke Redshift deduplication Lambda ###")
-    event = {
-        "schemas": ["new_linkedin"],
+    payload = {
+        "schemas": [get_schema_name(PROVIDER)],
         "tables": [],
         "do_delete_duplicates": True,
         "partition_order_by_field": "jab_id",
-        "env": "prod",
+        "env": get_running_env(),
         "mode": "readwrite",
     }
 
     lambda_client = boto3.client("lambda")
     lambda_client.invoke(
-        FunctionName="jabmo-ingest-redshift-deduplicator-Function-jhJwND5R8vnY",  # noqa: E501
-        Payload=json.dumps(event),
+        FunctionName=os.environ["LAMBDA_DEDUPLICATOR_FUNCTION_ARN"],
+        Payload=json.dumps(payload),
         InvocationType="Event",
     )
     logger.info("### Invocation sent###")
 
 
 if __name__ == "__main__":
-    main()
+    lambda_handler(None, None)

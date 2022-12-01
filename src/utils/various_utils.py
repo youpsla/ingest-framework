@@ -48,9 +48,15 @@ def get_running_env():
 
 
 def get_schema_name(channel):
-    schema_name = channel + "_" + get_running_env()
-    # return schema_name
-    return "new_linkedin"
+    running_env = get_running_env()
+
+    if channel == "linkedin" and running_env == "production":
+        return "new_linkedin"
+    if channel == "hubspot" and running_env == "production":
+        return "hubspot_development"
+
+    schema_name = channel + "_" + running_env
+    return schema_name
 
 
 def get_model_params_as_dict(channel, model_name):
@@ -112,7 +118,9 @@ def run_in_threads_pool(
             for k, v in request_params.items():
                 threads_list.append(
                     (
-                        executor.submit(source_function, endpoint=v["endpoint"]),
+                        executor.submit(
+                            source_function, endpoint=v["endpoint"]
+                        ),  # noqa: E501
                         k,
                     )
                 )
@@ -120,13 +128,13 @@ def run_in_threads_pool(
             if task[0].result():
                 task_result, endpoint = task[0].result()
                 tmp_result = []
-                # If there is a result_key in task prarams, we use it to retrieve only relevant data.
+                # If there is a result_key in task prarams, we use it to retrieve only relevant data. # noqa: E501
                 # Otherwise, we use all data received.
                 if result_key:
-                    # Sometimes the value task_result[result_key] can be a list, sometimes a dict
+                    # Sometimes the value task_result[result_key] can be a list, sometimes a dict # noqa: E501
                     # We test the type and adapt the way we add to tmp_result
                     #    - type list: We 'extend' tmp_result
-                    #    - type dict: We 'extend' tmp_result with the values of the dict
+                    #    - type dict: We 'extend' tmp_result with the values of the dict # noqa: E501
                     l_result = task_result[result_key]
                     if type(l_result) is list:
                         tmp_result.extend(l_result)
@@ -135,9 +143,9 @@ def run_in_threads_pool(
                 else:
                     tmp_result.append(task_result)
 
-                # If there is a pagination function for the task, we do requests until end of pagination has been reached.
+                # If there is a pagination function for the task, we do requests until end of pagination has been reached. # noqa: E501
                 if pagination_function:
-                    # We retrieve the endpoint with parameters updated depending on pagination result retrieved (start, count, ....)
+                    # We retrieve the endpoint with parameters updated depending on pagination result retrieved (start, count, ....) # noqa: E501
                     endpoint = pagination_function(endpoint, task_result)
                     while endpoint:
                         int_task = executor.submit(
@@ -158,7 +166,7 @@ def run_in_threads_pool(
 
 
 def zip_longest_repeat_value(*iterables):
-    """Equalize size of iterables to the longuest one. The latest value "short" irerable is repeated.
+    """Equalize size of iterables to the longuest one. The latest value "short" irerable is repeated. # noqa: E501
     Inputs:
         - [1,2,3]
         - [A,B]
