@@ -133,12 +133,12 @@ class HubspotClient(Client):
 
             # Get access token
             try:
-                access_token = (
-                    TokensApi().create_token(**refresh_token_params).access_token
-                )  # noqa: E501
+                access_token = (TokensApi().create_token(
+                    **refresh_token_params).access_token)  # noqa: E501
             except ApiException as e:
                 message = json.loads(e.body)["message"]
-                print(f"{message} for portal_id {tmp_secret_value['portal_id']}")
+                print(
+                    f"{message} for portal_id {tmp_secret_value['portal_id']}")
                 # TODO: Launch sentry alert
                 access_token = None
             except Exception as e:
@@ -146,7 +146,8 @@ class HubspotClient(Client):
                 raise (f"Unhandeld exception occurs: {e}")
 
             if access_token:
-                portal_token_dict[str(tmp_secret_value["portal_id"])] = access_token
+                portal_token_dict[str(
+                    tmp_secret_value["portal_id"])] = access_token
 
         request_params = [
             {
@@ -318,9 +319,9 @@ class HubspotClient(Client):
                 pass
 
             else:
-                # print(f"Endpoint: {endpoint}")
-                # print(f"{response.reason} - {response.text}")
-                raise ("Error while processing request")
+                raise (f"""Error while processing request:
+                - query: {endpoint}
+                - response: {response.reason} - {response.text}""")
 
         response = response.json()
         if "ServiceErrorCode" in response:
