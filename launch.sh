@@ -12,7 +12,7 @@ case $PROVIDER in
         ;;
 
     linkedin)
-        python linkedin/lambda_f/lambda_handler 2>&1
+        python linkedin/lambda_f.py 2>&1
         ;;
 
     *)
