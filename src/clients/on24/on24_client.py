@@ -6,6 +6,7 @@ from threading import current_thread, get_ident, get_native_id
 from hubspot.auth.oauth.api.tokens_api import TokensApi
 from requests.exceptions import ConnectionError, ConnectTimeout, RetryError
 from requests.structures import CaseInsensitiveDict
+
 from src.clients.aws.aws_tools import Secret, search_secrets_by_prefix
 from src.commons.client import Client
 from src.utils.endpoint_utils import Endpoint
@@ -53,6 +54,57 @@ def all_events(endpoint, task_result):
     return endpoint
 
 
+class On24Endpoint(Endpoint):
+    def __init__(
+        self,
+        params=None,
+        url_template=None,
+        query_params=None,
+        access_token_key=None,
+        access_token_secret=None
+    ):
+        super().__init__(
+            params=params, url_template=url_template, query_params=query_params
+        )
+        self.access_token_key = access_token_key
+        self.access_token_secret = access_token_secret
+        self._headers = None
+
+    def get_access_token(self):
+        access_token = (
+            TokensApi()
+            .create_token(**refresh_token_params)
+            .access_token  # noqa: E501
+        )
+        return access_token
+
+    def build_headers(self):
+        """# noqa: E501
+        Build the header of the http request
+
+        Use the access_token and optionnal header defined in json.
+
+        Args:
+            header: dict
+
+        Returns:
+            A dict of the build header.
+        """
+        headers = CaseInsensitiveDict()
+        headers["Accept"] = "application/json"
+        headers["cache-control"] = "no-cache"
+        headers["accessTokenKey"] = self.access_token_key
+        headers["accessTokenSecret"] = self.access_token_secret
+        return headers
+
+    @property
+    def headers(self):
+        if self._headers is None:
+            headers = self.build_headers()
+            self._headers = headers
+        return self._headers
+
+
 class On24Client(Client):
     def __init__(self, task=None, env=None, db_connection=None):
         super().__init__(env)
@@ -65,7 +117,6 @@ class On24Client(Client):
 
     def get(self, task_params, **_ignored):
 
-        final_result = []
         secrets_list = search_secrets_by_prefix("on24/api/")
         portal_token_list = []
         for secret in secrets_list.get("SecretList", []):
@@ -79,40 +130,51 @@ class On24Client(Client):
 
         # for ptd in [portal_token_list[2]]:
         for ptd in portal_token_list:
-            header = dict(**ptd)
-            header["Accept"] = "application/json"
-            header["cache-control"] = "no-cache"
+            # header = dict(**ptd)
+            # header["Accept"] = "application/json"
+            # header["cache-control"] = "no-cache"
             result = []
 
             db_params = self.get_request_params()
             total_requests_number = len(db_params)
-            endpoint_list = [
-                (
-                    Endpoint(
-                        params=v,
-                        url_template=task_params["query"]["template"],
-                        query_params=task_params["query"]["params"],
-                    ),
-                    k,
-                )
+            # endpoint_list = [
+            #     (
+            #         Endpoint(
+            #             params=v,
+            #             url_template=task_params["query"]["template"],
+            #             query_params=task_params["query"]["params"],
+            #         ),
+            #         k,
+            #     )
+            #     for k, v in db_params.items()
+            # ]
+            print(f"Number of requests to run: {total_requests_number}")
+
+            request_params = [
+                {
+                    k: {
+                        "endpoint": On24Endpoint(
+                            params=v,
+                            url_template=task_params["query"]["template"],
+                            query_params=task_params["query"],
+                            access_token_key=ptd["accessTokenKey"],
+                            access_token_secret=ptd["accessTokenSecret"]
+                        )
+                    }
+                }
                 for k, v in db_params.items()
             ]
-            print(f"Number of requests to run: {total_requests_number}")
+            result = []
 
             futures_results = []
 
-            endpoint_list_list = get_chunks(endpoint_list, chunk_size=100)
+            endpoint_list_list = get_chunks(request_params, chunk_size=100)
             for lst in endpoint_list_list:
                 # for lst in [endpoint_list_list[0]]:
-                access_token = (
-                    TokensApi()
-                    .create_token(**refresh_token_params)
-                    .access_token  # noqa: E501
-                )
-                headers = header
+                #headers = header
 
-                for ll in lst:
-                    ll[0].access_token = access_token
+                # for ll in lst:
+                #     ll[0].access_token = access_token
 
                 print(f"Chunck with {len(lst)} queries")
 
@@ -131,7 +193,7 @@ class On24Client(Client):
                 chunks_result_list = run_in_threads_pool(
                     request_params_list=lst,
                     source_function=self.do_get_query,
-                    headers=headers,
+                    # headers=headers,
                     result_key=task_params["query"]["response_datas_key"],
                     pagination_function=pagination_function
                     if pagination_function
@@ -188,7 +250,7 @@ class On24Client(Client):
         cpt = 1
         try:
             response = self.http_adapter.get(
-                url=endpoint.get_endpoint_as_string(), headers=headers
+                url=endpoint.get_endpoint_as_string(), headers=endpoint.headers
             )
         except ConnectionError as e:
             print("Error while connecting to db")
