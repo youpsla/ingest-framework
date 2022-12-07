@@ -1,4 +1,5 @@
 import json
+import logging
 import sys
 import webbrowser
 
@@ -8,12 +9,9 @@ from bingads.service_client import ServiceClient
 from suds import WebFault
 
 from src.clients.aws.aws_tools import Secret
-from src.clients.bing.constants import (
-    API_CREDENTIALS_SECRET_NAME,
-    BING_ENV,
-    DEVELOPER_TOKEN_SECRET_NAME,
-    REFRESH_TOKEN_SECRET_NAME,
-)
+from src.clients.bing.constants import (API_CREDENTIALS_SECRET_NAME, BING_ENV,
+                                        DEVELOPER_TOKEN_SECRET_NAME,
+                                        REFRESH_TOKEN_SECRET_NAME)
 
 # Required
 # CLIENT_ID = "029dd780-9575-46e8-a4a1-cfa64b94c4b2"
@@ -37,7 +35,6 @@ from src.clients.bing.constants import (
 CLIENT_STATE = "ClientStateGoesHere"
 
 # Optionally you can include logging to output traffic, for example the SOAP request and response.
-import logging
 
 rt = "0.ARAAyu2f7DtshEiXv9wti3dXqIDXnQJ1lehGpKHPpkuUxLIQAAY.AgABAAEAAAD--DLA3VO7QrddgJg7WevrAgDs_wQA9P-xvDTA00X1gmYqQVdTqd-6Y6mHYpeClAwapKSxireTY0uFBefTXr3by7PKpkQjbK_L9bx0hdPtzaLDVlk5Y3FpENccSXwSI3M3p77-8NNifKO2gutINObOmDHkBV44VcLm5OXFEdKXpMo1hhuVnIrXsPjJB21Bh-QXhbmkDy0vuyZH3RMZu-p-OZaYxx1OnfWcJswww0G3pYo7fJvfhteijV6BiVDdJN5xwEl2UAB1dLMDfMtSTI-eTRoc1b9kTsWFEXw8LS6QIh6E_hX5gaOGVZLCHmiEqkqF5pb2nS3xk9t6UzBy7PsnmrChqH9MPI6csdkDODjofiQDlAzR3EctdUAIAKB6whtN77iZOxfHdRE3cFV7gw1i0gPNgaNNDDUccO1k15dMWkXuHxssef8LCiJrxxOXbjNFqHPLwAtGVg1We4fj3CETM5IuIKxJeMZjOcoMgoLyuL-oGPDcvm6SvWYqvmjLTBsOlMnVrIwlQujvV7rxAssHfv9gpJrJ3WScrBRwSHZilRbSnC659hyF6j1_LlAnbJL5tg-jjBVrC9qTjIl3DWAsum3JcI-L1DPcMXt-yWCNQPIG-fxzTcLX-uMxjcQGFKFI__CcdaWxIClF3D6z9pynOCUW_dR1j3CgoE9XOqglEJwOXtcpeT5t_iGRRLvIv6kYi-n51qTJaMsuKwfXMIaM8ZbTVUjgONRo22ogn6FQDRL-yK8_iEe24pndT47tLbBA1DCD6T35OVKvuNVT43r4yDEvB3J2reqSC3VNaACr3A9ABVKaTq2CbDDpQeNQDEa9qct-GTnc51p2C8Cy4VbGnrS3uDCX"
 
@@ -48,7 +45,8 @@ rt = "0.ARAAyu2f7DtshEiXv9wti3dXqIDXnQJ1lehGpKHPpkuUxLIQAAY.AgABAAEAAAD--DLA3VO7
 
 def get_authorization_data(account_id=None):
 
-    developer_token = Secret(DEVELOPER_TOKEN_SECRET_NAME).get_value()["developer_token"]
+    developer_token = Secret(DEVELOPER_TOKEN_SECRET_NAME).get_value()[
+        "developer_token"]
 
     authorization_data = AuthorizationData(
         account_id=account_id,
@@ -102,7 +100,6 @@ def authenticate_with_oauth(authorization_data):
     # Uncomment this line if you want to store your refresh token. Be sure to save your refresh token securely.
     # authorization_data.authentication.token_refreshed_callback = save_refresh_token
 
-    # refresh_token = get_refresh_token()
     refresh_token_secret = Secret(REFRESH_TOKEN_SECRET_NAME)
     refresh_token_secret_value = refresh_token_secret.get_value()
     refresh_token = refresh_token_secret_value.get("refresh_token")
@@ -127,8 +124,10 @@ def authenticate_with_oauth(authorization_data):
         )
 
     # Get the new refresh_token and stor it in secrets.
-    new_refresh_token_secret_value = {"refresh_token": oauth_tokens.refresh_token}
-    new_refresh_token_secret_value_json = json.dumps(new_refresh_token_secret_value)
+    new_refresh_token_secret_value = {
+        "refresh_token": oauth_tokens.refresh_token}
+    new_refresh_token_secret_value_json = json.dumps(
+        new_refresh_token_secret_value)
     refresh_token_secret.put_value(new_refresh_token_secret_value_json)
 
 
@@ -143,16 +142,14 @@ def request_user_consent(authorization_data):
             " Advertising accounts. After you have granted consent in the web browser"
             " for the application to access your Microsoft Advertising accounts, please"
             " enter the response URI that includes the authorization 'code'"
-            " parameter: \n"
-        )
+            " parameter: \n")
     else:
         response_uri = raw_input(
             "You need to provide consent for the application to access your Microsoft"
             " Advertising accounts. After you have granted consent in the web browser"
             " for the application to access your Microsoft Advertising accounts, please"
             " enter the response URI that includes the authorization 'code'"
-            " parameter: \n"
-        )
+            " parameter: \n")
 
     if authorization_data.authentication.state != CLIENT_STATE:
         raise Exception(
@@ -163,22 +160,6 @@ def request_user_consent(authorization_data):
     authorization_data.authentication.request_oauth_tokens_by_response_uri(
         response_uri=response_uri
     )
-
-
-def get_refresh_token():
-    """
-    Returns a refresh token if found.
-    """
-    file = None
-    try:
-        file = open("/tmp/refresh_token.txt")
-        line = file.readline()
-        file.close()
-        return line if line else None
-    except IOError:
-        if file:
-            file.close()
-        return None
 
 
 def save_refresh_token(oauth_tokens):
@@ -210,7 +191,8 @@ def search_accounts_by_user_id(customer_service, user_id):
     found_last_page = False
 
     while not found_last_page:
-        paging = set_elements_to_none(customer_service.factory.create("ns5:Paging"))
+        paging = set_elements_to_none(
+            customer_service.factory.create("ns5:Paging"))
         paging.Index = page_index
         paging.Size = PAGE_SIZE
         search_accounts_response = customer_service.SearchAccounts(
@@ -274,7 +256,9 @@ def output_webfault_errors(ex):
             return
 
     # Handle serialization errors, for example: The formatter threw an exception while trying to deserialize the message, etc.
-    if hasattr(ex.fault, "detail") and hasattr(ex.fault.detail, "ExceptionDetail"):
+    if hasattr(
+            ex.fault, "detail") and hasattr(
+            ex.fault.detail, "ExceptionDetail"):
         api_errors = ex.fault.detail.ExceptionDetail
         if isinstance(api_errors, list):
             for api_error in api_errors:
@@ -350,7 +334,8 @@ def output_personname(data_object):
     output_status_message("* * * Begin output_personname * * *")
     output_status_message("FirstName: {0}".format(data_object.FirstName))
     output_status_message("LastName: {0}".format(data_object.LastName))
-    output_status_message("MiddleInitial: {0}".format(data_object.MiddleInitial))
+    output_status_message("MiddleInitial: {0}".format(
+        data_object.MiddleInitial))
     output_status_message("* * * End output_personname * * *")
 
 
@@ -366,7 +351,8 @@ def output_address(data_object):
     output_status_message("Line3: {0}".format(data_object.Line3))
     output_status_message("Line4: {0}".format(data_object.Line4))
     output_status_message("PostalCode: {0}".format(data_object.PostalCode))
-    output_status_message("StateOrProvince: {0}".format(data_object.StateOrProvince))
+    output_status_message("StateOrProvince: {0}".format(
+        data_object.StateOrProvince))
     output_status_message("TimeStamp: {0}".format(data_object.TimeStamp))
     output_status_message("BusinessName: {0}".format(data_object.BusinessName))
     output_status_message("* * * End output_address * * *")
@@ -378,7 +364,8 @@ def output_contactinfo(data_object):
     output_status_message("* * * Begin output_contactinfo * * *")
     output_status_message("Address:")
     output_address(data_object.Address)
-    output_status_message("ContactByPhone: {0}".format(data_object.ContactByPhone))
+    output_status_message("ContactByPhone: {0}".format(
+        data_object.ContactByPhone))
     output_status_message(
         "ContactByPostalMail: {0}".format(data_object.ContactByPostalMail)
     )
@@ -405,20 +392,23 @@ def output_user(data_object):
     output_status_message(
         "LastModifiedByUserId: {0}".format(data_object.LastModifiedByUserId)
     )
-    output_status_message("LastModifiedTime: {0}".format(data_object.LastModifiedTime))
+    output_status_message("LastModifiedTime: {0}".format(
+        data_object.LastModifiedTime))
     output_status_message("Lcid: {0}".format(data_object.Lcid))
     output_status_message("Name:")
     output_personname(data_object.Name)
     output_status_message("Password: {0}".format(data_object.Password))
     output_status_message("SecretAnswer: {0}".format(data_object.SecretAnswer))
-    output_status_message("SecretQuestion: {0}".format(data_object.SecretQuestion))
+    output_status_message("SecretQuestion: {0}".format(
+        data_object.SecretQuestion))
     output_status_message(
         "UserLifeCycleStatus: {0}".format(data_object.UserLifeCycleStatus)
     )
     output_status_message("TimeStamp: {0}".format(data_object.TimeStamp))
     output_status_message("UserName: {0}".format(data_object.UserName))
     output_status_message("ForwardCompatibilityMap:")
-    output_array_of_keyvaluepairofstringstring(data_object.ForwardCompatibilityMap)
+    output_array_of_keyvaluepairofstringstring(
+        data_object.ForwardCompatibilityMap)
     output_status_message("* * * End output_user * * *")
 
 
@@ -449,7 +439,8 @@ def main(authorization_data):
             # You can find out which pilot features the customer is able to use.
             # Each account could belong to a different customer, so use the customer ID in each account.
             output_status_message("-----\nGetCustomerPilotFeatures:")
-            output_status_message("Requested by CustomerId: {0}".format(customer_id))
+            output_status_message(
+                "Requested by CustomerId: {0}".format(customer_id))
             feature_pilot_flags = customer_service.GetCustomerPilotFeatures(
                 CustomerId=customer_id
             )

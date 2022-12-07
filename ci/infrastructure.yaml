@@ -13,16 +13,20 @@ Parameters:
     Description: The version of the stack, where the lambda.zip is uploaded
   CronJabmoHubspotDailyContacts:
     Type: String
-    Description: This is the cron expression of hubspot contact daily ingest
+    Description: This is the cron expression of Hubspot contact daily ingest
     Default: "cron(30 8 * * ? *)"
   CronJabmoHubspoHourlyContacts:
     Type: String
-    Description: This is the cron expression of hubspot contact hourly ingest
+    Description: This is the cron expression of Hubspot contact hourly ingest
     Default: "cron(00 * * * ? *)"
   CronJabmoLinkedinDaily:
     Type: String
-    Description: This is the cron expression of linkedin daily ingest
+    Description: This is the cron expression of Linkedin daily ingest
     Default: "cron(00 07 * * ? *)"
+  CronJabmoBingDaily:
+    Type: String
+    Description: This is the cron expression of Bing daily ingest
+    Default: "cron(00 09 * * ? *)"
 Conditions:
   IsProd: !Equals [!Ref Environment, "production"]
 Resources:
@@ -103,6 +107,18 @@ Resources:
         - Arn: !GetAtt IngestFrameworkLauncher.Arn
           Id: "IngestFrameworkLauncher"
           Input: !Sub '{"task_parameters":{"cluster":"ingest-framework-cluster-${Environment}","launchType":"FARGATE","taskDefinition":"ingest-framework-task-definition-${Environment}","count":1,"platformVersion":"LATEST","networkConfiguration":{"awsvpcConfiguration":{"subnets":["subnet-6501a53f","subnet-572e5b1f","subnet-bea63cd8"],"assignPublicIp":"ENABLED"}},"overrides":{"containerOverrides":[{"name":"ingest-framework-container-${Environment}","environment":[{"name":"PROVIDER","value":"linkedin"},{"name":"SENTRY_DSN","value":"${SentryDsn}"},{"name":"RUNNING_ENV","value":"${Environment}"},{"name":"TASK_GROUP","value":"daily_tasks_list"},{"name":"AWS_DEFAULT_REGION","value":"${AWS::Region}"},{"name":"LAMBDA_DEDUPLICATOR_FUNCTION_ARN","value":"${IngestFrameworkRedshiftDeduplicator.Arn}"}]}]}},"env":"${Environment}"}'
+
+  IngestFrameworkBingDailyCron:
+    Type: AWS::Events::Rule
+    Properties:
+      Name: !Sub "cron-ingest-framework-bing-daily-${Environment}"
+      Description: "ScheduledRule for Ingest Framework for Bing daily"
+      ScheduleExpression: !Ref CronJabmoBingDaily
+      State: !If [IsProd, ENABLED, DISABLED]
+      Targets:
+        - Arn: !GetAtt IngestFrameworkLauncher.Arn
+          Id: "IngestFrameworkLauncher"
+          Input: !Sub '{"task_parameters":{"cluster":"ingest-framework-cluster-${Environment}","launchType":"FARGATE","taskDefinition":"ingest-framework-task-definition-${Environment}","count":1,"platformVersion":"LATEST","networkConfiguration":{"awsvpcConfiguration":{"subnets":["subnet-6501a53f","subnet-572e5b1f","subnet-bea63cd8"],"assignPublicIp":"ENABLED"}},"overrides":{"containerOverrides":[{"name":"ingest-framework-container-${Environment}","environment":[{"name":"PROVIDER","value":"bing"},{"name":"SENTRY_DSN","value":"${SentryDsn}"},{"name":"RUNNING_ENV","value":"${Environment}"},{"name":"TASK_GROUP","value":"daily_tasks_list"},{"name":"AWS_DEFAULT_REGION","value":"${AWS::Region}"},{"name":"LAMBDA_DEDUPLICATOR_FUNCTION_ARN","value":"${IngestFrameworkRedshiftDeduplicator.Arn}"}]}]}},"env":"${Environment}"}'
 
 #######
 # ROLE
@@ -249,6 +265,9 @@ Resources:
                   - !Sub "arn:aws:secretsmanager:*:${AWS::AccountId}:secret:linkedin/ads/api/client*"
                   - !Sub "arn:aws:secretsmanager:*:${AWS::AccountId}:secret:linkedin/ads/api/refresh-token*"
                   - !Sub "arn:aws:secretsmanager:*:${AWS::AccountId}:secret:ingest-framework/prod/bing/*"
+                  - !Ref IngestFrameworkBingApiCredentials
+                  - !Ref IngestFrameworkBingDeveloperToken
+                  - !Ref IngestFrameworkBingRefreshToken
               - Effect: Allow
                 Action:
                   - secretsmanager:ListSecrets
@@ -302,6 +321,47 @@ Resources:
       RetentionInDays: 365
     DeletionPolicy: Delete
     UpdateReplacePolicy: Retain
+
+##################
+# SecretsManager
+##################
+
+  IngestFrameworkBingApiCredentials:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Description: Ingest Framework Bing Api Credentials
+      Name: !Sub ingest-framework/${Environment}/bing/api-credentials
+      SecretString: '{"client_id": 0, "client_secret": 0, "redirection_uri": 0}'
+      Tags:
+      - Key: Environment
+        Value: !Ref Environment
+      - Key: Application
+        Value: ingest-framework
+
+  IngestFrameworkBingDeveloperToken:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Description: Ingest Framework Bing Developer Token
+      Name: !Sub ingest-framework/${Environment}/bing/developer-token
+      SecretString: '{"developer_token": 0}'
+      Tags:
+      - Key: Environment
+        Value: !Ref Environment
+      - Key: Application
+        Value: ingest-framework
+
+  IngestFrameworkBingRefreshToken:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Description: Ingest Framework Bing Refresh Token
+      Name: !Sub ingest-framework/${Environment}/bing/refresh-token
+      SecretString: '{"refresh_token": 0}'
+      Tags:
+      - Key: Environment
+        Value: !Ref Environment
+      - Key: Application
+        Value: ingest-framework
+
 
 ######
 # ECR
