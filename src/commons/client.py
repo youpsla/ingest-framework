@@ -9,11 +9,8 @@ from src.commons.model import Model
 from src.constants import ENVS_LIST
 from src.utils.custom_logger import logger
 from src.utils.endpoint_utils import Endpoint
-from src.utils.various_utils import (
-    get_chunks,
-    run_in_threads_pool,
-    zip_longest_repeat_value,
-)
+from src.utils.various_utils import (get_chunks, run_in_threads_pool,
+                                     zip_longest_repeat_value)
 
 
 class Client:
@@ -102,7 +99,8 @@ class Client:
                     # This is done when we want to send more than one id to the API endpoint. # noqa: E501
                     # For linkedin, it allow to retrieve organizations names by batch. Then we are not faced to the 10 000 queries daily limit. # noqa: E501
                     if param.get("chunck"):
-                        for d in get_chunks(db_result, param.get("chunck_size", 20)):
+                        for d in get_chunks(db_result, param.get(
+                                "chunck_size", 20)):
                             key = str(list(d[0].keys())[0])
                             local_result = {
                                 key: ",".join(
@@ -126,7 +124,8 @@ class Client:
                     )
 
                     # Transform to timestamp
-                    target_timestamp = int(datetime.timestamp(target_day)) * 1000
+                    target_timestamp = int(
+                        datetime.timestamp(target_day)) * 1000
 
                     tmp_result = [{param["name"]: target_timestamp}]
 
@@ -191,6 +190,16 @@ class Client:
                     if param["part_of_date_name"] == "year":
                         result = datetime.strftime(target_day, "%Y")
                         tmp_result = [{param["name"]: result}]
+
+                if param["type"] == "as_YYYY-MM-DD":
+                    target_day = self.get_day_relative_to_today_from_params(
+                        day_params=param,
+                        offset_unity=param["offset_unity"],
+                    )
+
+                    target_day = target_day.strftime("%Y-%m-%d")
+
+                    tmp_result = [{param["name"]: target_day}]
 
                 result_lists.append(tmp_result)
         # As zip_longest_repeat_value needs only non empty lists. We check that here. # noqa: E501
@@ -274,9 +283,8 @@ class Client:
                             ]  # noqa: E501
                         ]
                     # Sometimes, values returned by the source
-                    api_data = (
-                        r if isinstance(r, dict) else {task_params["key_for_values"]: r}
-                    )
+                    api_data = (r if isinstance(r, dict) else {
+                        task_params["key_for_values"]: r})
                     local_result.append(
                         dict(ChainMap(*data_to_add_to_results, api_data))  # noqa: E501
                     )

@@ -9,11 +9,8 @@ from src.commons.client_helper import get_client
 from src.commons.model import Model
 from src.utils.custom_logger import logger
 from src.utils.sql_utils import SqlQuery
-from src.utils.various_utils import (
-    get_model_params_as_dict,
-    get_running_env,
-    nested_get,
-)
+from src.utils.various_utils import (get_model_params_as_dict, get_running_env,
+                                     nested_get)
 
 # from src.clients.bing.bing_client import ReportManager
 
@@ -284,13 +281,10 @@ class Task:
 
     def partial_update(self, values_dicts_list, where_dicts_list=None):
         sql_query = SqlQuery(
-            self.db_connection,
-            "partial_update",
-            fields=[f["table_field_name"] for f in self.params["db_query"]["fields"]],
-            values=values_dicts_list,
-            model=self.model,
-            where=where_dicts_list,
-        )
+            self.db_connection, "partial_update",
+            fields=[f["table_field_name"]
+                    for f in self.params["db_query"]["fields"]],
+            values=values_dicts_list, model=self.model, where=where_dicts_list,)
         sql_query.run()
 
     def update(self, values_dicts_list, update_keys):

@@ -1,0 +1,22 @@
+{
+    "name": "on24",
+    "daily_tasks_list" : [
+        "events_modified"
+    ],
+    "daily_tasks_list_bck" : [
+        "all_events",
+        "all_registrants",
+        "all_attendees",
+        "events_updated",
+        "events_modified",
+        "speakers",
+        "videos",
+        "slides",
+        "ondemand_registrants"
+    ],
+    "new_client_tasks" : [
+    ]
+
+}
+
+

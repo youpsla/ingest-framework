@@ -1,0 +1,428 @@
+[
+    {
+        "events": {
+            "client_id": {
+                "type": "raw",
+                "source_path": [
+                    "clientid"
+                ]
+            },
+            "event_id": {
+                "type": "raw",
+                "source_path": [
+                    "eventid"
+                ]
+            },
+            "goodafter": {
+                "type": "raw",
+                "source_path": [
+                    "goodafter"
+                ]
+            },
+            "description": {
+                "type": "raw",
+                "source_path": [
+                    "description"
+                ]
+            },
+            "displaytimezonecd": {
+                "type": "raw",
+                "source_path": [
+                    "displaytimezonecd"
+                ]
+            },
+            "eventtype": {
+                "type": "raw",
+                "source_path": [
+                    "eventtype"
+                ]
+            },
+            "createtimestamp": {
+                "type": "raw",
+                "source_path": [
+                    "createtimestamp"
+                ]
+            },
+            "localelanguagecd": {
+                "type": "raw",
+                "source_path": [
+                    "localelanguagecd"
+                ]
+            },
+            "lastmodified": {
+                "type": "raw",
+                "source_path": [
+                    "lastmodified"
+                ]
+            },
+            "iseliteexpired": {
+                "type": "raw",
+                "source_path": [
+                    "iseliteexpired"
+                ]
+            },
+            "livestart": {
+                "type": "raw",
+                "source_path": [
+                    "livestart"
+                ]
+            },
+            "liveend": {
+                "type": "raw",
+                "source_path": [
+                    "liveend"
+                ]
+            },
+            "archivestart": {
+                "type": "raw",
+                "source_path": [
+                    "archivestart"
+                ]
+            },
+            "archiveend": {
+                "type": "raw",
+                "source_path": [
+                    "archiveend"
+                ]
+            },
+            "audienceurl": {
+                "type": "raw",
+                "source_path": [
+                    "audienceurl"
+                ]
+            },
+            "eventprofile": {
+                "type": "raw",
+                "source_path": [
+                    "eventprofile"
+                ]
+            },
+            "streamtype": {
+                "type": "raw",
+                "source_path": [
+                    "streamtype"
+                ]
+            },
+            "audiencekey": {
+                "type": "raw",
+                "source_path": [
+                    "audiencekey"
+                ]
+            },
+            "reporturl": {
+                "type": "raw",
+                "source_path": [
+                    "reporturl"
+                ]
+            },
+            "uploadurl": {
+                "type": "raw",
+                "source_path": [
+                    "uploadurl"
+                ]
+            },
+            "pmurl": {
+                "type": "raw",
+                "source_path": [
+                    "pmurl"
+                ]
+            },
+            "previewurl": {
+                "type": "raw",
+                "source_path": [
+                    "previewurl"
+                ]
+            },
+            "contenttype": {
+                "type": "raw",
+                "source_path": [
+                    "contenttype"
+                ]
+            },
+            "lastupdated": {
+                "type": "raw",
+                "source_path": [
+                    "lastupdated"
+                ]
+            },
+            "category": {
+                "type": "raw",
+                "source_path": [
+                    "category"
+                ]
+            },
+            "isactive": {
+                "type": "raw",
+                "source_path": [
+                    "isactive"
+                ]
+            },
+            "regrequired": {
+                "type": "raw",
+                "source_path": [
+                    "regrequired"
+                ]
+            }
+        }
+    },
+    {
+        "registrants": {
+            "client_id": {
+                "type": "raw",
+                "source_path": [
+                    "clientid"
+                ]
+            },
+            "event_id": {
+                "type": "raw",
+                "source_path": [
+                    "eventid"
+                ]
+            },
+            "event_user_id": {
+                "type": "raw",
+                "source_path": [
+                    "eventuserid"
+                ]
+            },
+            "first_name": {
+                "type": "raw",
+                "source_path": [
+                    "firstname"
+                ]
+            },
+            "last_name": {
+                "type": "raw",
+                "source_path": [
+                    "lastname"
+                ]
+            },
+            "email": {
+                "type": "raw",
+                "source_path": [
+                    "email"
+                ]
+            },
+            "company": {
+                "type": "raw",
+                "source_path": [
+                    "company"
+                ]
+            },
+            "job_function": {
+                "type": "raw",
+                "source_path": [
+                    "jobfunction"
+                ]
+            },
+            "marketing_email": {
+                "type": "raw",
+                "source_path": [
+                    "marketingemail"
+                ]
+            },
+            "event_email": {
+                "type": "raw",
+                "source_path": [
+                    "eventemail"
+                ]
+            },
+            "user_profile_url": {
+                "type": "raw",
+                "source_path": [
+                    "userprofileurl"
+                ]
+            },
+            "ip_address": {
+                "type": "raw",
+                "source_path": [
+                    "ipaddress"
+                ]
+            },
+            "os": {
+                "type": "raw",
+                "source_path": [
+                    "os"
+                ]
+            },
+            "browser": {
+                "type": "raw",
+                "source_path": [
+                    "browser"
+                ]
+            },
+            "email_format": {
+                "type": "raw",
+                "source_path": [
+                    "emailformat"
+                ]
+            },
+            "source_event_id": {
+                "type": "raw",
+                "source_path": [
+                    "sourceeventid"
+                ]
+            },
+            "partnerref": {
+                "type": "raw",
+                "source_path": [
+                    "partnerref"
+                ]
+            },
+            "user_status": {
+                "type": "raw",
+                "source_path": [
+                    "userstatus"
+                ]
+            },
+            "create_timestamp": {
+                "type": "raw",
+                "source_path": [
+                    "createtimestamp"
+                ]
+            },
+            "last_activity": {
+                "type": "raw",
+                "source_path": [
+                    "lastactivity"
+                ]
+            },
+            "registrant_type": {
+                "type": "raw",
+                "source_path": [
+                    "registranttype"
+                ]
+            }
+        }
+    },
+    {
+        "attendees": {
+            "client_id": {
+                "type": "raw",
+                "source_path": [
+                    "clientid"
+                ]
+            },
+            "event_id": {
+                "type": "raw",
+                "source_path": [
+                    "eventid"
+                ]
+            },
+            "event_user_id": {
+                "type": "raw",
+                "source_path": [
+                    "eventuserid"
+                ]
+            },
+            "source_event_id": {
+                "type": "raw",
+                "source_path": [
+                    "sourceeventid"
+                ]
+            },
+            "email": {
+                "type": "raw",
+                "source_path": [
+                    "email"
+                ]
+            },
+            "is_blocked": {
+                "type": "raw",
+                "source_path": [
+                    "isblocked"
+                ]
+            },
+            "engagement_score": {
+                "type": "raw",
+                "source_path": [
+                    "engagementscore"
+                ]
+            },
+            "live_minutes": {
+                "type": "raw",
+                "source_path": [
+                    "liveminutes"
+                ]
+            },
+            "live_viewed": {
+                "type": "raw",
+                "source_path": [
+                    "liveviewed"
+                ]
+            },
+            "archive_minutes": {
+                "type": "raw",
+                "source_path": [
+                    "archiveminutes"
+                ]
+            },
+            "archive_viewed": {
+                "type": "raw",
+                "source_path": [
+                    "archiveviewed"
+                ]
+            },
+            "asked_questions": {
+                "type": "raw",
+                "source_path": [
+                    "askedquestions"
+                ]
+            },
+            "resources_downloaded": {
+                "type": "raw",
+                "source_path": [
+                    "resourcesdownloaded"
+                ]
+            },
+            "answered_polls": {
+                "type": "raw",
+                "source_path": [
+                    "answeredpolls"
+                ]
+            },
+            "answered_surveys": {
+                "type": "raw",
+                "source_path": [
+                    "answeredsurveys"
+                ]
+            },
+            "user_profile_url": {
+                "type": "raw",
+                "source_path": [
+                    "userprofileurl"
+                ]
+            },
+            "user_status": {
+                "type": "raw",
+                "source_path": [
+                    "userstatus"
+                ]
+            },
+            "cumulative_live_minutes": {
+                "type": "raw",
+                "source_path": [
+                    "cumulativeliveminutes"
+                ]
+            },
+            "cumulative_archive_minutes": {
+                "type": "raw",
+                "source_path": [
+                    "cumulativearchiveminutes"
+                ]
+            },
+            "first_archive_activity": {
+                "type": "raw",
+                "source_path": [
+                    "firstarchiveactivity"
+                ]
+            },
+            "last_archive_activity": {
+                "type": "raw",
+                "source_path": [
+                    "lastarchiveactivity"
+                ]
+            }
+        }
+    }
+]

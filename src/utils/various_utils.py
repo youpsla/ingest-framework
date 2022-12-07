@@ -48,15 +48,9 @@ def get_running_env():
 
 
 def get_schema_name(channel):
-    running_env = get_running_env()
-
-    if channel == "linkedin" and running_env == "production":
-        return "new_linkedin"
-    if channel == "hubspot" and running_env == "production":
-        return "hubspot_development"
-
-    schema_name = channel + "_" + running_env
+    schema_name = channel + "_" + get_running_env()
     return schema_name
+    # return "hubspot_development"
 
 
 def get_model_params_as_dict(channel, model_name):
@@ -83,7 +77,7 @@ def get_chunks(source_list, chunk_size=500):
     """
     if len(source_list) > chunk_size:
         chunks_lists = [
-            source_list[offs : offs + chunk_size]  # noqa: E203
+            source_list[offs: offs + chunk_size]  # noqa: E203
             for offs in range(0, len(source_list), chunk_size)
         ]
         return chunks_lists
