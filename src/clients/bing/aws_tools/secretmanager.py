@@ -1,8 +1,9 @@
 from src.clients.aws.aws_tools import Secret, SecretsManager
-
-API_CREDENTIALS_SECRET_NAME = "ingest-framework/prod/bing/api-credentials"
-DEVELOPER_TOKEN_SECRET_NAME = "ingest-framework/prod/bing/developer-token"
-REFRESH_TOKEN_SECRET_NAME = "ingest-framework/prod/bing/refresh-token"
+from src.clients.bing.constants import (
+    API_CREDENTIALS_SECRET_NAME,
+    DEVELOPER_TOKEN_SECRET_NAME,
+    REFRESH_TOKEN_SECRET_NAME
+)
 
 
 class BingSecretsManager(SecretsManager):
@@ -27,7 +28,6 @@ class BingSecretsManager(SecretsManager):
         return True
 
     def put_refresh_token(self, refresh_token):
-        secret_name = "ingest-framework/prod/bing/refresh-token"
-        refresh_token_secret = Secret(secret_name)
+        refresh_token_secret = Secret(REFRESH_TOKEN_SECRET_NAME)
         refresh_token_secret.put_value("refresh_token", refresh_token)
         return True
