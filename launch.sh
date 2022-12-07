@@ -23,6 +23,10 @@ case $PROVIDER in
         fi
         ;;
 
+    bing)
+        python bing/src/lambda_f.py 2>&1
+        ;;
+
     *)
         # Use the sentry-cli tool to report the error to Sentry in case in
         # unknown provider given.
