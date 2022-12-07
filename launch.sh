@@ -4,23 +4,22 @@ echo "#######################"
 echo -e "Launching provider $PROVIDER"
 echo "#######################"
 
+handle_error() {
+    if [ $? -ne 0 ]; then
+        ERROR_MESSAGE="Execution script for provider '$PROVIDER' failed"
+        sentry-cli send-event --message "$ERROR_MESSAGE"
+    fi
+}
+
 
 case $PROVIDER in
 
     hubspot)
         python hubspot_lambda_handler/src/lambda_f.py 2>&1
-        if [ $? -ne 0 ]; then
-            ERROR_MESSAGE="Execution script for provider '$PROVIDER' failed"
-            sentry-cli send-event --message "$ERROR_MESSAGE"
-        fi
         ;;
 
     linkedin)
         python linkedin/lambda_f.py 2>&1
-        if [ $? -ne 0 ]; then
-            ERROR_MESSAGE="Execution script for provider '$PROVIDER' failed"
-            sentry-cli send-event --message "$ERROR_MESSAGE"
-        fi
         ;;
 
     bing)
@@ -35,3 +34,6 @@ case $PROVIDER in
         echo $ERROR_MESSAGE
         ;;
 esac
+
+# Send error to Sentry if an error occured within this script.
+handle_error
