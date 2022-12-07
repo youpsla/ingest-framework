@@ -13,19 +13,19 @@ Parameters:
     Description: The version of the stack, where the lambda.zip is uploaded
   CronJabmoHubspotDailyContacts:
     Type: String
-    Description: This is the cron expression of hubspot contact daily ingest
+    Description: This is the cron expression of Hubspot contact daily ingest
     Default: "cron(30 8 * * ? *)"
   CronJabmoHubspoHourlyContacts:
     Type: String
-    Description: This is the cron expression of hubspot contact hourly ingest
+    Description: This is the cron expression of Hubspot contact hourly ingest
     Default: "cron(00 * * * ? *)"
   CronJabmoLinkedinDaily:
     Type: String
-    Description: This is the cron expression of linkedin daily ingest
+    Description: This is the cron expression of Linkedin daily ingest
     Default: "cron(00 07 * * ? *)"
   CronJabmoBingDaily:
     Type: String
-    Description: This is the cron expression of linkedin daily ingest
+    Description: This is the cron expression of Bing daily ingest
     Default: "cron(00 09 * * ? *)"
 Conditions:
   IsProd: !Equals [!Ref Environment, "production"]
