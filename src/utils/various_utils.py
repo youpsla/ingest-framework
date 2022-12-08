@@ -7,7 +7,16 @@ from suds.sudsobject import asdict
 
 
 def nested_get(dic, keys):
+    """Returns the value in a nested dictionary at the given sequence of keys.
+       Handle List too. In the keys sequence, could be integer too (Used as list index).
 
+    Args:
+        dic: A nested dictionary.
+        keys: A sequence of keys.
+
+    Returns:
+        The value in the nested dictionary at the given sequence of keys, or None if any of the keys is not found in the dictionary.
+    """
     try:
         if keys:
             for key in keys:
@@ -60,18 +69,20 @@ def get_schema_name(channel):
 
 
 def get_model_params_as_dict(channel, model_name):
-    """
-    Returns the model parameters as a dictionary for the given channel and model name.
+    """Returns the model parameters as a dictionary for the given channel and model
+    name.
 
     Args:
         channel: str, the channel for which the model parameters are to be returned
-        model_name: str, the name of the model for which the parameters are to be returned
+        model_name: str, the name of the model for which the parameters are to be
+            returned
 
     Returns:
         dict, the model parameters for the given channel and model name
 
     Raises:
-        ValueError: if the given channel and/or model name is not found in the models.json file
+        ValueError: if the given channel and/or model name is not found in the
+            models.json file
     """
     app_home = os.environ.get("APPLICATION_HOME")
     model_file = os.path.join(app_home, "configs", channel, "models.json")
