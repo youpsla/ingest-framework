@@ -155,7 +155,7 @@ class Model:
             result.append(f)
         return result
 
-    def get_all(self, fields=None, filter_field=None):
+    def get_all(self, fields=None):
         """Get all record for a table corresponding to the current model. # noqa: E501
 
         Args:
@@ -170,7 +170,6 @@ class Model:
             "select",
             model=self,
             fields=fields,
-            filter_field=filter_field,
         )
         res = q.run()
         return res
