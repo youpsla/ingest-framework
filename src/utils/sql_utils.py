@@ -16,7 +16,6 @@ class SqlQuery:
         fields=None,
         values=None,
         model=None,
-        max_field=None,
         raw_sql=None,
         where=None,
         update_keys=None,
@@ -27,7 +26,6 @@ class SqlQuery:
         self.values = values
         self.db_connection = db_connection
         self.model = model
-        self.max_field = max_field
         self._raw_sql = raw_sql
         self.sql = None
         self.where = where
@@ -77,13 +75,6 @@ class SqlQuery:
                     extras.execute_values(
                         cursor, self.sql, self.values, page_size=500
                     )  # noqa: E501
-                elif self.qtype == "select_max":
-                    self.sql = self.get_sql_select_max()
-                    cursor.execute(self.sql, self.values)
-                elif self.qtype == "select_max_for_date_plus_one_day":
-                    self.sql = self.get_sql_select_max_for_date_plus_one_day()
-                    cursor.execute(self.sql, self.values)
-
                 elif self.qtype == "get_from_raw_sql":
                     cursor.execute(self.raw_sql)
                     return cursor.fetchall()
@@ -132,14 +123,6 @@ class SqlQuery:
             # f" {'where '+self.where if self.where else ''}"
             f" {'where '+self.filter_field['name'] +'=' + str(self.filter_field['value']) if self.filter_field else ''}"  # noqa: E501
         )
-        return sql
-
-    def get_sql_select_max(self):
-        sql = f"SELECT MAX({self.max_field}) FROM {self.schema_table}"
-        return sql
-
-    def get_sql_select_max_for_date_plus_one_day(self):
-        sql = f"SELECT MAX({self.max_field}) + INTERVAL '1 day' as max_date FROM {self.schema_table}"  # noqa: E501
         return sql
 
     def get_sql_insert(self, schema_table):
