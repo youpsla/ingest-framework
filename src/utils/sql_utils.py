@@ -141,8 +141,6 @@ class SqlQuery:
 
     def get_sql_update(self):
         set_fields = set(self.values[0].keys()) - set(self.update_keys)
-        # set_fields_1 = [f.name for f in self.model.fields_list]
-        # set_fields_1.remove(self.update_keys)
 
         def update_get_set(self):
             set_data = " , ".join(
@@ -172,11 +170,6 @@ class SqlQuery:
                     for pk in self.update_keys
                 ]
             )
-            # result = "{target}.{pk} = {stage_table_name}.{pk}".format(
-            #     target=target,
-            #     stage_table_name=self.stage_table_name,
-            #     pk=self.update_key,
-            # )
             return result
 
         def update_get_and_where(self):
@@ -237,11 +230,6 @@ class SqlQuery:
                     for pk in self.update_keys
                 ]
             )
-            # result = "{target}.{pk} = {stage_table_name}.{pk}".format(
-            #     target=target,
-            #     stage_table_name=self.stage_table_name,
-            #     pk=self.update_key,
-            # )
             return result
 
         def update_get_and_where(self):
@@ -296,7 +284,6 @@ class SqlQuery:
             [f" {k}='{v}'" for d in self.where for k, v in d.items()]
         )  # noqa: E501
 
-        # set_data = ' , '.join(['='.join((str(a[0]),str(a[1]))) for a in zip(fields,values)]) # noqa: E501
         set_data = " , ".join(
             [
                 "=".join(
