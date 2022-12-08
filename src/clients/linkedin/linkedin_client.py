@@ -6,6 +6,7 @@ from threading import current_thread, get_ident, get_native_id
 import requests
 from requests.exceptions import ConnectionError, ConnectTimeout, RetryError
 from requests.structures import CaseInsensitiveDict
+
 from src.clients.aws.aws_tools import Secret
 from src.commons.client import Client
 from src.utils.endpoint_utils import Endpoint
@@ -19,23 +20,6 @@ class LinkedInAccessToken:
         self.refresh_token_value = LinkedInRefreshToken().value
         self.client_secret_value = LinkedInClientCredentials().get_value()
 
-    # @property
-    # def will_expire_soon(self):
-    #     endpoint = "https://www.linkedin.com/oauth/v2/introspectToken"
-    #     data = {
-    #         "client_id": self.client_secret_value["id"],
-    #         "client_secret": self.client_secret_value["secret"],
-    #         "token": access_token,
-    #     }
-
-    #     response = self.do_query(endpoint=endpoint, data=data)
-    #     expires_at = json.loads(response.text)["expires_at"]
-
-    #     if expires_at < datetime.now().timestamp() + (3 * 24 * 3600):
-    #         return True
-
-    #     return False
-
     @property
     def value(self):
 
@@ -48,7 +32,8 @@ class LinkedInAccessToken:
             "client_secret": self.client_secret_value["secret"],
         }
 
-        response = LinkedInClient.do_auth_post_query(endpoint=endpoint, data=data)
+        response = LinkedInClient.do_auth_post_query(
+            endpoint=endpoint, data=data)
 
         # WIth the new API, looks like the generated token is not fully processed enough quick by linkedin.
         # A small sleep here allow Linkedin to have time to proceed.
@@ -100,7 +85,8 @@ class LinkedInRefreshToken(Secret):
             "token": self.value,
         }
 
-        response = LinkedInClient.do_auth_post_query(endpoint=endpoint, data=data)
+        response = LinkedInClient.do_auth_post_query(
+            endpoint=endpoint, data=data)
         expires_at = json.loads(response.text)["expires_at"]
 
         if expires_at < datetime.now().timestamp() + (7 * 24 * 3600):
@@ -117,11 +103,9 @@ class LinkedinEndpoint(Endpoint):
         query_params=None,
         access_token=None,
     ):
-        # self.query_params = query_params
         super().__init__(
             params=params,
             url_template=url_template,
-            # query_params=self.query_params["params"],
             query_params=query_params,
         )
         self.access_token = access_token
@@ -214,9 +198,6 @@ class LinkedInClient(Client):
             A list of lists.
         """
 
-        # Build specific header and authorization stuff if necessary
-        # headers = self.build_headers(header=header)
-
         # Get a list of params to use for requests.
         db_params = self.get_request_params()
         print(f"Number of requests to run: {len(db_params)}")
@@ -227,7 +208,6 @@ class LinkedInClient(Client):
                     "endpoint": LinkedinEndpoint(
                         params=v,
                         url_template=task_params["query"]["template"],
-                        # query_params=task_params["query"]["params"],
                         query_params=task_params["query"],
                         access_token=self.access_token,
                     )
@@ -236,9 +216,6 @@ class LinkedInClient(Client):
             for k, v in db_params.items()
         ]
         result = []
-
-        # Build endpoints using params previously generated.
-        # endpoint_list = self.get_endpoint_list(task_params, db_params)
 
         # Request provider. and get result of all requests.
         if self.task.name not in [
@@ -259,7 +236,8 @@ class LinkedInClient(Client):
         else:
             pagination_function = None
 
-        api_datas = self.do_requests(task_params, request_params, pagination_function)
+        api_datas = self.do_requests(
+            task_params, request_params, pagination_function)
 
         # Add data to the API response
         result = self.add_request_params_to_api_call_result(
@@ -366,8 +344,3 @@ class LinkedInClient(Client):
             print("Error while processing request")
 
         return response
-
-
-if __name__ == "__main__":
-    lc = LinkedInClient()
-    print(lc)

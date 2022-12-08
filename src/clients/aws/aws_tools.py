@@ -16,7 +16,8 @@ class SecretManagerClient:
     def get_client(self, region_name):
         # Create a Secrets Manager client
         session = boto3.session.Session()
-        client = session.client(service_name="secretsmanager", region_name=region_name)
+        client = session.client(
+            service_name="secretsmanager", region_name=region_name)
         return client
 
 
@@ -48,8 +49,7 @@ class Secret:
 
         try:
             get_secret_value_response = self.secretsmanager.client.get_secret_value(
-                SecretId=self.name
-            )
+                SecretId=self.name)
         except ClientError as e:
             if e.response["Error"]["Code"] == "DecryptionFailureException":
                 # Secrets Manager can't decrypt the protected secret text using the provided KMS key.
@@ -198,50 +198,3 @@ class SecretsManager:
                     get_secret_value_response["SecretBinary"]
                 )
                 return decoded_binary_secret
-
-
-class HubspotSecretsManager(SecretsManager):
-    def __init__(self):
-        super().__init__()
-        self.credentials = None
-
-    def get_hubspot_credentials(self, portal_id):
-        """
-        Retrieve the hubspot credentials from AWS secret manager service.
-
-        Raises
-        ------
-        LookupError: if client_id, secret_id or redirect_uri not in the
-                    credentials retrieved.
-
-        Parameters
-        ----------
-            portal_id: str
-                Client connected with Oauth2 to Jabmo account
-
-        Returns
-        -------
-        credentials : dict
-            client_secret: str
-                Jabmo app's client secret
-        """
-        secret_name = f"hubspot/api/{portal_id}"
-        credentials = self.get_secret(secret_name)
-        if not credentials:
-            raise SystemError("An error occured when trying to retrieve the secret")
-        if "refresh_token" not in credentials:
-            raise LookupError("'refresh_token' must be in '{secret_name}' secret keys")
-        # elif "client_secret" not in credentials:
-        #     raise LookupError("'client_secret' must be in '{secret_name}' secret keys")
-        # elif "redirect_uri" not in credentials:
-        #     raise LookupError("'redirect_uri' must be in '{secret_name}' secret keys")
-        self.credentials = credentials
-
-    def get_refresh_token(self, portal_id):
-        self.get_hubspot_credentials(portal_id)
-        return self.credentials["refresh_token"]
-
-
-if __name__ == "__main__":
-    res = search_secrets_by_prefix("hubspot")
-    print(res)

@@ -1,7 +1,7 @@
 import logging
-import os
 
 import psycopg2
+
 from src.clients.aws.aws_tools import Secret
 from src.constants import DB_SECRET_NAMES
 from src.utils.various_utils import get_running_env
