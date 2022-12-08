@@ -5,6 +5,9 @@ Parameters:
   Environment:
     Type: String
     Default: development
+  Tag:
+    Type: String
+    Default: latest
   SentryDsn:
     Type: String
     Default: ""
@@ -362,20 +365,6 @@ Resources:
       - Key: Application
         Value: ingest-framework
 
-
-######
-# ECR
-######
-  IngestFrameworkRepository:
-    Type: AWS::ECR::Repository
-    Properties:
-      RepositoryName: !Sub "ingest-framework-repository-${Environment}"
-      Tags:
-        - Key: Environment
-          Value: !Ref Environment
-        - Key: Version
-          Value: !Ref StackVersion
-
 #######
 # ECS
 #######
@@ -397,7 +386,7 @@ Resources:
     Properties:
       ContainerDefinitions:
         - Name: !Sub "ingest-framework-container-${Environment}"
-          Image: !Sub "${AWS::AccountId}.dkr.ecr.eu-west-1.amazonaws.com/ingest-framework-repository-${Environment}:${Environment}"
+          Image: !Sub "${AWS::AccountId}.dkr.ecr.eu-west-1.amazonaws.com/ingest-framework-repository:${Tag}"
           LogConfiguration:
             LogDriver: awslogs
             Options:
@@ -417,7 +406,6 @@ Resources:
           Value: !Ref Environment
         - Key: Version
           Value: !Ref StackVersion
-
 
   WebIngestDataECSService:
     Type: AWS::ECS::Service
@@ -443,9 +431,5 @@ Resources:
 # Outputs
 #######
 Outputs:
-  IngestFrameworkRepositoryArn:
-    Value: !GetAtt IngestFrameworkRepository.Arn
-    Export:
-      Name: !Sub "IngestFrameworkRepositoryArn-${Environment}"
   StackVersion:
     Value: !Ref StackVersion
