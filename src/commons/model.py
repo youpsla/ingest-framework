@@ -11,11 +11,6 @@ from src.utils.sql_utils import SqlQuery
 from src.utils.various_utils import nested_get
 
 
-class ModelManager:
-    def __init__(self):
-        pass
-
-
 class Model:
     """A class representing datas to be store in Db. # noqa: E501
 

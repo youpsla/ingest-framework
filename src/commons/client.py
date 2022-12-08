@@ -1,6 +1,6 @@
 import uuid
 from collections import ChainMap
-from datetime import date, datetime, timedelta
+from datetime import datetime
 
 import pendulum
 import pytz
@@ -8,12 +8,8 @@ import pytz
 from src.commons.model import Model
 from src.constants import ENVS_LIST
 from src.utils.custom_logger import logger
-from src.utils.endpoint_utils import Endpoint
-from src.utils.various_utils import (
-    get_chunks,
-    run_in_threads_pool,
-    zip_longest_repeat_value,
-)
+from src.utils.various_utils import (get_chunks, run_in_threads_pool,
+                                     zip_longest_repeat_value)
 
 
 class Client:
@@ -102,7 +98,8 @@ class Client:
                     # This is done when we want to send more than one id to the API endpoint. # noqa: E501
                     # For linkedin, it allow to retrieve organizations names by batch. Then we are not faced to the 10 000 queries daily limit. # noqa: E501
                     if param.get("chunck"):
-                        for d in get_chunks(db_result, param.get("chunck_size", 20)):
+                        for d in get_chunks(db_result, param.get(
+                                "chunck_size", 20)):
                             key = str(list(d[0].keys())[0])
                             local_result = {
                                 key: ",".join(
@@ -126,7 +123,8 @@ class Client:
                     )
 
                     # Transform to timestamp
-                    target_timestamp = int(datetime.timestamp(target_day)) * 1000
+                    target_timestamp = int(
+                        datetime.timestamp(target_day)) * 1000
 
                     tmp_result = [{param["name"]: target_timestamp}]
 
@@ -274,48 +272,13 @@ class Client:
                             ]  # noqa: E501
                         ]
                     # Sometimes, values returned by the source
-                    api_data = (
-                        r if isinstance(r, dict) else {task_params["key_for_values"]: r}
-                    )
+                    api_data = (r if isinstance(r, dict) else {
+                        task_params["key_for_values"]: r})
                     local_result.append(
                         dict(ChainMap(*data_to_add_to_results, api_data))  # noqa: E501
                     )
             result.extend(local_result)
         return result
-
-    def get_endpoint_list(
-        self,
-        task_params=None,
-        db_params=None,
-    ):
-        endpoint_list = [
-            (
-                Endpoint(
-                    params=v,
-                    url_template=task_params["query"]["template"],
-                    query_params=task_params["query"]["params"],
-                ),
-                k,
-            )
-            for k, v in db_params.items()
-        ]
-
-        # request_params = [
-        #     {
-        #         k: {
-        #             "endpoint": Endpoint(
-        #                 params=v,
-        #                 url_template=task_params["query"]["template"],
-        #                 query_params=task_params["query"]["params"],
-        #             ),
-        #             "headers": self.build_headers(
-        #                 header=None, access_token=portal_token_dict[v["portal_id"]]
-        #             ),
-        #         }
-        #     }
-        #     for k, v in db_params.items()
-
-        return endpoint_list
 
     def do_requests(self, task_params, endpoint_list, pagination_function):
         futures_results = []
