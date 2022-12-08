@@ -60,6 +60,19 @@ def get_schema_name(channel):
 
 
 def get_model_params_as_dict(channel, model_name):
+    """
+    Returns the model parameters as a dictionary for the given channel and model name.
+
+    Args:
+        channel: str, the channel for which the model parameters are to be returned
+        model_name: str, the name of the model for which the parameters are to be returned
+
+    Returns:
+        dict, the model parameters for the given channel and model name
+
+    Raises:
+        ValueError: if the given channel and/or model name is not found in the models.json file
+    """
     app_home = os.environ.get("APPLICATION_HOME")
     model_file = os.path.join(app_home, "configs", channel, "models.json")
     with open(model_file, "r") as f:
@@ -83,7 +96,7 @@ def get_chunks(source_list, chunk_size=500):
     """
     if len(source_list) > chunk_size:
         chunks_lists = [
-            source_list[offs : offs + chunk_size]  # noqa: E203
+            source_list[offs: offs + chunk_size]  # noqa: E203
             for offs in range(0, len(source_list), chunk_size)
         ]
         return chunks_lists
