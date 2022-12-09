@@ -73,7 +73,7 @@ def main():
 
     task_group_list = channel_params[get_task_group_name()]
 
-    logger.info(f"Daily tasks run: {task_group_list}")
+    logger.info(f"Tasks names: {task_group_list}")
 
     db_connection = RedshiftClient().db_connection
     with db_connection.cursor() as cursor:
