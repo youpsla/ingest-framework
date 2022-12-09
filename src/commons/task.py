@@ -4,15 +4,12 @@ import json
 import os
 import time
 
-# from src.clients.bing.bing_client import ReportManager
 from src.commons.client_helper import get_client
 from src.commons.model import Model
 from src.utils.custom_logger import logger
 from src.utils.sql_utils import SqlQuery
 from src.utils.various_utils import (get_model_params_as_dict, get_running_env,
                                      nested_get)
-
-# from src.clients.bing.bing_client import ReportManager
 
 
 class Task:
@@ -35,7 +32,6 @@ class Task:
         self.running_env = get_running_env()
         self.db_connection = db_connection
         self._params = None
-        self._request_data_source = None
         self._source = None
 
     @property
@@ -59,17 +55,6 @@ class Task:
                 self.running_env, destination_name, self
             )  # noqa: E501
         return self._destination
-
-    @property
-    def request_data_source(self):
-        if not self._request_data_source:
-            request_data_source_name = self.params.get(
-                "request_data_source", None
-            )  # noqa: E501
-            self._request_data_source = get_client(
-                self.running_env, request_data_source_name, self
-            )
-        return self._request_data_source
 
     def get_params_json_file_path(self):
         app_home = os.environ["APPLICATION_HOME"]
@@ -198,21 +183,6 @@ class Task:
 
         if "partial_update" in self.actions:
             for d in source_data:
-                # m = Model(
-                #     self.model.model_name,
-                #     self.db_connection,
-                #     channel=self.channel,  # noqa: E501
-                # )
-                # m.set_field(
-                #     self.params["db_query"]["fields"][0],
-                #     m.params[self.params["db_query"]["fields"][0]],
-                # )
-                # m.set_field(
-                #     d["where_field"],
-                #     m.params[d["where_field"]],
-                # )
-                # m.populate_values(d["datas"])
-                # setattr(getattr(m, d["where_field"]), "value", d["where_value"]) # noqa: E501
 
                 where_dicts_list = []
                 for v in self.params["db_query"]["keys"]:

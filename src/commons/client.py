@@ -1,6 +1,6 @@
 import uuid
 from collections import ChainMap
-from datetime import date, datetime, timedelta
+from datetime import datetime
 
 import pendulum
 import pytz
@@ -8,7 +8,6 @@ import pytz
 from src.commons.model import Model
 from src.constants import ENVS_LIST
 from src.utils.custom_logger import logger
-from src.utils.endpoint_utils import Endpoint
 from src.utils.various_utils import (get_chunks, run_in_threads_pool,
                                      zip_longest_repeat_value)
 
@@ -290,40 +289,6 @@ class Client:
                     )
             result.extend(local_result)
         return result
-
-    def get_endpoint_list(
-        self,
-        task_params=None,
-        db_params=None,
-    ):
-        endpoint_list = [
-            (
-                Endpoint(
-                    params=v,
-                    url_template=task_params["query"]["template"],
-                    query_params=task_params["query"]["params"],
-                ),
-                k,
-            )
-            for k, v in db_params.items()
-        ]
-
-        # request_params = [
-        #     {
-        #         k: {
-        #             "endpoint": Endpoint(
-        #                 params=v,
-        #                 url_template=task_params["query"]["template"],
-        #                 query_params=task_params["query"]["params"],
-        #             ),
-        #             "headers": self.build_headers(
-        #                 header=None, access_token=portal_token_dict[v["portal_id"]]
-        #             ),
-        #         }
-        #     }
-        #     for k, v in db_params.items()
-
-        return endpoint_list
 
     def do_requests(self, task_params, endpoint_list, pagination_function):
         futures_results = []

@@ -11,11 +11,6 @@ from src.utils.sql_utils import SqlQuery
 from src.utils.various_utils import nested_get
 
 
-class ModelManager:
-    def __init__(self):
-        pass
-
-
 class Model:
     """A class representing datas to be store in Db. # noqa: E501
 
@@ -155,7 +150,7 @@ class Model:
             result.append(f)
         return result
 
-    def get_all(self, fields=None, filter_field=None):
+    def get_all(self, fields=None):
         """Get all record for a table corresponding to the current model. # noqa: E501
 
         Args:
@@ -170,48 +165,12 @@ class Model:
             "select",
             model=self,
             fields=fields,
-            filter_field=filter_field,
         )
         res = q.run()
         return res
 
     def get_fields_value_as_string(self, fields):
         return "".join([str(getattr(self, f).db_value) for f in fields])
-
-    def get_max_for_date_field_plus_one_day(self, field):
-        """Get max value for a a date field and add one day.
-
-        Args:
-            field: The field we want the max vamlue for.
-
-        Returns:
-            A list of tuple with one tuple containing the max value.
-
-        """
-        q = SqlQuery(
-            self.db_connection,
-            "select_max_for_date_plus_one_day",
-            max_field=field,
-            model=self,
-        )
-        res = q.run()
-        return res
-
-    def get_max_for_field(self, field):
-        """Get max value for a specific field.
-
-        Args:
-            field: The field we want the max vamlue for.
-
-        Returns:
-            A list of tuple with one tuple containing the max value.
-
-        """
-        q = SqlQuery(
-            self.db_connection, "select_max", max_field=field, model=self
-        )  # noqa: E501
-        res = q.run()
-        return res
 
     @staticmethod
     def get_from_raw_sql(db_connection, sql):
@@ -222,9 +181,6 @@ class Model:
         Args:
             db_connection:
             sql: A string repsenting the sql query.
-
-        Returns:
-            A list of tuple with one tuple containing the max value.
 
         """
         q = SqlQuery(db_connection, "get_from_raw_sql", raw_sql=sql)
@@ -240,9 +196,6 @@ class Model:
         Args:
             db_connection:
             sql: A string repsenting the sql query.
-
-        Returns:
-            A list of tuple with one tuple containing the max value.
 
         """
         q = SqlQuery(db_connection, "raw_sql", raw_sql=sql)

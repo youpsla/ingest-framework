@@ -5,21 +5,14 @@ import uuid
 from datetime import datetime
 
 from bingads.v13.bulk import *
-from bingads.v13.reporting.reporting_service_manager import ReportingServiceManager
+from bingads.v13.reporting.reporting_service_manager import \
+    ReportingServiceManager
 
-from src.clients.bing.auth_helper import (
-    AuthorizationData,
-    ServiceClient,
-    authenticate,
-    get_authorization_data,
-    output_status_message,
-)
+from src.clients.bing.auth_helper import (ServiceClient, authenticate,
+                                          get_authorization_data,
+                                          output_status_message)
 from src.commons.client import Client
 from src.utils.various_utils import nested_get, recursive_asdict
-
-# Unusual import for preventing circular import.
-# Import module instead of file.
-
 
 # The report file extension type.
 REPORT_FILE_FORMAT = "Csv"
@@ -67,12 +60,12 @@ class BingAdsClient(Client):
         if self.task.name in ["daily_ads_update", "daily_adgroups_update"]:
             final_result = []
             if db_params:
-                original_db_params = {
-                    key: copy.deepcopy(value) for key, value in db_params.items()
-                }
+                original_db_params = {key: copy.deepcopy(
+                    value) for key, value in db_params.items()}
                 result_file_path_list = []
                 for k, v in db_params.items():
-                    self.authorization_data = get_authorization_data(v["AccountId"])
+                    self.authorization_data = get_authorization_data(
+                        v["AccountId"])
 
                     bulk_service_manager = BulkServiceManager(
                         authorization_data=self.authorization_data,
@@ -99,11 +92,14 @@ class BingAdsClient(Client):
                         last_sync_time_in_utc=None,
                         result_file_directory=FILE_DIRECTORY,
                         result_file_name="ingest_" + str(uuid.uuid4()) + ".csv",
-                        overwrite_result_file=True,  # Set this value true if you want to overwrite the same file.
-                        timeout_in_milliseconds=TIMEOUT_IN_MILLISECONDS,  # You may optionally cancel the download after a specified time interval.
+                        # Set this value true if you want to overwrite the same file.
+                        overwrite_result_file=True,
+                        # You may optionally cancel the download after a specified time interval.
+                        timeout_in_milliseconds=TIMEOUT_IN_MILLISECONDS,
                     )
 
-                    output_status_message("-----\nAwaiting Background Completion...")
+                    output_status_message(
+                        "-----\nAwaiting Background Completion...")
                     result_file_path = bulk_service_manager.download_file(
                         download_parameters
                     )
@@ -125,11 +121,9 @@ class BingAdsClient(Client):
             "daily_ad_metrics_update",
         ]:
             if db_params:
-                original_db_params = {
-                    key: copy.deepcopy(value) for key, value in db_params.items()
-                }
+                original_db_params = {key: copy.deepcopy(
+                    value) for key, value in db_params.items()}
                 for k, v in db_params.items():
-                    # self.authorization_data = get_authorization_data(v["AccountId"])
                     self.authorization_data = get_authorization_data()
                     authenticate(self.authorization_data)
                     request = ReportRequest(
@@ -145,18 +139,6 @@ class BingAdsClient(Client):
                     result_file_path = report_manager.submit_and_download()
                     # api_datas = {k: request.submit_and_download()}
                     return result_file_path
-        # else:
-        #     if db_params:
-        #         kwargs = list(db_params.values())[0]
-        #     else:
-        #         kwargs = []
-        #     request = ServiceRequest(
-        #         authorization_data=self.authorization_data,
-        #         service_name=self.task.params["query"]["service_name"],
-        #         task=self.task,
-        #         kwargs=kwargs
-        #         # kwargs=kwargs,
-        #     )
         if self.task.name == "daily_accounts_update":
             self.authorization_data = get_authorization_data()
             authenticate(self.authorization_data)
@@ -169,15 +151,15 @@ class BingAdsClient(Client):
         else:
             final_result = []
             if db_params:
-                original_db_params = {
-                    key: copy.deepcopy(value) for key, value in db_params.items()
-                }
+                original_db_params = {key: copy.deepcopy(
+                    value) for key, value in db_params.items()}
                 counter = 0
                 counter_total = len(db_params)
                 print(f"Number of requests to run: {counter_total}")
                 result = []
                 for k, v in db_params.items():
-                    self.authorization_data = get_authorization_data(v["AccountId"])
+                    self.authorization_data = get_authorization_data(
+                        v["AccountId"])
                     authenticate(self.authorization_data)
                     # Delete entries which cannot be passed to the service for the request. used for AccountId which has to be in authentication only.
                     if not self.task.name == "daily_campaigns_update":
@@ -189,9 +171,7 @@ class BingAdsClient(Client):
                         service_name=self.task.params["query"]["service_name"],
                         task=self.task,
                         kwargs=v
-                        # kwargs=kwargs,
                     )
-                    # request.param = param[0]
                     api_datas = {k: request.get()}
                     result.append(api_datas)
                     counter += 1
@@ -237,7 +217,8 @@ class ServiceRequest:
         if self.task.name == "daily_accounts_update":
             result = self.service.GetAccountsInfo()
             result = recursive_asdict(result)
-            result = nested_get(result, self.task.params["query"]["response_datas_key"])
+            result = nested_get(
+                result, self.task.params["query"]["response_datas_key"])
             return result
 
         if self.task.name == "daily_campaigns_update":
@@ -245,7 +226,8 @@ class ServiceRequest:
             result = self.service.GetCampaignsByAccountId(**self.kwargs)
 
             result = recursive_asdict(result)
-            result = nested_get(result, self.task.params["query"]["response_datas_key"])
+            result = nested_get(
+                result, self.task.params["query"]["response_datas_key"])
             return result
 
         if self.task.name == "daily_ads_update":
@@ -261,9 +243,11 @@ class ServiceRequest:
             adTypes.AdType.append("Text")
 
             # TODO: Generic way of managing params here
-            result = self.service.GetAdsByAdGroupId(**self.kwargs, AdTypes=adTypes)
+            result = self.service.GetAdsByAdGroupId(
+                **self.kwargs, AdTypes=adTypes)
             result = recursive_asdict(result)
-            result = nested_get(result, self.task.params["query"]["response_datas_key"])
+            result = nested_get(
+                result, self.task.params["query"]["response_datas_key"])
             return result
 
         if self.task.name == "daily_medias_update":
@@ -273,7 +257,8 @@ class ServiceRequest:
             )
 
             result = recursive_asdict(result)
-            result = nested_get(result, self.task.params["query"]["response_datas_key"])
+            result = nested_get(
+                result, self.task.params["query"]["response_datas_key"])
             return result
 
         raise ValueError("Unknown task name")
@@ -341,8 +326,7 @@ class ReportManager:
         track status until the report is complete e.g. either using
         ReportingDownloadOperation.track() or ReportingDownloadOperation.get_status()."""
         reporting_download_operation = self.reporting_service_manager.submit_download(
-            self.report_request
-        )
+            self.report_request)
 
         # You may optionally cancel the track() operation after a specified time interval.
         # reporting_operation_status = self.reporting_download_operation.track(
@@ -353,8 +337,8 @@ class ReportManager:
         # or use custom polling logic with get_status() as shown below.
         for i in range(10):
             time.sleep(
-                self.reporting_service_manager.poll_interval_in_milliseconds / 1000.0
-            )
+                self.reporting_service_manager.poll_interval_in_milliseconds /
+                1000.0)
 
             download_status = reporting_download_operation.get_status()
 
@@ -364,10 +348,13 @@ class ReportManager:
         result_file_path = reporting_download_operation.download_result_file(
             result_file_directory=FILE_DIRECTORY,
             # result_file_name="staging.csv",
-            result_file_name=self.get_result_file_name(self.report_request.ReportName),
+            result_file_name=self.get_result_file_name(
+                self.report_request.ReportName),
             decompress=True,
-            overwrite=True,  # Set this value true if you want to overwrite the same file.
-            timeout_in_milliseconds=TIMEOUT_IN_MILLISECONDS,  # You may optionally cancel the download after a specified time interval.
+            # Set this value true if you want to overwrite the same file.
+            overwrite=True,
+            # You may optionally cancel the download after a specified time interval.
+            timeout_in_milliseconds=TIMEOUT_IN_MILLISECONDS,
         )
 
         return result_file_path
@@ -566,7 +553,8 @@ class ReportRequest:
         self,
     ):
 
-        report_request = self.service.factory.create("AdPerformanceReportRequest")
+        report_request = self.service.factory.create(
+            "AdPerformanceReportRequest")
         report_request.Aggregation = self.aggregation
         report_request.ExcludeColumnHeaders = self.exclude_column_headers
         report_request.ExcludeReportFooter = self.exclude_report_footer
@@ -581,10 +569,10 @@ class ReportRequest:
             "AccountIds",
             {"long": self.kwargs["id"].split(",")},
         )
-        # setattr(scope, "AccountIds", {"long": [self.kwargs["AccountId"]]})
         report_request.Scope = scope
 
-        report_columns = self.service.factory.create("ArrayOfAdPerformanceReportColumn")
+        report_columns = self.service.factory.create(
+            "ArrayOfAdPerformanceReportColumn")
         report_columns.AdPerformanceReportColumn.append(
             [
                 "TimePeriod",

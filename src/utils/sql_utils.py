@@ -16,23 +16,19 @@ class SqlQuery:
         fields=None,
         values=None,
         model=None,
-        max_field=None,
         raw_sql=None,
         where=None,
-        update_keys=None,
-        filter_field=None,
+        update_keys=None
     ):
         self.qtype = qtype
         self.fields = fields
         self.values = values
         self.db_connection = db_connection
         self.model = model
-        self.max_field = max_field
         self._raw_sql = raw_sql
         self.sql = None
         self.where = where
         self.update_keys = update_keys
-        self.filter_field = filter_field
         self._values_list = None
 
     @property
@@ -77,13 +73,6 @@ class SqlQuery:
                     extras.execute_values(
                         cursor, self.sql, self.values, page_size=500
                     )  # noqa: E501
-                elif self.qtype == "select_max":
-                    self.sql = self.get_sql_select_max()
-                    cursor.execute(self.sql, self.values)
-                elif self.qtype == "select_max_for_date_plus_one_day":
-                    self.sql = self.get_sql_select_max_for_date_plus_one_day()
-                    cursor.execute(self.sql, self.values)
-
                 elif self.qtype == "get_from_raw_sql":
                     cursor.execute(self.raw_sql)
                     return cursor.fetchall()
@@ -129,17 +118,7 @@ class SqlQuery:
         sql = (
             f"SELECT {'*' if not self.fields else ','.join(self.fields)}"
             f" from {self.schema_table}"
-            # f" {'where '+self.where if self.where else ''}"
-            f" {'where '+self.filter_field['name'] +'=' + str(self.filter_field['value']) if self.filter_field else ''}"  # noqa: E501
         )
-        return sql
-
-    def get_sql_select_max(self):
-        sql = f"SELECT MAX({self.max_field}) FROM {self.schema_table}"
-        return sql
-
-    def get_sql_select_max_for_date_plus_one_day(self):
-        sql = f"SELECT MAX({self.max_field}) + INTERVAL '1 day' as max_date FROM {self.schema_table}"  # noqa: E501
         return sql
 
     def get_sql_insert(self, schema_table):
@@ -162,8 +141,6 @@ class SqlQuery:
 
     def get_sql_update(self):
         set_fields = set(self.values[0].keys()) - set(self.update_keys)
-        # set_fields_1 = [f.name for f in self.model.fields_list]
-        # set_fields_1.remove(self.update_keys)
 
         def update_get_set(self):
             set_data = " , ".join(
@@ -193,11 +170,6 @@ class SqlQuery:
                     for pk in self.update_keys
                 ]
             )
-            # result = "{target}.{pk} = {stage_table_name}.{pk}".format(
-            #     target=target,
-            #     stage_table_name=self.stage_table_name,
-            #     pk=self.update_key,
-            # )
             return result
 
         def update_get_and_where(self):
@@ -258,11 +230,6 @@ class SqlQuery:
                     for pk in self.update_keys
                 ]
             )
-            # result = "{target}.{pk} = {stage_table_name}.{pk}".format(
-            #     target=target,
-            #     stage_table_name=self.stage_table_name,
-            #     pk=self.update_key,
-            # )
             return result
 
         def update_get_and_where(self):
@@ -317,7 +284,6 @@ class SqlQuery:
             [f" {k}='{v}'" for d in self.where for k, v in d.items()]
         )  # noqa: E501
 
-        # set_data = ' , '.join(['='.join((str(a[0]),str(a[1]))) for a in zip(fields,values)]) # noqa: E501
         set_data = " , ".join(
             [
                 "=".join(

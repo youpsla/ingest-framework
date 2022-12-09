@@ -127,7 +127,6 @@ class HubspotClient(Client):
                 "client_id": "fa6040db-72c2-4cca-b529-34d951716062",
                 "client_secret": "f5d8dedb-7d18-4c19-a2a7-d25053d9c6cb",
                 "redirect_uri": "https://connect.jabmo.app",
-                # "refresh_token": "eu1-e86f-fc6e-4e94-8ff2-43870c0d1b4f",
                 "refresh_token": refresh_token,
             }
 
@@ -155,7 +154,6 @@ class HubspotClient(Client):
                     "endpoint": HubspotEndpoint(
                         params=v,
                         url_template=task_params["query"]["template"],
-                        # query_params=task_params["query"]["params"],
                         query_params=task_params["query"],
                         portal_access_token_dict=portal_token_dict,
                     )
@@ -184,7 +182,6 @@ class HubspotClient(Client):
             "email_events_open_daily",
             "email_events_forward_daily",
         ]:
-            # db_params = self.get_request_params()
 
             print(f"Number of requests to run: {len(request_params)}")
 
@@ -192,8 +189,6 @@ class HubspotClient(Client):
 
             endpoint_list_list = get_chunks(request_params, chunk_size=100)
             for lst in endpoint_list_list:
-                # for lst in [endpoint_list_list[0]]:
-
                 print(f"Chunck with {len(lst)} queries")
 
                 pagination_function = None
