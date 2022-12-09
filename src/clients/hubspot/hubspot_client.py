@@ -185,7 +185,7 @@ class HubspotClient(Client):
 
             print(f"Number of requests to run: {len(request_params)}")
 
-            futures_results = []
+            api_datas = []
 
             endpoint_list_list = get_chunks(request_params, chunk_size=100)
             for lst in endpoint_list_list:
@@ -226,33 +226,11 @@ class HubspotClient(Client):
                     if pagination_function
                     else None,
                 )
-                futures_results.extend(chunks_result_list)
+                api_datas.extend(chunks_result_list)
 
-            for fr in futures_results:
-                local_result = []
-                for k, v in fr.items():
-                    for r in v:
-                        data_to_add_to_results = []
-                        if task_params.get(
-                            "fields_to_add_to_api_result", None
-                        ):  # noqa: E501
-                            data_to_add_to_results = [
-                                {e["destination_key"]: db_params[k][e["origin_key"]]}
-                                for e in task_params[
-                                    "fields_to_add_to_api_result"
-                                ]  # noqa: E501
-                            ]
-                        api_data = (
-                            r
-                            if isinstance(r, dict)
-                            else {task_params["key_for_values"]: r}
-                        )
-                        local_result.append(
-                            dict(
-                                ChainMap(*data_to_add_to_results, api_data)
-                            )  # noqa: E501
-                        )
-                result.extend(local_result)
+            result = self.add_request_params_to_api_call_result(
+                api_datas, task_params, db_params
+            )
 
         return result
 
