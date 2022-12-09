@@ -26,6 +26,14 @@ Parameters:
     Type: String
     Description: This is the cron expression of Linkedin daily ingest
     Default: "cron(00 07 * * ? *)"
+  CronJabmoLinkedinMonthly:
+    Type: String
+    Description: This is the cron expression of Linkedin monthly ingest
+    Default: "cron(00 04 1 * ? *)"
+  CronJabmoLinkedinQuarterly:
+    Type: String
+    Description: This is the cron expression of Linkedin quarterly ingest
+    Default: "cron(00 11 2 */3 ? *)"
   CronJabmoBingDaily:
     Type: String
     Description: This is the cron expression of Bing daily ingest
@@ -110,6 +118,30 @@ Resources:
         - Arn: !GetAtt IngestFrameworkLauncher.Arn
           Id: "IngestFrameworkLauncher"
           Input: !Sub '{"task_parameters":{"cluster":"ingest-framework-cluster-${Environment}","launchType":"FARGATE","taskDefinition":"ingest-framework-task-definition-${Environment}","count":1,"platformVersion":"LATEST","networkConfiguration":{"awsvpcConfiguration":{"subnets":["subnet-6501a53f","subnet-572e5b1f","subnet-bea63cd8"],"assignPublicIp":"ENABLED"}},"overrides":{"containerOverrides":[{"name":"ingest-framework-container-${Environment}","environment":[{"name":"PROVIDER","value":"linkedin"},{"name":"SENTRY_DSN","value":"${SentryDsn}"},{"name":"RUNNING_ENV","value":"${Environment}"},{"name":"TASK_GROUP","value":"daily_tasks_list"},{"name":"AWS_DEFAULT_REGION","value":"${AWS::Region}"},{"name":"LAMBDA_DEDUPLICATOR_FUNCTION_ARN","value":"${IngestFrameworkRedshiftDeduplicator.Arn}"}]}]}},"env":"${Environment}"}'
+
+  IngestFrameworkLinkedinMonthlyCron:
+    Type: AWS::Events::Rule
+    Properties:
+      Name: !Sub "cron-ingest-framework-linkedin-monthly-${Environment}"
+      Description: "ScheduledRule for Ingest Framework for LinkedIn monthly"
+      ScheduleExpression: !Ref CronJabmoLinkedinMonthly
+      State: !If [IsProd, ENABLED, DISABLED]
+      Targets:
+        - Arn: !GetAtt IngestFrameworkLauncher.Arn
+          Id: "IngestFrameworkLauncher"
+          Input: !Sub '{"task_parameters":{"cluster":"ingest-framework-cluster-${Environment}","launchType":"FARGATE","taskDefinition":"ingest-framework-task-definition-${Environment}","count":1,"platformVersion":"LATEST","networkConfiguration":{"awsvpcConfiguration":{"subnets":["subnet-6501a53f","subnet-572e5b1f","subnet-bea63cd8"],"assignPublicIp":"ENABLED"}},"overrides":{"containerOverrides":[{"name":"ingest-framework-container-${Environment}","environment":[{"name":"PROVIDER","value":"linkedin"},{"name":"SENTRY_DSN","value":"${SentryDsn}"},{"name":"RUNNING_ENV","value":"${Environment}"},{"name":"TASK_GROUP","value":"monthly_tasks_list"},{"name":"AWS_DEFAULT_REGION","value":"${AWS::Region}"},{"name":"LAMBDA_DEDUPLICATOR_FUNCTION_ARN","value":"${IngestFrameworkRedshiftDeduplicator.Arn}"}]}]}},"env":"${Environment}"}'
+
+  IngestFrameworkLinkedinQuarterlyCron:
+    Type: AWS::Events::Rule
+    Properties:
+      Name: !Sub "cron-ingest-framework-linkedin-quarterly-${Environment}"
+      Description: "ScheduledRule for Ingest Framework for LinkedIn quarterly"
+      ScheduleExpression: !Ref CronJabmoLinkedinQuarterly
+      State: !If [IsProd, ENABLED, DISABLED]
+      Targets:
+        - Arn: !GetAtt IngestFrameworkLauncher.Arn
+          Id: "IngestFrameworkLauncher"
+          Input: !Sub '{"task_parameters":{"cluster":"ingest-framework-cluster-${Environment}","launchType":"FARGATE","taskDefinition":"ingest-framework-task-definition-${Environment}","count":1,"platformVersion":"LATEST","networkConfiguration":{"awsvpcConfiguration":{"subnets":["subnet-6501a53f","subnet-572e5b1f","subnet-bea63cd8"],"assignPublicIp":"ENABLED"}},"overrides":{"containerOverrides":[{"name":"ingest-framework-container-${Environment}","environment":[{"name":"PROVIDER","value":"linkedin"},{"name":"SENTRY_DSN","value":"${SentryDsn}"},{"name":"RUNNING_ENV","value":"${Environment}"},{"name":"TASK_GROUP","value":"quarterly_tasks"},{"name":"AWS_DEFAULT_REGION","value":"${AWS::Region}"},{"name":"LAMBDA_DEDUPLICATOR_FUNCTION_ARN","value":"${IngestFrameworkRedshiftDeduplicator.Arn}"}]}]}},"env":"${Environment}"}'
 
   IngestFrameworkBingDailyCron:
     Type: AWS::Events::Rule
