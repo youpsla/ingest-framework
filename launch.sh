@@ -14,19 +14,7 @@ handle_error() {
 
 case $PROVIDER in
 
-    hubspot)
-        python src/scripts/lambda_f.py 2>&1
-        ;;
-
-    linkedin)
-        python src/scripts/lambda_f.py 2>&1
-        ;;
-
-    bing)
-        python src/scripts/lambda_f.py 2>&1
-        ;;
-
-    on24)
+    hubspot | linkedin | bing | on24)
         python src/scripts/lambda_f.py 2>&1
         ;;
 
