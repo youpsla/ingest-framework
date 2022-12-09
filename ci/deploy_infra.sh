@@ -72,7 +72,7 @@ else
     TAG=$STACK_VERSION
 fi
 
-echo "==> Deploying for $1 environment <=="
+echo -e "\n==> Deploying ingest-framework to: $1 stack <==\n"
 read -p "$(echo -e 'Continue?\n[Enter] → Yes\n[Ctrl]+[C] → No.\n ')"
 ############################################################################################
 
@@ -86,7 +86,7 @@ else
 fi
 
 echo "==> Deploying/updating ECR resource <=="
-sam deploy -t ci/repository.yaml \
+sam deploy -t ci/cluster-resository-infrastructure.yaml \
     --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM \
     --parameter-overrides \
         Environment=$1 \
@@ -95,10 +95,10 @@ sam deploy -t ci/repository.yaml \
     --confirm-changeset \
     --use-json \
     --s3-bucket $BUCKET_NAME \
-    --stack-name jabmo-ingest-framework-repository \
+    --stack-name jabmo-ingest-framework-cluster-resository \
     --profile $AWS_PROFILE
 
-echo "==> Deploying/updating the infrastructure <=="
+echo "==> Deploying/updating the $1 infrastructure <=="
 sam deploy -t ci/infrastructure.yaml \
     --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM \
     --parameter-overrides \
@@ -124,20 +124,13 @@ aws ecr get-login-password \
     --password-stdin $CALLER_IDENTITY.dkr.ecr.eu-west-1.amazonaws.com
 
 
-############################################################################################
-
-
 echo "==> building the image ingest-framework <=="
 docker build -t ingest-framework -f docker/ingest-framework.dockerfile . --platform linux/amd64
 
 
-############################################################################################
-
 echo "==> Tagging the image ingest-framework <=="
-# Deploy the image in ECR.
 docker tag ingest-framework $CALLER_IDENTITY.dkr.ecr.eu-west-1.amazonaws.com/$REPOSITORY_NAME:$TAG
 
-############################################################################################
 
 echo "==> Pushing the image to $CALLER_IDENTITY.dkr.ecr.eu-west-1.amazonaws.com/ingest-framework-repository <=="
 docker push $CALLER_IDENTITY.dkr.ecr.eu-west-1.amazonaws.com/ingest-framework-repository:$TAG

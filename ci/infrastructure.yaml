@@ -368,19 +368,6 @@ Resources:
 #######
 # ECS
 #######
-  IngestFrameworkECSCluster:
-    Type: AWS::ECS::Cluster
-    Properties:
-      ClusterName: !Sub "ingest-framework-cluster-${Environment}"
-      ClusterSettings:
-        - Name: containerInsights
-          Value: enabled
-      Tags:
-        - Key: Environment
-          Value: !Ref Environment
-        - Key: Version
-          Value: !Ref StackVersion
-
   IngestFrameworkECSTaskDefinition:
     Type: AWS::ECS::TaskDefinition
     Properties:
@@ -410,7 +397,7 @@ Resources:
   WebIngestDataECSService:
     Type: AWS::ECS::Service
     Properties:
-      Cluster: !GetAtt IngestFrameworkECSCluster.Arn
+      Cluster: !ImportValue ingest-framework-ecs-cluster-arn
       DeploymentController:
         Type: ECS
       DesiredCount: 0
