@@ -163,74 +163,54 @@ class HubspotClient(Client):
         ]
         result = []
 
-        if self.task.name in [
-            "contacts",
-            "contacts_recently_created",
-            "contacts_recently_updated",
-            "companies",
-            "companies_recently_updated",
-            "campaigns",
-            "campaign_details",
-            "company_contact_associations",
-            "contact_company_associations",
-            "contact_created_company_daily_associations",
-            "contact_updated_company_hourly_associations",
-            "email_events_click_since_2022",
-            "email_events_open_since_2022",
-            "email_events_forward_since_2022",
-            "email_events_click_daily",
-            "email_events_open_daily",
-            "email_events_forward_daily",
-        ]:
+        print(f"Number of requests to run: {len(request_params)}")
 
-            print(f"Number of requests to run: {len(request_params)}")
+        api_datas = []
 
-            api_datas = []
+        endpoint_list_list = get_chunks(request_params, chunk_size=100)
+        for lst in endpoint_list_list:
+            print(f"Chunck with {len(lst)} queries")
 
-            endpoint_list_list = get_chunks(request_params, chunk_size=100)
-            for lst in endpoint_list_list:
-                print(f"Chunck with {len(lst)} queries")
+            pagination_function = None
+            if self.task.name in [
+                "contacts_recently_created",
+                "contacts_recently_updated",
+            ]:
+                pagination_function = contacts_recently_created_updated_pagination
 
-                pagination_function = None
-                if self.task.name in [
-                    "contacts_recently_created",
-                    "contacts_recently_updated",
-                ]:
-                    pagination_function = contacts_recently_created_updated_pagination
+            if self.task.name == "contacts":
+                pagination_function = contacts_pagination
 
-                if self.task.name == "contacts":
-                    pagination_function = contacts_pagination
+            if self.task.name == "companies":
+                pagination_function = companies_pagination
 
-                if self.task.name == "companies":
-                    pagination_function = companies_pagination
-
-                if self.task.name in [
-                    "campaigns",
-                    "companies_recently_updated",
-                    "contact_company_associations",
-                    "contact_updated_company_hourly_associations",
-                    "contact_created_company_daily_associations",
-                    "email_events_open_daily",
-                    "email_events_click_daily",
-                    "email_events_forward_daily",
-                    "email_events_click_since_2022",
-                    "email_events_open_since_2022",
-                    "email_events_forward_since_2022",
-                ]:
-                    pagination_function = hasMore_offset_pagination
-                chunks_result_list = run_in_threads_pool(
-                    request_params_list=lst,
-                    source_function=self.do_get_query,
-                    result_key=task_params["query"]["response_datas_key"],
-                    pagination_function=pagination_function
-                    if pagination_function
-                    else None,
-                )
-                api_datas.extend(chunks_result_list)
-
-            result = self.add_request_params_to_api_call_result(
-                api_datas, task_params, db_params
+            if self.task.name in [
+                "campaigns",
+                "companies_recently_updated",
+                "contact_company_associations",
+                "contact_updated_company_hourly_associations",
+                "contact_created_company_daily_associations",
+                "email_events_open_daily",
+                "email_events_click_daily",
+                "email_events_forward_daily",
+                "email_events_click_since_2022",
+                "email_events_open_since_2022",
+                "email_events_forward_since_2022",
+            ]:
+                pagination_function = hasMore_offset_pagination
+            chunks_result_list = run_in_threads_pool(
+                request_params_list=lst,
+                source_function=self.do_get_query,
+                result_key=task_params["query"]["response_datas_key"],
+                pagination_function=pagination_function
+                if pagination_function
+                else None,
             )
+            api_datas.extend(chunks_result_list)
+
+        result = self.add_request_params_to_api_call_result(
+            api_datas, task_params, db_params
+        )
 
         return result
 
