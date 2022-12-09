@@ -5,7 +5,7 @@
 # Steps:
 #   1 - Checks if the provided environment is valid, and if not, it prints a help message and exits.
 #   2 - Deploy or update the infrastructures using the sam deploy command,
-#       specifying the ci/repository.yam & ci/infrastructure.yaml template file and setting the Environment,
+#       specifying the ci/cluster-resository-infrastructure.yam & ci/infrastructure.yaml template file and setting the Environment,
 #       SentryDsn, Tag and StackVersion parameters.
 #   3 - Log in to the AWS Docker repository using the aws ecr get-login-password and docker login commands.
 #   4 - Build a Docker image using the docker build command and tags it with the current environment and timestamp.
