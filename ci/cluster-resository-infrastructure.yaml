@@ -1,0 +1,47 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: Ingest Framework repository
+Parameters:
+  StackVersion:
+    Type: String
+    Description: The version of the stack.
+  RepositoryName:
+    Type: String
+    Default: ingest-framework-repository
+Resources:
+
+######
+# ECR
+######
+  IngestFrameworkRepository:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: !Ref RepositoryName
+      Tags:
+        - Key: Environment
+          Value: production
+        - Key: Version
+          Value: !Ref StackVersion
+
+#######
+# ECS
+#######
+  IngestFrameworkECSCluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: !Sub "ingest-framework-cluster"
+      ClusterSettings:
+        - Name: containerInsights
+          Value: enabled
+      Tags:
+        - Key: Environment
+          Value: production
+        - Key: Version
+          Value: !Ref StackVersion
+
+Outputs:
+  IngestFrameworkECScluster:
+    Description: The name of the ECS cluster created by the Ingest Framework stack
+    Value: !GetAtt IngestFrameworkECSCluster.Arn
+    Export:
+        Name: ingest-framework-ecs-cluster-arn
