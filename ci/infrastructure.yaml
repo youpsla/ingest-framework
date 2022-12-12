@@ -8,6 +8,9 @@ Parameters:
   Tag:
     Type: String
     Default: latest
+  TS:
+    Type: String
+    Default: Empty
   SentryDsn:
     Type: String
     Default: ""
@@ -454,4 +457,4 @@ Resources:
 #######
 Outputs:
   StackVersion:
-    Value: !Ref StackVersion
+    Value: !Sub "${StackVersion}-${TS}"

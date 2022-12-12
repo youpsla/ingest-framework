@@ -5,6 +5,9 @@ Parameters:
   StackVersion:
     Type: String
     Description: The version of the stack.
+  TS:
+    Type: String
+    Default: Empty
   RepositoryName:
     Type: String
     Default: ingest-framework-repository
@@ -41,3 +44,10 @@ Resources:
           Value: production
         - Key: Version
           Value: !Ref StackVersion
+
+#######
+# Outputs
+#######
+Outputs:
+  StackVersion:
+    Value: !Sub "${StackVersion}-${TS}"

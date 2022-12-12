@@ -7,9 +7,9 @@
 #   2 - Deploy or update the infrastructures using the sam deploy command,
 #       specifying the ci/cluster-resository-infrastructure.yam & ci/infrastructure.yaml template file and setting the Environment,
 #       SentryDsn, Tag and StackVersion parameters.
-#   3 - Log in to the AWS Docker repository using the aws ecr get-login-password and docker login commands.
-#   4 - Build a Docker image using the docker build command and tags it with the current environment and timestamp.
-#   5 - Push the Docker image to the AWS Docker repository using the docker push command.
+#   3 - Log in to the AWS Docker repository using the aws ecr get-login-password and docker login commands (IF NOT THE SAME APP VERSION).
+#   4 - Build a Docker image using the docker build command and tags it with the current environment and timestamp (IF NOT THE SAME APP VERSION).
+#   5 - Push the Docker image to the AWS Docker repository using the docker push command ((IF NOT THE SAME APP VERSION)).
 #
 # Help:
 #
@@ -66,7 +66,7 @@ BUCKET_NAME=jabmo-ingest
 CLUSTER_NAME=ingest-framework-cluster
 REPOSITORY_NAME=ingest-framework-repository
 TS=$(date +"%s")
-STACK_VERSION=$(git describe --abbrev=0 --tags)-$1
+STACK_VERSION=$(git describe --abbrev=0 --tags)
 if [ "$1" == "development" ]; then
     TAG=latest
 else
@@ -94,8 +94,10 @@ sam deploy -t ci/cluster-resository-infrastructure.yaml \
         StackVersion=$STACK_VERSION \
         RepositoryName=$REPOSITORY_NAME \
         ClusterName=$CLUSTER_NAME \
+        TS=$TS \
     --confirm-changeset \
     --use-json \
+    --no-fail-on-empty-changeset \
     --s3-bucket $BUCKET_NAME \
     --stack-name jabmo-ingest-framework-cluster-resository \
     --profile $AWS_PROFILE
@@ -108,8 +110,10 @@ sam deploy -t ci/infrastructure.yaml \
         StackVersion=$STACK_VERSION \
         ClusterName=$CLUSTER_NAME \
         Tag=$TAG \
+        TS=$TS \
     --confirm-changeset \
     --use-json \
+    --no-fail-on-empty-changeset \
     --s3-bucket $BUCKET_NAME \
     --stack-name jabmo-ingest-framework-$1 \
     --profile $AWS_PROFILE
@@ -117,7 +121,16 @@ sam deploy -t ci/infrastructure.yaml \
 
 ############################################################################################
 
+if [ "$1" == "production" ]; then
+    IMAGE_EXISTS=$(aws ecr describe-images --repository-name $REPOSITORY_NAME | grep "$TAG")
+    if [ -n "$IMAGE_EXISTS" ]; then
+        echo -e "\n /!\ Image version $TAG already exists /!\ \n"
+        echo "exiting."
+        exit
+    fi
+fi
 
+echo -e "\nDeploying new image version $TAG <==\n"
 echo "==> Login to AWS docker repository: $CALLER_IDENTITY.dkr.ecr.eu-west-1.amazonaws.com <=="
 aws ecr get-login-password \
     --region eu-west-1 \
@@ -135,5 +148,5 @@ echo "==> Tagging the image ingest-framework <=="
 docker tag ingest-framework $CALLER_IDENTITY.dkr.ecr.eu-west-1.amazonaws.com/$REPOSITORY_NAME:$TAG
 
 
-echo "==> Pushing the image to $CALLER_IDENTITY.dkr.ecr.eu-west-1.amazonaws.com/ingest-framework-repository <=="
-docker push $CALLER_IDENTITY.dkr.ecr.eu-west-1.amazonaws.com/ingest-framework-repository:$TAG
+echo "==> Pushing the image to $CALLER_IDENTITY.dkr.ecr.eu-west-1.amazonaws.com/$REPOSITORY_NAME <=="
+docker push $CALLER_IDENTITY.dkr.ecr.eu-west-1.amazonaws.com/$REPOSITORY_NAME:$TAG
