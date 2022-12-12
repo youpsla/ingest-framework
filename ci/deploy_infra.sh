@@ -66,7 +66,7 @@ BUCKET_NAME=jabmo-ingest
 CLUSTER_NAME=ingest-framework-cluster
 REPOSITORY_NAME=ingest-framework-repository
 TS=$(date +"%s")
-STACK_VERSION=$(git describe)-$1-$TS
+STACK_VERSION=$(git describe --abbrev=0 --tags)-$1
 if [ "$1" == "development" ]; then
     TAG=latest
 else
