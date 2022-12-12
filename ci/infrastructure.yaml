@@ -14,6 +14,9 @@ Parameters:
   StackVersion:
     Type: String
     Description: The version of the stack, where the lambda.zip is uploaded
+  ClusterName:
+    Type: String
+    Description: The name of the ECS cluster to deploy
   CronJabmoHubspotDailyContacts:
     Type: String
     Description: This is the cron expression of Hubspot contact daily ingest
@@ -429,7 +432,7 @@ Resources:
   WebIngestDataECSService:
     Type: AWS::ECS::Service
     Properties:
-      Cluster: !ImportValue ingest-framework-ecs-cluster-arn
+      Cluster: !Sub "arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:cluster/${ClusterName}"
       DeploymentController:
         Type: ECS
       DesiredCount: 0

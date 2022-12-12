@@ -63,6 +63,7 @@ fi
 # Define variables.
 CALLER_IDENTITY=$(aws sts get-caller-identity --query "Account" --output text)
 BUCKET_NAME=jabmo-ingest
+CLUSTER_NAME=ingest-framework-cluster
 REPOSITORY_NAME=ingest-framework-repository
 TS=$(date +"%s")
 STACK_VERSION=$(git describe)-$1-$TS
@@ -91,7 +92,8 @@ sam deploy -t ci/cluster-resository-infrastructure.yaml \
     --parameter-overrides \
         Environment=$1 \
         StackVersion=$STACK_VERSION \
-        RepositoryName=$REPOSITORY_NAME\
+        RepositoryName=$REPOSITORY_NAME \
+        ClusterName=$CLUSTER_NAME \
     --confirm-changeset \
     --use-json \
     --s3-bucket $BUCKET_NAME \
@@ -104,6 +106,7 @@ sam deploy -t ci/infrastructure.yaml \
     --parameter-overrides \
         Environment=$1 \
         StackVersion=$STACK_VERSION \
+        ClusterName=$CLUSTER_NAME \
         Tag=$TAG \
     --confirm-changeset \
     --use-json \

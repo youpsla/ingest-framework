@@ -8,6 +8,9 @@ Parameters:
   RepositoryName:
     Type: String
     Default: ingest-framework-repository
+  ClusterName:
+    Type: String
+    Description: The name of the ECS cluster to deploy
 Resources:
 
 ######
@@ -29,7 +32,7 @@ Resources:
   IngestFrameworkECSCluster:
     Type: AWS::ECS::Cluster
     Properties:
-      ClusterName: !Sub "ingest-framework-cluster"
+      ClusterName: !Ref ClusterName
       ClusterSettings:
         - Name: containerInsights
           Value: enabled
@@ -38,10 +41,3 @@ Resources:
           Value: production
         - Key: Version
           Value: !Ref StackVersion
-
-Outputs:
-  IngestFrameworkECScluster:
-    Description: The name of the ECS cluster created by the Ingest Framework stack
-    Value: !GetAtt IngestFrameworkECSCluster.Arn
-    Export:
-        Name: ingest-framework-ecs-cluster-arn
