@@ -4,9 +4,9 @@ import time
 
 import boto3
 import sentry_sdk
-from sentry_sdk.integrations.aws_lambda import AwsLambdaIntegration
+from sentry_sdk.integrations.excepthook import ExcepthookIntegration
 
-from configs.globals import PROVIDER
+from configs.globals import PROVIDER, SENTRY_DSN, TASK_GROUP
 from src.clients.redshift.redshift_client import RedshiftClient
 from src.commons.task import Task
 from src.utils.custom_logger import logger
@@ -15,10 +15,13 @@ from src.utils.various_utils import get_running_env, get_schema_name
 
 def activate_sentry():
     sentry_sdk.init(
-        dsn=os.environ["SENTRY_DSN"],
-        integrations=[AwsLambdaIntegration(timeout_warning=True)],
+        dsn=SENTRY_DSN,
+        integrations=[ExcepthookIntegration(always_run=True)],
         traces_sample_rate=1.0,
+        environment=get_running_env()
     )
+    sentry_sdk.set_tag("provider", PROVIDER)
+    sentry_sdk.set_tag("task_group", TASK_GROUP)
     logger.info("Sentry activated")
 
 
@@ -43,17 +46,6 @@ def get_channel_params():
     return f
 
 
-def get_task_group_name():
-    task_group_name = os.environ.get("TASK_GROUP")
-    if not task_group_name:
-        raise Exception("Can't find task group.")
-    return task_group_name
-
-
-def lambda_handler(event, context):
-    main()
-
-
 def run_task(channel, task_name, db_connection):
     """Runs a task
     """
@@ -65,13 +57,13 @@ def run_task(channel, task_name, db_connection):
     return result, destination
 
 
-def main():
+def lambda_handler(event, context):
     logger.info("### Starting Ingest lambda ###")
     start = time.time()
 
     channel_params = get_channel_params()
 
-    task_group_list = channel_params[get_task_group_name()]
+    task_group_list = channel_params[TASK_GROUP]
 
     logger.info(f"Tasks names: {task_group_list}")
 
@@ -114,4 +106,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    lambda_handler(None, None)
