@@ -4,9 +4,9 @@ import time
 
 import boto3
 import sentry_sdk
-from sentry_sdk.integrations.aws_lambda import AwsLambdaIntegration
+from sentry_sdk.integrations.excepthook import ExcepthookIntegration
 
-from configs.globals import PROVIDER, TASK_GROUP
+from configs.globals import PROVIDER, SENTRY_DSN, TASK_GROUP
 from src.clients.redshift.redshift_client import RedshiftClient
 from src.commons.task import Task
 from src.utils.custom_logger import logger
@@ -15,11 +15,11 @@ from src.utils.various_utils import get_running_env, get_schema_name
 
 def activate_sentry():
     sentry_sdk.init(
-        dsn=os.environ["SENTRY_DSN"],
-        integrations=[AwsLambdaIntegration(timeout_warning=True)],
+        dsn=SENTRY_DSN,
+        integrations=[ExcepthookIntegration(always_run=True)],
         traces_sample_rate=1.0,
+        environment=get_running_env()
     )
-    sentry_sdk.set_tag("environment", get_running_env())
     sentry_sdk.set_tag("provider", PROVIDER)
     sentry_sdk.set_tag("task_group", TASK_GROUP)
     logger.info("Sentry activated")
