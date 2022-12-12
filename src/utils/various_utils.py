@@ -57,9 +57,15 @@ def get_running_env():
 
 
 def get_schema_name(channel):
-    schema_name = channel + "_" + get_running_env()
+    running_env = get_running_env()
+
+    if channel == "linkedin" and running_env == "production":
+        return "new_linkedin"
+    if channel == "hubspot" and running_env == "production":
+        return "hubspot_development"
+
+    schema_name = channel + "_" + running_env
     return schema_name
-    # return "hubspot_development"
 
 
 def get_model_params_as_dict(channel, model_name):
