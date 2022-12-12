@@ -7,23 +7,34 @@ import sentry_sdk
 from sentry_sdk.integrations.aws_lambda import AwsLambdaIntegration
 
 from configs.globals import PROVIDER
-# Import redshift here for being able to rollback()/commit() transaction.
 from src.clients.redshift.redshift_client import RedshiftClient
 from src.commons.task import Task
 from src.utils.custom_logger import logger
 from src.utils.various_utils import get_running_env, get_schema_name
 
-sentry_sdk.init(
-    dsn=os.environ["SENTRY_DSN"],
-    integrations=[AwsLambdaIntegration(timeout_warning=True)],
-    traces_sample_rate=1.0,
-)
+
+def activate_sentry():
+    sentry_sdk.init(
+        dsn=os.environ["SENTRY_DSN"],
+        integrations=[AwsLambdaIntegration(timeout_warning=True)],
+        traces_sample_rate=1.0,
+    )
+    logger.info("Sentry activated")
+
+
+# Activate Sentry only when running in Lambda
+if os.environ.get("AWS_EXECUTION_ENV") is not None and get_running_env() in [
+    "production",
+    "staging",
+]:
+    activate_sentry()
 
 
 def get_params_json_file_path():
     app_home = os.environ["APPLICATION_HOME"]
     return os.path.realpath(
-        os.path.join(app_home, "configs", PROVIDER, "channel.json"))
+        os.path.join(app_home, "configs", PROVIDER, "channel.json")
+    )
 
 
 def get_channel_params():
@@ -62,8 +73,7 @@ def main():
 
     task_group_list = channel_params[get_task_group_name()]
 
-    # Daily tasks run
-    logger.info(f"{PROVIDER} - {task_group_list}")
+    logger.info(f"Tasks names: {task_group_list}")
 
     db_connection = RedshiftClient().db_connection
     with db_connection.cursor() as cursor:

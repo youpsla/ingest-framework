@@ -2,8 +2,6 @@ import json
 
 from campaignmanagement_example_helper import *
 
-# Common
-
 
 def output_bing_ads_webfault_error(error):
     if hasattr(error, "ErrorCode"):
@@ -39,7 +37,9 @@ def output_webfault_errors(ex):
 
     # Handle serialization errors, for example: The formatter threw an exception while trying to deserialize the message:
     # There was an error while trying to deserialize parameter https://bingads.microsoft.com/CampaignManagement/v13:Entities.
-    if hasattr(ex.fault, "detail") and hasattr(ex.fault.detail, "ExceptionDetail"):
+    if hasattr(
+            ex.fault, "detail") and hasattr(
+            ex.fault.detail, "ExceptionDetail"):
         api_errors = ex.fault.detail.ExceptionDetail
         if isinstance(api_errors, list):
             for api_error in api_errors:
@@ -69,7 +69,8 @@ def output_error_detail(error_detail, error_attribute_set):
 
 
 def output_percent_complete(progress):
-    output_status_message("Percent Complete: {0}".format(progress.percent_complete))
+    output_status_message("Percent Complete: {0}".format(
+        progress.percent_complete))
 
 
 def output_bulk_errors(errors):
@@ -78,7 +79,8 @@ def output_bulk_errors(errors):
             output_status_message("Number: {0}".format(error.error))
         output_status_message("Error: {0}".format(error.number))
         if error.editorial_reason_code is not None:
-            output_status_message("EditorialTerm: {0}".format(error.editorial_term))
+            output_status_message("EditorialTerm: {0}".format(
+                error.editorial_term))
             output_status_message(
                 "EditorialReasonCode: {0}".format(error.editorial_reason_code)
             )
@@ -113,9 +115,11 @@ def output_bulk_quality_score_data(quality_score_data):
 
 def output_bulk_bid_suggestions(bid_suggestions):
     if bid_suggestions is not None:
-        output_status_message("BestPosition: {0}".format(bid_suggestions.best_position))
+        output_status_message("BestPosition: {0}".format(
+            bid_suggestions.best_position))
         output_status_message("MainLine: {0}".format(bid_suggestions.main_line))
-        output_status_message("FirstPage: {0}".format(bid_suggestions.first_page))
+        output_status_message("FirstPage: {0}".format(
+            bid_suggestions.first_page))
 
 
 def output_bulk_feeds(bulk_entities):
@@ -169,7 +173,8 @@ def output_bulk_feed_items(bulk_entities):
             output_status_message("DayTimeRanges:")
             for daytime_range in entity.daytime_ranges:
                 output_daytime(daytime_range)
-        output_status_message("DevicePreference: {0}".format(entity.device_preference))
+        output_status_message("DevicePreference: {0}".format(
+            entity.device_preference))
         output_status_message("EndDate: {0}".format(entity.end_date))
         output_status_message("FeedId: {0}".format(entity.feed_id))
         output_status_message("Id: {0}".format(entity.id))
@@ -303,11 +308,11 @@ def output_bulk_product_partition_tree(node, child_branches, tree_level):
 
     if ad_group_criterion.Criterion.PartitionType == "Unit":
         if ad_group_criterion.Type == "BiddableAdGroupCriterion":
-            output_status_message(
-                "{0}Bid Amount: {1}".format(pad, ad_group_criterion.CriterionBid.Amount)
-            )
+            output_status_message("{0}Bid Amount: {1}".format(
+                pad, ad_group_criterion.CriterionBid.Amount))
         elif ad_group_criterion.Type == "NegativeAdGroupCriterion":
-            output_status_message("{0}Not Bidding on this Condition".format(pad))
+            output_status_message(
+                "{0}Not Bidding on this Condition".format(pad))
 
     null_attribute = (
         "(All other)"
@@ -323,12 +328,12 @@ def output_bulk_product_partition_tree(node, child_branches, tree_level):
         )
     )
 
-    output_status_message(
-        "{0}Operand: {1}\n".format(pad, ad_group_criterion.Criterion.Condition.Operand)
-    )
+    output_status_message("{0}Operand: {1}\n".format(
+        pad, ad_group_criterion.Criterion.Condition.Operand))
 
     for child_node in child_branches[ad_group_criterion.Id]:
-        output_bulk_product_partition_tree(child_node, child_branches, tree_level + 1)
+        output_bulk_product_partition_tree(
+            child_node, child_branches, tree_level + 1)
 
 
 def output_bulk_product_ads(bulk_entities):
@@ -400,11 +405,8 @@ def output_bulk_campaign_action_ad_extensions(bulk_entities):
     for entity in bulk_entities:
         output_status_message("BulkCampaignActionAdExtension:")
         if entity.ad_extension_id_to_entity_id_association is not None:
-            output_status_message(
-                "AdExtensionId: {0}".format(
-                    entity.ad_extension_id_to_entity_id_association.AdExtensionId
-                )
-            )
+            output_status_message("AdExtensionId: {0}".format(
+                entity.ad_extension_id_to_entity_id_association.AdExtensionId))
             output_status_message(
                 "EntityId: {0}".format(
                     entity.ad_extension_id_to_entity_id_association.EntityId
@@ -412,7 +414,8 @@ def output_bulk_campaign_action_ad_extensions(bulk_entities):
             )
         output_status_message("Campaign Name: {0}".format(entity.campaign_name))
         output_status_message("Client Id: {0}".format(entity.client_id))
-        output_status_message("Editorial Status: {0}".format(entity.editorial_status))
+        output_status_message("Editorial Status: {0}".format(
+            entity.editorial_status))
         if entity.last_modified_time is not None:
             output_status_message(
                 "LastModifiedTime: {0}".format(entity.last_modified_time)
@@ -448,11 +451,8 @@ def output_bulk_campaign_app_ad_extensions(bulk_entities):
     for entity in bulk_entities:
         output_status_message("BulkCampaignAppAdExtension:")
         if entity.ad_extension_id_to_entity_id_association is not None:
-            output_status_message(
-                "AdExtensionId: {0}".format(
-                    entity.ad_extension_id_to_entity_id_association.AdExtensionId
-                )
-            )
+            output_status_message("AdExtensionId: {0}".format(
+                entity.ad_extension_id_to_entity_id_association.AdExtensionId))
             output_status_message(
                 "EntityId: {0}".format(
                     entity.ad_extension_id_to_entity_id_association.EntityId
@@ -460,7 +460,8 @@ def output_bulk_campaign_app_ad_extensions(bulk_entities):
             )
         output_status_message("Campaign Name: {0}".format(entity.campaign_name))
         output_status_message("Client Id: {0}".format(entity.client_id))
-        output_status_message("Editorial Status: {0}".format(entity.editorial_status))
+        output_status_message("Editorial Status: {0}".format(
+            entity.editorial_status))
         if entity.last_modified_time is not None:
             output_status_message(
                 "LastModifiedTime: {0}".format(entity.last_modified_time)
@@ -496,11 +497,8 @@ def output_bulk_campaign_call_ad_extensions(bulk_entities):
     for entity in bulk_entities:
         output_status_message("BulkCampaignCallAdExtension:")
         if entity.ad_extension_id_to_entity_id_association is not None:
-            output_status_message(
-                "AdExtensionId: {0}".format(
-                    entity.ad_extension_id_to_entity_id_association.AdExtensionId
-                )
-            )
+            output_status_message("AdExtensionId: {0}".format(
+                entity.ad_extension_id_to_entity_id_association.AdExtensionId))
             output_status_message(
                 "EntityId: {0}".format(
                     entity.ad_extension_id_to_entity_id_association.EntityId
@@ -508,7 +506,8 @@ def output_bulk_campaign_call_ad_extensions(bulk_entities):
             )
         output_status_message("Campaign Name: {0}".format(entity.campaign_name))
         output_status_message("Client Id: {0}".format(entity.client_id))
-        output_status_message("Editorial Status: {0}".format(entity.editorial_status))
+        output_status_message("Editorial Status: {0}".format(
+            entity.editorial_status))
         if entity.last_modified_time is not None:
             output_status_message(
                 "LastModifiedTime: {0}".format(entity.last_modified_time)
@@ -544,11 +543,8 @@ def output_bulk_campaign_callout_ad_extensions(bulk_entities):
     for entity in bulk_entities:
         output_status_message("BulkCampaignCalloutAdExtension:")
         if entity.ad_extension_id_to_entity_id_association is not None:
-            output_status_message(
-                "AdExtensionId: {0}".format(
-                    entity.ad_extension_id_to_entity_id_association.AdExtensionId
-                )
-            )
+            output_status_message("AdExtensionId: {0}".format(
+                entity.ad_extension_id_to_entity_id_association.AdExtensionId))
             output_status_message(
                 "EntityId: {0}".format(
                     entity.ad_extension_id_to_entity_id_association.EntityId
@@ -556,7 +552,8 @@ def output_bulk_campaign_callout_ad_extensions(bulk_entities):
             )
         output_status_message("Campaign Name: {0}".format(entity.campaign_name))
         output_status_message("Client Id: {0}".format(entity.client_id))
-        output_status_message("Editorial Status: {0}".format(entity.editorial_status))
+        output_status_message("Editorial Status: {0}".format(
+            entity.editorial_status))
         if entity.last_modified_time is not None:
             output_status_message(
                 "LastModifiedTime: {0}".format(entity.last_modified_time)
@@ -592,11 +589,8 @@ def output_bulk_campaign_location_ad_extensions(bulk_entities):
     for entity in bulk_entities:
         output_status_message("BulkCampaignLocationAdExtension:")
         if entity.ad_extension_id_to_entity_id_association is not None:
-            output_status_message(
-                "AdExtensionId: {0}".format(
-                    entity.ad_extension_id_to_entity_id_association.AdExtensionId
-                )
-            )
+            output_status_message("AdExtensionId: {0}".format(
+                entity.ad_extension_id_to_entity_id_association.AdExtensionId))
             output_status_message(
                 "EntityId: {0}".format(
                     entity.ad_extension_id_to_entity_id_association.EntityId
@@ -604,7 +598,8 @@ def output_bulk_campaign_location_ad_extensions(bulk_entities):
             )
         output_status_message("Campaign Name: {0}".format(entity.campaign_name))
         output_status_message("Client Id: {0}".format(entity.client_id))
-        output_status_message("Editorial Status: {0}".format(entity.editorial_status))
+        output_status_message("Editorial Status: {0}".format(
+            entity.editorial_status))
         if entity.last_modified_time is not None:
             output_status_message(
                 "LastModifiedTime: {0}".format(entity.last_modified_time)
@@ -640,11 +635,8 @@ def output_bulk_campaign_price_ad_extensions(bulk_entities):
     for entity in bulk_entities:
         output_status_message("BulkCampaignPriceAdExtension:")
         if entity.ad_extension_id_to_entity_id_association is not None:
-            output_status_message(
-                "AdExtensionId: {0}".format(
-                    entity.ad_extension_id_to_entity_id_association.AdExtensionId
-                )
-            )
+            output_status_message("AdExtensionId: {0}".format(
+                entity.ad_extension_id_to_entity_id_association.AdExtensionId))
             output_status_message(
                 "EntityId: {0}".format(
                     entity.ad_extension_id_to_entity_id_association.EntityId
@@ -652,7 +644,8 @@ def output_bulk_campaign_price_ad_extensions(bulk_entities):
             )
         output_status_message("Campaign Name: {0}".format(entity.campaign_name))
         output_status_message("Client Id: {0}".format(entity.client_id))
-        output_status_message("Editorial Status: {0}".format(entity.editorial_status))
+        output_status_message("Editorial Status: {0}".format(
+            entity.editorial_status))
         if entity.last_modified_time is not None:
             output_status_message(
                 "LastModifiedTime: {0}".format(entity.last_modified_time)
@@ -688,11 +681,8 @@ def output_bulk_campaign_review_ad_extensions(bulk_entities):
     for entity in bulk_entities:
         output_status_message("BulkCampaignReviewAdExtension:")
         if entity.ad_extension_id_to_entity_id_association is not None:
-            output_status_message(
-                "AdExtensionId: {0}".format(
-                    entity.ad_extension_id_to_entity_id_association.AdExtensionId
-                )
-            )
+            output_status_message("AdExtensionId: {0}".format(
+                entity.ad_extension_id_to_entity_id_association.AdExtensionId))
             output_status_message(
                 "EntityId: {0}".format(
                     entity.ad_extension_id_to_entity_id_association.EntityId
@@ -700,7 +690,8 @@ def output_bulk_campaign_review_ad_extensions(bulk_entities):
             )
         output_status_message("Campaign Name: {0}".format(entity.campaign_name))
         output_status_message("Client Id: {0}".format(entity.client_id))
-        output_status_message("Editorial Status: {0}".format(entity.editorial_status))
+        output_status_message("Editorial Status: {0}".format(
+            entity.editorial_status))
         if entity.last_modified_time is not None:
             output_status_message(
                 "LastModifiedTime: {0}".format(entity.last_modified_time)
@@ -735,11 +726,8 @@ def output_bulk_campaign_sitelink_ad_extensions(bulk_entities):
     for entity in bulk_entities:
         output_status_message("BulkCampaignSitelinkAdExtension:")
         if entity.ad_extension_id_to_entity_id_association is not None:
-            output_status_message(
-                "AdExtensionId: {0}".format(
-                    entity.ad_extension_id_to_entity_id_association.AdExtensionId
-                )
-            )
+            output_status_message("AdExtensionId: {0}".format(
+                entity.ad_extension_id_to_entity_id_association.AdExtensionId))
             output_status_message(
                 "EntityId: {0}".format(
                     entity.ad_extension_id_to_entity_id_association.EntityId
@@ -747,7 +735,8 @@ def output_bulk_campaign_sitelink_ad_extensions(bulk_entities):
             )
         output_status_message("Campaign Name: {0}".format(entity.campaign_name))
         output_status_message("Client Id: {0}".format(entity.client_id))
-        output_status_message("Editorial Status: {0}".format(entity.editorial_status))
+        output_status_message("Editorial Status: {0}".format(
+            entity.editorial_status))
         if entity.last_modified_time is not None:
             output_status_message(
                 "LastModifiedTime: {0}".format(entity.last_modified_time)
@@ -782,11 +771,8 @@ def output_bulk_campaign_structured_snippet_ad_extensions(bulk_entities):
     for entity in bulk_entities:
         output_status_message("BulkCampaignStructuredSnippetAdExtension:")
         if entity.ad_extension_id_to_entity_id_association is not None:
-            output_status_message(
-                "AdExtensionId: {0}".format(
-                    entity.ad_extension_id_to_entity_id_association.AdExtensionId
-                )
-            )
+            output_status_message("AdExtensionId: {0}".format(
+                entity.ad_extension_id_to_entity_id_association.AdExtensionId))
             output_status_message(
                 "EntityId: {0}".format(
                     entity.ad_extension_id_to_entity_id_association.EntityId
@@ -794,7 +780,8 @@ def output_bulk_campaign_structured_snippet_ad_extensions(bulk_entities):
             )
         output_status_message("Campaign Name: {0}".format(entity.campaign_name))
         output_status_message("Client Id: {0}".format(entity.client_id))
-        output_status_message("Editorial Status: {0}".format(entity.editorial_status))
+        output_status_message("Editorial Status: {0}".format(
+            entity.editorial_status))
         if entity.last_modified_time is not None:
             output_status_message(
                 "LastModifiedTime: {0}".format(entity.last_modified_time)

@@ -1,6 +1,7 @@
 from src.clients.bing.bing_client import BingAdsClient
 from src.clients.hubspot.hubspot_client import HubspotClient
 from src.clients.linkedin.linkedin_client import LinkedInClient
+from src.clients.on24.on24_client import On24Client
 from src.clients.redshift.redshift_client import RedshiftClient
 
 
@@ -19,6 +20,10 @@ def get_client(env, client_name, task, db_connection=None):
         return client
     elif client_name == "hubspot":
         client = HubspotClient(task=task, env=env, db_connection=db_connection)
+        client.name = client_name
+        return client
+    elif client_name == "on24":
+        client = On24Client(task=task, env=env, db_connection=db_connection)
         client.name = client_name
         return client
     else:

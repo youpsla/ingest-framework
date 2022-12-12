@@ -7,7 +7,16 @@ from suds.sudsobject import asdict
 
 
 def nested_get(dic, keys):
+    """Returns the value in a nested dictionary at the given sequence of keys.
+       Handle List too. In the keys sequence, could be integer too (Used as list index).
 
+    Args:
+        dic: A nested dictionary.
+        keys: A sequence of keys.
+
+    Returns:
+        The value in the nested dictionary at the given sequence of keys, or None if any of the keys is not found in the dictionary.
+    """
     try:
         if keys:
             for key in keys:
@@ -48,18 +57,27 @@ def get_running_env():
 
 
 def get_schema_name(channel):
-    running_env = get_running_env()
-
-    if channel == "linkedin" and running_env == "production":
-        return "new_linkedin"
-    if channel == "hubspot" and running_env == "production":
-        return "hubspot_development"
-
-    schema_name = channel + "_" + running_env
+    schema_name = channel + "_" + get_running_env()
     return schema_name
+    # return "hubspot_development"
 
 
 def get_model_params_as_dict(channel, model_name):
+    """Returns the model parameters as a dictionary for the given channel and model
+    name.
+
+    Args:
+        channel: str, the channel for which the model parameters are to be returned
+        model_name: str, the name of the model for which the parameters are to be
+            returned
+
+    Returns:
+        dict, the model parameters for the given channel and model name
+
+    Raises:
+        ValueError: if the given channel and/or model name is not found in the
+            models.json file
+    """
     app_home = os.environ.get("APPLICATION_HOME")
     model_file = os.path.join(app_home, "configs", channel, "models.json")
     with open(model_file, "r") as f:
@@ -83,7 +101,7 @@ def get_chunks(source_list, chunk_size=500):
     """
     if len(source_list) > chunk_size:
         chunks_lists = [
-            source_list[offs : offs + chunk_size]  # noqa: E203
+            source_list[offs: offs + chunk_size]
             for offs in range(0, len(source_list), chunk_size)
         ]
         return chunks_lists
@@ -130,6 +148,9 @@ def run_in_threads_pool(
                 tmp_result = []
                 # If there is a result_key in task prarams, we use it to retrieve only relevant data. # noqa: E501
                 # Otherwise, we use all data received.
+                # This allow to manage 2 cases:
+                # - API answer is a list of datas we want to process. Then, we don't use result_key and process each elem of the list
+                # - API answer has a key in which data are stored. Then we extract data with result_key and add to global result
                 if result_key:
                     # Sometimes the value task_result[result_key] can be a list, sometimes a dict # noqa: E501
                     # We test the type and adapt the way we add to tmp_result
@@ -161,7 +182,6 @@ def run_in_threads_pool(
                             )  # noqa: E501
 
                 result.append({task[1]: tmp_result})
-                # print(f"# requests run so far: {len(result)}")
     return result
 
 

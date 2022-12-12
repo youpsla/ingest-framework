@@ -127,7 +127,6 @@ class HubspotClient(Client):
                 "client_id": "fa6040db-72c2-4cca-b529-34d951716062",
                 "client_secret": "f5d8dedb-7d18-4c19-a2a7-d25053d9c6cb",
                 "redirect_uri": "https://connect.jabmo.app",
-                # "refresh_token": "eu1-e86f-fc6e-4e94-8ff2-43870c0d1b4f",
                 "refresh_token": refresh_token,
             }
 
@@ -155,7 +154,6 @@ class HubspotClient(Client):
                     "endpoint": HubspotEndpoint(
                         params=v,
                         url_template=task_params["query"]["template"],
-                        # query_params=task_params["query"]["params"],
                         query_params=task_params["query"],
                         portal_access_token_dict=portal_token_dict,
                     )
@@ -165,99 +163,54 @@ class HubspotClient(Client):
         ]
         result = []
 
-        if self.task.name in [
-            "contacts",
-            "contacts_recently_created",
-            "contacts_recently_updated",
-            "companies",
-            "companies_recently_updated",
-            "campaigns",
-            "campaign_details",
-            "company_contact_associations",
-            "contact_company_associations",
-            "contact_created_company_daily_associations",
-            "contact_updated_company_hourly_associations",
-            "email_events_click_since_2022",
-            "email_events_open_since_2022",
-            "email_events_forward_since_2022",
-            "email_events_click_daily",
-            "email_events_open_daily",
-            "email_events_forward_daily",
-        ]:
-            # db_params = self.get_request_params()
+        print(f"Number of requests to run: {len(request_params)}")
 
-            print(f"Number of requests to run: {len(request_params)}")
+        api_datas = []
 
-            futures_results = []
+        endpoint_list_list = get_chunks(request_params, chunk_size=100)
+        for lst in endpoint_list_list:
+            print(f"Chunck with {len(lst)} queries")
 
-            endpoint_list_list = get_chunks(request_params, chunk_size=100)
-            for lst in endpoint_list_list:
-                # for lst in [endpoint_list_list[0]]:
+            pagination_function = None
+            if self.task.name in [
+                "contacts_recently_created",
+                "contacts_recently_updated",
+            ]:
+                pagination_function = contacts_recently_created_updated_pagination
 
-                print(f"Chunck with {len(lst)} queries")
+            if self.task.name == "contacts":
+                pagination_function = contacts_pagination
 
-                pagination_function = None
-                if self.task.name in [
-                    "contacts_recently_created",
-                    "contacts_recently_updated",
-                ]:
-                    pagination_function = contacts_recently_created_updated_pagination
+            if self.task.name == "companies":
+                pagination_function = companies_pagination
 
-                if self.task.name == "contacts":
-                    pagination_function = contacts_pagination
+            if self.task.name in [
+                "campaigns",
+                "companies_recently_updated",
+                "contact_company_associations",
+                "contact_updated_company_hourly_associations",
+                "contact_created_company_daily_associations",
+                "email_events_open_daily",
+                "email_events_click_daily",
+                "email_events_forward_daily",
+                "email_events_click_since_2022",
+                "email_events_open_since_2022",
+                "email_events_forward_since_2022",
+            ]:
+                pagination_function = hasMore_offset_pagination
+            chunks_result_list = run_in_threads_pool(
+                request_params_list=lst,
+                source_function=self.do_get_query,
+                result_key=task_params["query"]["response_datas_key"],
+                pagination_function=pagination_function
+                if pagination_function
+                else None,
+            )
+            api_datas.extend(chunks_result_list)
 
-                if self.task.name == "companies":
-                    pagination_function = companies_pagination
-
-                if self.task.name in [
-                    "campaigns",
-                    "companies_recently_updated",
-                    "contact_company_associations",
-                    "contact_updated_company_hourly_associations",
-                    "contact_created_company_daily_associations",
-                    "email_events_open_daily",
-                    "email_events_click_daily",
-                    "email_events_forward_daily",
-                    "email_events_click_since_2022",
-                    "email_events_open_since_2022",
-                    "email_events_forward_since_2022",
-                ]:
-                    pagination_function = hasMore_offset_pagination
-                chunks_result_list = run_in_threads_pool(
-                    request_params_list=lst,
-                    source_function=self.do_get_query,
-                    result_key=task_params["query"]["response_datas_key"],
-                    pagination_function=pagination_function
-                    if pagination_function
-                    else None,
-                )
-                futures_results.extend(chunks_result_list)
-
-            for fr in futures_results:
-                local_result = []
-                for k, v in fr.items():
-                    for r in v:
-                        data_to_add_to_results = []
-                        if task_params.get(
-                            "fields_to_add_to_api_result", None
-                        ):  # noqa: E501
-                            data_to_add_to_results = [
-                                {e["destination_key"]: db_params[k][e["origin_key"]]}
-                                for e in task_params[
-                                    "fields_to_add_to_api_result"
-                                ]  # noqa: E501
-                            ]
-                        api_data = (
-                            r
-                            if isinstance(r, dict)
-                            else {task_params["key_for_values"]: r}
-                        )
-                        local_result.append(
-                            dict(
-                                ChainMap(*data_to_add_to_results, api_data)
-                            )  # noqa: E501
-                        )
-                result.extend(local_result)
+        result = self.add_request_params_to_api_call_result(
+            api_datas, task_params, db_params
+        )
 
         return result
 

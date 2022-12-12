@@ -3,7 +3,6 @@
 
 import requests
 from requests.adapters import HTTPAdapter
-from requests.exceptions import ConnectionError, ConnectTimeout, RetryError
 from requests.packages.urllib3.util.retry import Retry
 
 DEFAULT_TIMEOUT = 30  # seconds
