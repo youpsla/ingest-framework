@@ -19,9 +19,9 @@ def activate_sentry():
         integrations=[AwsLambdaIntegration(timeout_warning=True)],
         traces_sample_rate=1.0,
     )
-    sentry_sdk.setTag("environment", get_running_env())
-    sentry_sdk.setTag("provider", PROVIDER)
-    sentry_sdk.setTag("task_group", TASK_GROUP)
+    sentry_sdk.set_tag("environment", get_running_env())
+    sentry_sdk.set_tag("provider", PROVIDER)
+    sentry_sdk.set_tag("task_group", TASK_GROUP)
     logger.info("Sentry activated")
 
 
