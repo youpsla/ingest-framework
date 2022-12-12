@@ -7,9 +7,9 @@
 #   2 - Deploy or update the infrastructures using the sam deploy command,
 #       specifying the ci/cluster-repository-infrastructure.yam & ci/infrastructure.yaml template file and setting the Environment,
 #       SentryDsn, Tag and StackVersion parameters.
-#   3 - Log in to the AWS Docker repository using the aws ecr get-login-password and docker login commands (IF NOT THE SAME APP VERSION).
-#   4 - Build a Docker image using the docker build command and tags it with the current environment and timestamp (IF NOT THE SAME APP VERSION).
-#   5 - Push the Docker image to the AWS Docker repository using the docker push command ((IF NOT THE SAME APP VERSION)).
+#   3 - Log in to the AWS Docker repository using the aws ecr get-login-password and docker login commands.
+#   4 - Build a Docker image using the docker build command and tags it with the current environment and timestamp.
+#   5 - Push the Docker image to the AWS Docker repository using the docker push command.
 #
 # Help:
 #
@@ -120,15 +120,6 @@ sam deploy -t ci/infrastructure.yaml \
 
 
 ############################################################################################
-
-if [ "$1" == "production" ]; then
-    IMAGE_EXISTS=$(aws ecr describe-images --repository-name $REPOSITORY_NAME | grep "$TAG")
-    if [ -n "$IMAGE_EXISTS" ]; then
-        echo -e "\n /!\ Image version $TAG already exists /!\ \n"
-        echo "exiting."
-        exit
-    fi
-fi
 
 echo -e "\nDeploying new image version $TAG <==\n"
 echo "==> Login to AWS docker repository: $CALLER_IDENTITY.dkr.ecr.eu-west-1.amazonaws.com <=="
