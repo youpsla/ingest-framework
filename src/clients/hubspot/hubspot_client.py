@@ -140,9 +140,6 @@ class HubspotClient(Client):
                     f"{message} for portal_id {tmp_secret_value['portal_id']}")
                 # TODO: Launch sentry alert
                 access_token = None
-            except Exception as e:
-                print(e)
-                raise (f"Unhandeld exception occurs: {e}")
 
             if access_token:
                 portal_token_dict[str(
@@ -248,19 +245,17 @@ class HubspotClient(Client):
             time.sleep(300)
             c_thread = current_thread()
             print(
-                f"{cpt} attemp(s) failed. Restarting thread after 100 seconds of pause: name={c_thread.name}, idnet={get_ident()}, id={get_native_id()}"  # noqa: E501
+                f"{cpt} attemp(s) failed. Restarting thread after 100 seconds "
+                f"of pause: name={c_thread.name}, idnet={get_ident()}, "
+                f"id={get_native_id()}"
             )
             response = self.do_get_query(endpoint=endpoint, headers=headers)
             if cpt == 5:
-                raise TimeoutError("Failed to reach endpoint: {endpoint}")
+                raise TimeoutError(f"Failed to reach endpoint: {endpoint}")
 
             return None
-        except Exception as e:
-            print("Unhandled exception occurs")
-            print(e)
-            raise ("Error while processing request")
 
-        if response.status_code != 200:
+        if response.status_code != 200 or response.status_code != 401:
             # TODO: Manage differents error cases.
             if (
                 response.status_code == 404
@@ -268,13 +263,11 @@ class HubspotClient(Client):
                 in json.loads(response.text)["message"]  # noqa: E501
             ):
                 return None
-            elif response.status_code == 401:
-                pass
-
             else:
-                raise (f"""Error while processing request:
-                - query: {endpoint}
-                - response: {response.reason} - {response.text}""")
+                raise Exception(
+                    f"Error while processing request: endpoint: {endpoint} "
+                    f"response: {response.reason} - {response.text}"
+                )
 
         response = response.json()
         if "ServiceErrorCode" in response:

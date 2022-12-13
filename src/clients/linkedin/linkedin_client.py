@@ -280,36 +280,33 @@ class LinkedInClient(Client):
             time.sleep(300)
             c_thread = current_thread()
             print(
-                f"{cpt} attemp(s) failed. Restarting thread after 100 seconds of pause: name={c_thread.name}, idnet={get_ident()}, id={get_native_id()}"  # noqa: E501
+                f"{cpt} attemp(s) failed. Restarting thread after 100 seconds "
+                f"of pause: name={c_thread.name}, idnet={get_ident()}, "
+                f"id={get_native_id()}"
             )
             response = self.do_get_query(endpoint=endpoint)
             if cpt == 5:
                 raise TimeoutError("Failed to reach endpoint: {endpoint}")
 
             return None
-        except Exception as e:
-            print("Unhandled e     xception occurs")
-            print(e)
-            raise ("Error while processing request")
 
-        if response.status_code != 200:
+        if response.status_code != 200 or response.status_code != 401:
             # TODO: Manage differents error cases.
             if (
                 response.status_code == 404
                 and "Unknown email campaign id"
-                in json.loads(response.text)["message"]  # noqa: E501
+                in json.loads(response.text)["message"]
             ):
                 return None
-            elif response.status_code == 401:
-                pass
-
-            # When a cretive doesn't exist anymore in the Liunkedin DB, got a 404 not found error.
+            # When a creative doesn't exist anymore in the Linkedin DB, got a
+            # 404 not found error.
             elif response.status_code == 404:
                 print("Creative not found in Linkedin DB")
             else:
-                print(f"Endpoint: {endpoint}")
-                print(f"{response.reason} - {response.text}")
-                raise ("Error while processing request")
+                raise Exception(
+                    f"Error while processing request Endpoint: {endpoint} "
+                    f"{response.reason} - {response.text}"
+                )
 
         response = response.json()
         if "ServiceErrorCode" in response:
