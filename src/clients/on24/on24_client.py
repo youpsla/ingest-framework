@@ -268,7 +268,7 @@ class On24Client(Client):
             time.sleep(300)
             c_thread = current_thread()
             print(
-                f"{cpt} attemp(s) failed. Restarting thread after 100 seconds of pause: name={c_thread.name}, idnet={get_ident()}, id={get_native_id()}"  # noqa: E501
+                f"{cpt} attempt(s) failed. Restarting thread after 100 seconds of pause: name={c_thread.name}, idnet={get_ident()}, id={get_native_id()}"  # noqa: E501
             )
             response = self.do_get_query(endpoint=endpoint, headers=headers)
             if cpt == 5:

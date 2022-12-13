@@ -290,15 +290,15 @@ class LinkedInClient(Client):
 
             return None
 
-        if response.status_code != 200 and response.status_code != 401:
+        if response.status_code != 200 or response.status_code != 401:
             # TODO: Manage differents error cases.
             if (
                 response.status_code == 404
                 and "Unknown email campaign id"
-                in json.loads(response.text)["message"]  # noqa: E501
+                in json.loads(response.text)["message"]
             ):
                 return None
-            # When a cretive doesn't exist anymore in the Liunkedin DB, got a
+            # When a creative doesn't exist anymore in the Linkedin DB, got a
             # 404 not found error.
             elif response.status_code == 404:
                 print("Creative not found in Linkedin DB")
