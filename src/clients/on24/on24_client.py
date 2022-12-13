@@ -275,10 +275,6 @@ class On24Client(Client):
                 raise TimeoutError("Failed to reach endpoint: {endpoint}")
 
             return None
-        except Exception as e:
-            print("Unhandled exception occurs")
-            print(e)
-            raise ("Error while processing request")
 
         if response.status_code != 200:
             # TODO: Manage differents error cases.
@@ -294,7 +290,7 @@ class On24Client(Client):
             else:
                 print(f"Endpoint: {endpoint}")
                 print(f"{response.reason} - {response.text}")
-                raise ("Error while processing request")
+                raise Exception("Error while processing request")
 
         response = response.json()
         if "ServiceErrorCode" in response:
