@@ -2,6 +2,8 @@ import os
 import sys
 
 PROVIDER = os.environ["PROVIDER"]
+SENTRY_DSN = os.environ["SENTRY_DSN"]
+TASK_GROUP = os.environ["TASK_GROUP"]
 
 if os.environ.get("AWS_EXECUTION_ENV") is None:
     local_home = "/Users/Alain/Projects/jabmo/ingest"

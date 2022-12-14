@@ -268,17 +268,13 @@ class On24Client(Client):
             time.sleep(300)
             c_thread = current_thread()
             print(
-                f"{cpt} attemp(s) failed. Restarting thread after 100 seconds of pause: name={c_thread.name}, idnet={get_ident()}, id={get_native_id()}"  # noqa: E501
+                f"{cpt} attempt(s) failed. Restarting thread after 100 seconds of pause: name={c_thread.name}, idnet={get_ident()}, id={get_native_id()}"  # noqa: E501
             )
             response = self.do_get_query(endpoint=endpoint, headers=headers)
             if cpt == 5:
                 raise TimeoutError("Failed to reach endpoint: {endpoint}")
 
             return None
-        except Exception as e:
-            print("Unhandled exception occurs")
-            print(e)
-            raise ("Error while processing request")
 
         if response.status_code != 200:
             # TODO: Manage differents error cases.
@@ -294,7 +290,7 @@ class On24Client(Client):
             else:
                 print(f"Endpoint: {endpoint}")
                 print(f"{response.reason} - {response.text}")
-                raise ("Error while processing request")
+                raise Exception("Error while processing request")
 
         response = response.json()
         if "ServiceErrorCode" in response:

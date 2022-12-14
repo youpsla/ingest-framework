@@ -209,9 +209,10 @@ class Task:
             try:
                 query = self.params["raw_sql_to_run"]
             except KeyError:
-                raise (
-                    "A task with raw_sql in actions must have a raw_sql_to_run key"  # noqa: E501
-                )  # noqa: E501
+                raise KeyError(
+                    "A task with raw_sql in actions must have a "
+                    "raw_sql_to_run key"
+                )
 
             Model.run_raw_sql(db_connection=self.db_connection, sql=query)
 
