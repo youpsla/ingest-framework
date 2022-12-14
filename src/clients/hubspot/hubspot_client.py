@@ -255,7 +255,7 @@ class HubspotClient(Client):
 
             return None
 
-        if response.status_code != 200 or response.status_code != 401:
+        if response.status_code != 200 and response.status_code != 401:
             # TODO: Manage differents error cases.
             if (
                 response.status_code == 404
