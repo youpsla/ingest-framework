@@ -67,6 +67,7 @@ Resources:
       Environment:
         Variables:
           SENTRY_DSN: !Ref SentryDsn
+          ACCEPTED_ENVIRONMENT: !Ref Environment
 
   IngestFrameworkRedshiftDeduplicator:
     Type: AWS::Serverless::Function

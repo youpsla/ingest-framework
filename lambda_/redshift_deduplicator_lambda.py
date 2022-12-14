@@ -63,7 +63,10 @@ def get_db_connection(env, mode):
     dbname = xxx
     """
     client = boto3.client("secretsmanager")
-    local_env = "dev" if env == "development" else "prod"
+    if env == "development" or env.startswith("if-dev-"):
+        local_env = "dev"
+    else:
+        local_env = "prod"
     secret_values = client.get_secret_value(
         SecretId=DB_SECRET_NAMES["redshift"][local_env][mode],
     )
