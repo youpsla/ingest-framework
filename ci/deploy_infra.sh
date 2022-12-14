@@ -15,7 +15,7 @@
 #
 #   AWS_PROFILE=<profile> ./deploy_infra.sh <environment>
 #
-#   <environment>: The environment to deploy to. Must be one of [development or production].
+#   <environment>: The environment to deploy to. Must be one of [development, production, if-dev-<initials>].
 #
 # Examples:
 #
@@ -32,7 +32,7 @@ help() {
     echo -e "HELP:\n"
     echo -e "    $0 <environment>\n"
     echo "    environment: The environment for which to deploy ingest-framework."
-    echo "    Must be one of [production, development]"
+    echo "    Must be one of [production, development, if-dev-<name>]"
     echo ""
     echo "    /!\ Docker is required /!\\"
     echo ""
@@ -44,7 +44,7 @@ help() {
 }
 
 # Check if environment name was provided and is valid.
-if [[ ! "$1" =~ ^(development|production)$ ]]; then
+if [[ ! "$1" =~ ^(^if-dev-.+$|development|production)$ ]]; then
     echo -e "\n /!\ ERROR: VALID PARAMETER ENVIRONMENT REQUIRED. /!\ \n"
     help
     exit 1
@@ -69,6 +69,8 @@ TS=$(date +"%s")
 STACK_VERSION=$(git describe --abbrev=0 --tags)
 if [ "$1" == "development" ]; then
     TAG=latest
+elif [[ "$1" =~ ^if-dev-.+$ ]]; then
+    TAG=$1-$STACK_VERSION
 else
     TAG=$STACK_VERSION
 fi
@@ -90,7 +92,6 @@ echo "==> Deploying/updating ECR resource <=="
 sam deploy -t ci/cluster-repository-infrastructure.yaml \
     --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM \
     --parameter-overrides \
-        Environment=$1 \
         StackVersion=$STACK_VERSION \
         RepositoryName=$REPOSITORY_NAME \
         ClusterName=$CLUSTER_NAME \

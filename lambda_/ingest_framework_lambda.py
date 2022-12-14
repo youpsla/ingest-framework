@@ -7,6 +7,7 @@ import sentry_sdk
 from sentry_sdk.integrations.aws_lambda import AwsLambdaIntegration
 
 SENTRY_DSN = os.environ["SENTRY_DSN"]
+ACCEPTED_ENVIRONMENT = os.environ["ACCEPTED_ENVIRONMENT"]
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -42,10 +43,9 @@ def lambda_handler(event, context):
                         f"Running task {environment} environment:\n"
                         f"{task_parameters}"
                     )
-        accepted_environment = ["production", "staging", "development"]
-        if environment not in ["production", "staging", "development"]:
+        if environment != ACCEPTED_ENVIRONMENT:
             raise ValueError(
-                        f"'env' variable should be in {accepted_environment}"
+                        f"'env' variable should be {ACCEPTED_ENVIRONMENT}"
                     )
         elif not task_parameters:
             raise ValueError("'task_parameters' parameter is not valid")
