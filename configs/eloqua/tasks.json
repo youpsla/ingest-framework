@@ -1,0 +1,43 @@
+[
+    {
+        "daily_accounts_update": {
+            "actions": [
+                "insert",
+                "update"
+            ],
+            "exclude_existing_in_db": true,
+            "source": "eloqua",
+            "destination": "redshift",
+            "request_data_source": "redshift",
+            "data_source": {
+                "name": "clients",
+                "raw_sql": "select distinct(name) from {schema}.clients"
+            },
+            "destination_unique_keys": [
+                "id", "client"
+            ],
+            "model": "accounts",
+            "update_keys": [
+                "id", "client"
+            ],
+            "query": {
+                "response_datas_key": "elements",
+                "template": "{base}",
+                "params": [
+                    {
+                        "name": "base",
+                        "type": "constant",
+                        "output_type": "arg",
+                        "value": "https://secure.p02.eloqua.com/API/REST/2.0/data/accounts"
+                    },
+                    {
+                        "name": "client_name",
+                        "type": "db",
+                        "data_source_name": "clients",
+                        "source_key": "name"
+                    }
+                ]
+            }
+        }
+    },
+]

@@ -7,6 +7,14 @@ It is used for:
 
 Tasks to be runned are defined in a tasks.json file and data model in a models.json file.
 
+
+
+
+## New provider Steps
+1) Create a folder in "configs". The name of the folder is the name of the PROVIDER env var.
+2) Create 3 files in "configs/<provider>": tasks.json, channels.json, models.json
+3) Update src.commons.client_helper.py to add new provider client Class in get_client function.
+
 ## List of configuration files
 - channel.json: Define the list of tasks to be runned
 - tasks.json: Define params of each task
