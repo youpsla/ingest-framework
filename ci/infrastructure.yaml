@@ -20,30 +20,30 @@ Parameters:
   ClusterName:
     Type: String
     Description: The name of the ECS cluster to deploy
-  CronJabmoHubspotDailyContacts:
-    Type: String
-    Description: This is the cron expression of Hubspot contact daily ingest
-    Default: "cron(30 8 * * ? *)"
   CronJabmoHubspoHourlyContacts:
     Type: String
     Description: This is the cron expression of Hubspot contact hourly ingest
     Default: "cron(00 * * * ? *)"
-  CronJabmoLinkedinDaily:
-    Type: String
-    Description: This is the cron expression of Linkedin daily ingest
-    Default: "cron(00 07 * * ? *)"
   CronJabmoLinkedinMonthly:
     Type: String
     Description: This is the cron expression of Linkedin monthly ingest
-    Default: "cron(00 04 1 * ? *)"
+    Default: "cron(30 04 1 * ? *)"
+  CronJabmoLinkedinDaily:
+    Type: String
+    Description: This is the cron expression of Linkedin daily ingest
+    Default: "cron(30 05 * * ? *)"
+  CronJabmoHubspotDailyContacts:
+    Type: String
+    Description: This is the cron expression of Hubspot contact daily ingest
+    Default: "cron(30 06 * * ? *)"
   CronJabmoLinkedinQuarterly:
     Type: String
     Description: This is the cron expression of Linkedin quarterly ingest
-    Default: "cron(00 11 2 */3 ? *)"
+    Default: "cron(30 07 2 */3 ? *)"
   CronJabmoBingDaily:
     Type: String
     Description: This is the cron expression of Bing daily ingest
-    Default: "cron(00 09 * * ? *)"
+    Default: "cron(30 08 * * ? *)"
 Conditions:
   IsProd: !Equals [!Ref Environment, "production"]
 Resources:
