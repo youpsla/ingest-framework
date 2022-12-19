@@ -14,15 +14,22 @@
                 "raw_sql": "select distinct(name) from {schema}.clients"
             },
             "destination_unique_keys": [
-                "id", "client"
+                "id", "client_name"
             ],
             "model": "accounts",
             "update_keys": [
-                "id", "client"
+                "id", "client_name"
+            ],
+            "fields_to_add_to_api_result": [
+                {
+                    "name": "client_name",
+                    "origin_key": "client_name",
+                    "destination_key": "client_name"
+                }
             ],
             "query": {
                 "response_datas_key": "elements",
-                "template": "{base}",
+                "template": "{base}?{count}&{page}",
                 "params": [
                     {
                         "name": "base",
@@ -33,11 +40,24 @@
                     {
                         "name": "client_name",
                         "type": "db",
+                        "output_type": "arg",
                         "data_source_name": "clients",
                         "source_key": "name"
+                    },
+                    {
+                        "name": "count",
+                        "type": "constant",
+                        "output_type": "kwarg",
+                        "value": 100
+                    },
+                    {
+                        "name": "page",
+                        "type": "constant",
+                        "output_type": "kwarg",
+                        "value": 1
                     }
                 ]
             }
         }
-    },
+    }
 ]
