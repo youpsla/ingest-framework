@@ -288,7 +288,7 @@ class On24Client(Client):
                 pass
 
             else:
-                print(f"Endpoint: {endpoint}")
+                print(f"Endpoint: {endpoint.get_endpoint_as_string()}")
                 print(f"{response.reason} - {response.text}")
                 raise Exception("Error while processing request")
 

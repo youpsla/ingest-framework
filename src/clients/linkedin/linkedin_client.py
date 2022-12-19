@@ -304,9 +304,8 @@ class LinkedInClient(Client):
                 print("Creative not found in Linkedin DB")
             else:
                 raise Exception(
-                    f"Error while processing request Endpoint: {endpoint} "
-                    f"{response.reason} - {response.text}"
-                )
+                    f"Error while processing request Endpoint: {endpoint.get_endpoint_as_string()} "
+                    f"{response.reason} - {response.text}")
 
         response = response.json()
         if "ServiceErrorCode" in response:

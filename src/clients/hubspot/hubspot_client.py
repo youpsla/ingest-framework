@@ -265,9 +265,8 @@ class HubspotClient(Client):
                 return None
             else:
                 raise Exception(
-                    f"Error while processing request: endpoint: {endpoint} "
-                    f"response: {response.reason} - {response.text}"
-                )
+                    f"Error while processing request: endpoint: {endpoint.get_endpoint_as_string()} "
+                    f"response: {response.reason} - {response.text}")
 
         response = response.json()
         if "ServiceErrorCode" in response:
