@@ -279,6 +279,14 @@ class Field:
         return result
 
     @staticmethod
+    def epoch_to_datetime(value):
+        result = datetime.fromtimestamp(
+            value if isinstance(value, int) else int(value)
+        )
+
+        return result
+
+    @staticmethod
     def t_milliseconds_to_datetime(value):
         """Transform an int representing a date in milliseconds to a datetime object.
 
@@ -382,6 +390,9 @@ class Field:
                     result = None
                 else:
                     result = self.value
+
+            if self.transform_function["type"] == "epoch_to_datetime":
+                result = self.epoch_to_datetime(self.value)
 
         # Sometimes the value to insert in a INT field in Redshift is an empty string. This lead to an error.
         # We set result to None if result == "". THis produce a null value in redshift.

@@ -1,4 +1,5 @@
 from src.clients.bing.bing_client import BingAdsClient
+from src.clients.eloqua.eloqua_client import EloquaClient
 from src.clients.hubspot.hubspot_client import HubspotClient
 from src.clients.linkedin.linkedin_client import LinkedInClient
 from src.clients.on24.on24_client import On24Client
