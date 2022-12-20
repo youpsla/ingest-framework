@@ -1,3 +1,4 @@
+import base64
 import json
 import time
 from threading import current_thread, get_ident, get_native_id
@@ -21,12 +22,20 @@ class EloquaEndpoint(Endpoint):
         url_template=None,
         query_params=None,
         credentials=None,
+        client_name=None
     ):
         super().__init__(
             params=params, url_template=url_template, query_params=query_params
         )
         self.credentials = credentials
+        self.client_name = client_name
         self._headers = None
+
+    def build_base64_basic_auth(self):
+        auth_string = f"{self.client_name}\{self.credentials}"
+        bytes_auth_string = auth_string.encode('utf-8')
+        base64_auth_string = base64.b64encode(bytes_auth_string)
+        return base64_auth_string.decode('utf-8')
 
     def build_headers(self):
         """# noqa: E501
@@ -45,7 +54,7 @@ class EloquaEndpoint(Endpoint):
         headers["cache-control"] = "no-cache"
         headers[
             "Authorization"
-        ] = f"Basic {self.credentials['encoded_credentials']}"
+        ] = f"Basic {self.build_base64_basic_auth()}"
 
         return headers
 
@@ -84,8 +93,7 @@ class EloquaClient(Client):
     @staticmethod
     def get_client_credentials_from_aws_secrets():
         secret_value = Secret(ELOQUA_CREDFENTIALS_SECRET_NAME).get_value()
-        print(secret_value)
-        return secret_value
+        return secret_value["credentials"]
 
     def get(self, task_params, **_ignored):
 
@@ -102,6 +110,7 @@ class EloquaClient(Client):
                         url_template=task_params["query"]["template"],
                         query_params=task_params["query"],
                         credentials=credentials,
+                        client_name=v["client_name"]
                     )
                 }
             }
