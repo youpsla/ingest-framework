@@ -59,5 +59,75 @@
                 ]
             }
         }
+<<<<<<< HEAD
+=======
+    },
+    {
+        "daily_contacts_update": {
+            "actions": [
+                "insert",
+                "update"
+            ],
+            "exclude_existing_in_db": true,
+            "source": "eloqua",
+            "destination": "redshift",
+            "request_data_source": "redshift",
+            "data_source": {
+                "name": "clients",
+                "raw_sql": "select distinct(name) from {schema}.clients"
+            },
+            "destination_unique_keys": [
+                "id", "client_name"
+            ],
+            "model": "contacts",
+            "update_keys": [
+                "id", "client_name"
+            ],
+            "fields_to_add_to_api_result": [
+                {
+                    "name": "client_name",
+                    "origin_key": "client_name",
+                    "destination_key": "client_name"
+                }
+            ],
+            "query": {
+                "response_datas_key": "elements",
+                "template": "{base}?{count}&{page}&{depth}",
+                "params": [
+                    {
+                        "name": "base",
+                        "type": "constant",
+                        "output_type": "arg",
+                        "value": "https://secure.p02.eloqua.com/API/REST/2.0/data/contacts"
+                    },
+                    {
+                        "name": "client_name",
+                        "type": "db",
+                        "output_type": "arg",
+                        "data_source_name": "clients",
+                        "source_key": "name"
+                    },
+                    {
+                        "name": "count",
+                        "type": "constant",
+                        "output_type": "kwarg",
+                        "value": 100
+                    },
+                    {
+                        "name": "page",
+                        "type": "constant",
+                        "output_type": "kwarg",
+                        "value": 1
+                    },
+                    {
+                        "name": "depth",
+                        "type": "constant",
+                        "output_type": "kwarg",
+                        "value": "partial"
+                    }
+                ]
+            }
+        }
+>>>>>>> feat/V3-1134
     }
 ]

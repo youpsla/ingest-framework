@@ -1,6 +1,15 @@
 {
     "name": "eloqua",
     "daily_tasks_list" : [
+<<<<<<< HEAD
         "daily_accounts_update"
+=======
+        "daily_accounts_update",
+        "daily_contacts_update"
+    ],
+    "daily_tasks_list_bck" : [
+        "daily_accounts_update",
+        "daily_contacts_update"
+>>>>>>> feat/V3-1134
     ]
 }

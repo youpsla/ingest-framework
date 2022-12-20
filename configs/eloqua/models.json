@@ -56,5 +56,84 @@
                 }
             }
         }
+<<<<<<< HEAD
+=======
+    },
+    {
+        "contacts": {
+            "client_name": {
+                "type": "raw",
+                "source_path": [
+                    "client_name"
+                ]
+            },
+            "id": {
+                "type": "raw",
+                "source_path": [
+                    "id"
+                ]
+            },
+            "name": {
+                "type": "raw",
+                "source_path": [
+                    "name"
+                ]
+            },
+            "email": {
+                "type": "raw",
+                "source_path": [
+                    "emailAddress"
+                ]
+            },
+            "first_name": {
+                "type": "raw",
+                "source_path": [
+                    "firstName"
+                ]
+            },
+            "last_name": {
+                "type": "raw",
+                "source_path": [
+                    "lastName"
+                ]
+            },
+            "title": {
+                "type": "raw",
+                "source_path": [
+                    "lastName"
+                ]
+            },
+            "account_name": {
+                "type": "raw",
+                "source_path": [
+                    "accountName"
+                ]
+            },
+            "account_id": {
+                "type": "raw",
+                "source_path": [
+                    "accountId"
+                ]
+            },
+            "created_at": {
+                "type": "function",
+                "source_path": [
+                    "createdAt"
+                ],
+                "transform_function": {
+                    "type": "epoch_to_datetime"
+                }
+            },
+            "updated_at": {
+                "type": "function",
+                "source_path": [
+                    "updatedAt"
+                ],
+                "transform_function": {
+                    "type": "epoch_to_datetime"
+                }
+            }
+        }
+>>>>>>> feat/V3-1134
     }
 ]
