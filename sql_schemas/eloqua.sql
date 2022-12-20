@@ -47,6 +47,7 @@ create table eloqua_development.campaigns
     id VARCHAR(255)   ENCODE lzo,
     name     varchar(1024) ENCODE lzo,
     campaign_category varchar(255) ENCODE lzo,
+    email_id varchar(255) ENCODE lzo,
     created_at TIMESTAMP WITHOUT TIME ZONE   ENCODE az64,
     updated_at TIMESTAMP WITHOUT TIME ZONE   ENCODE az64
 );

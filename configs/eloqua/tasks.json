@@ -157,7 +157,7 @@
             ],
             "query": {
                 "response_datas_key": "elements",
-                "template": "{base}?{count}&{page}",
+                "template": "{base}?{count}&{page}&{depth}",
                 "params": [
                     {
                         "name": "base",
@@ -183,6 +183,12 @@
                         "type": "constant",
                         "output_type": "kwarg",
                         "value": 1
+                    },
+                    {
+                        "name": "depth",
+                        "type": "constant",
+                        "output_type": "kwarg",
+                        "value": "complete"
                     }
                 ]
             }

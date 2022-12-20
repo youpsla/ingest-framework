@@ -159,6 +159,14 @@
                     "campaignCategory"
                 ]
             },
+            "email_id": {
+                "type": "raw",
+                "source_path": [
+                    "elements",
+                    1,
+                    "emailId"
+                ]
+            },
             "created_at": {
                 "type": "function",
                 "source_path": [
