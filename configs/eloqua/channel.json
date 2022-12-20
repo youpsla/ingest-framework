@@ -1,11 +1,12 @@
 {
     "name": "eloqua",
     "daily_tasks_list" : [
-        "daily_campaigns_update"
+        "daily_emails_update"
     ],
     "daily_tasks_list_bck" : [
         "daily_accounts_update",
         "daily_contacts_update",
-        "daily_campaigns_update"
+        "daily_campaigns_update",
+        "daily_emails_update"
     ]
 }
