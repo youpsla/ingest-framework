@@ -1,0 +1,117 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: Ingest Framework infrastructure
+Parameters:
+  Environment:
+    Type: String
+  Tag:
+    Type: String
+  SentryDsn:
+    Type: String
+  IngestFrameworkLauncherArn:
+    Type: String
+    Description: Lambda ingest framework launcher arn.
+  IngestFrameworkRedshiftDeduplicatorArn:
+    Type: String
+    Description: Lambda ingest framework redshift deduplicator arn.
+  CronJabmoHubspoHourlyContacts:
+    Type: String
+    Description: This is the cron expression of Hubspot contact hourly ingest
+    Default: "cron(00 * * * ? *)"
+  CronJabmoLinkedinMonthly:
+    Type: String
+    Description: This is the cron expression of Linkedin monthly ingest
+    Default: "cron(30 04 1 * ? *)"
+  CronJabmoLinkedinDaily:
+    Type: String
+    Description: This is the cron expression of Linkedin daily ingest
+    Default: "cron(30 05 * * ? *)"
+  CronJabmoHubspotDailyContacts:
+    Type: String
+    Description: This is the cron expression of Hubspot contact daily ingest
+    Default: "cron(30 06 * * ? *)"
+  CronJabmoLinkedinQuarterly:
+    Type: String
+    Description: This is the cron expression of Linkedin quarterly ingest
+    Default: "cron(30 07 2 */3 ? *)"
+  CronJabmoBingDaily:
+    Type: String
+    Description: This is the cron expression of Bing daily ingest.
+    Default: "cron(30 08 * * ? *)"
+Conditions:
+  IsProd: !Equals [!Ref Environment, "production"]
+Resources:
+#########
+# Rules
+#########
+  IngestFrameworkHubspotContactDailyCron:
+    Type: AWS::Events::Rule
+    Properties:
+      Name: !Sub "cron-ingest-framework-hubspot-contact-daily-${Environment}"
+      Description: "ScheduledRule for Ingest Framework for hubspot contact daily"
+      ScheduleExpression: !Ref CronJabmoHubspotDailyContacts
+      State: !If [IsProd, ENABLED, DISABLED]
+      Targets:
+        - Arn: !Ref IngestFrameworkLauncherArn
+          Id: "IngestFrameworkLauncher"
+          Input: !Sub '{"task_parameters":{"cluster":"ingest-framework-cluster","launchType":"FARGATE","taskDefinition":"ingest-framework-task-definition-${Environment}","count":1,"platformVersion":"LATEST","networkConfiguration":{"awsvpcConfiguration":{"subnets":["subnet-6501a53f","subnet-572e5b1f","subnet-bea63cd8"],"assignPublicIp":"ENABLED"}},"overrides":{"containerOverrides":[{"name":"ingest-framework-container-${Environment}","environment":[{"name":"PROVIDER","value":"hubspot"},{"name":"SENTRY_DSN","value":"${SentryDsn}"},{"name":"RUNNING_ENV","value":"${Environment}"},{"name":"TASK_GROUP","value":"daily_tasks_list"},{"name":"AWS_DEFAULT_REGION","value":"${AWS::Region}"},{"name": "APP_VERSION", "value": "${Tag}"},{"name":"LAMBDA_DEDUPLICATOR_FUNCTION_ARN","value":"${IngestFrameworkRedshiftDeduplicatorArn}"}]}]}},"env":"${Environment}"}'
+
+  IngestFrameworkHubspotContacHourlyCron:
+    Type: AWS::Events::Rule
+    Properties:
+      Name: !Sub "cron-ingest-framework-hubspot-contact-hourly-${Environment}"
+      Description: "ScheduledRule for Ingest Framework for hubspot contact hourly"
+      ScheduleExpression: !Ref CronJabmoHubspoHourlyContacts
+      State: !If [IsProd, ENABLED, DISABLED]
+      Targets:
+        - Arn: !Ref IngestFrameworkLauncherArn
+          Id: "IngestFrameworkLauncher"
+          Input: !Sub '{"task_parameters":{"cluster":"ingest-framework-cluster","launchType":"FARGATE","taskDefinition":"ingest-framework-task-definition-${Environment}","count":1,"platformVersion":"LATEST","networkConfiguration":{"awsvpcConfiguration":{"subnets":["subnet-6501a53f","subnet-572e5b1f","subnet-bea63cd8"],"assignPublicIp":"ENABLED"}},"overrides":{"containerOverrides":[{"name":"ingest-framework-container-${Environment}","environment":[{"name":"PROVIDER","value":"hubspot"},{"name":"SENTRY_DSN","value":"${SentryDsn}"},{"name":"RUNNING_ENV","value":"${Environment}"},{"name":"TASK_GROUP","value":"hourly_tasks_list"},{"name":"AWS_DEFAULT_REGION","value":"${AWS::Region}"},{"name": "APP_VERSION", "value": "${Tag}"},{"name":"LAMBDA_DEDUPLICATOR_FUNCTION_ARN","value":"${IngestFrameworkRedshiftDeduplicatorArn}"}]}]}},"env":"${Environment}"}'
+
+  IngestFrameworkLinkedinDailyCron:
+    Type: AWS::Events::Rule
+    Properties:
+      Name: !Sub "cron-ingest-framework-linkedin-daily-${Environment}"
+      Description: "ScheduledRule for Ingest Framework for LinkedIn daily"
+      ScheduleExpression: !Ref CronJabmoLinkedinDaily
+      State: !If [IsProd, ENABLED, DISABLED]
+      Targets:
+        - Arn: !Ref IngestFrameworkLauncherArn
+          Id: "IngestFrameworkLauncher"
+          Input: !Sub '{"task_parameters":{"cluster":"ingest-framework-cluster","launchType":"FARGATE","taskDefinition":"ingest-framework-task-definition-${Environment}","count":1,"platformVersion":"LATEST","networkConfiguration":{"awsvpcConfiguration":{"subnets":["subnet-6501a53f","subnet-572e5b1f","subnet-bea63cd8"],"assignPublicIp":"ENABLED"}},"overrides":{"containerOverrides":[{"name":"ingest-framework-container-${Environment}","environment":[{"name":"PROVIDER","value":"linkedin"},{"name":"SENTRY_DSN","value":"${SentryDsn}"},{"name":"RUNNING_ENV","value":"${Environment}"},{"name":"TASK_GROUP","value":"daily_tasks_list"},{"name":"AWS_DEFAULT_REGION","value":"${AWS::Region}"},{"name": "APP_VERSION", "value": "${Tag}"},{"name":"LAMBDA_DEDUPLICATOR_FUNCTION_ARN","value":"${IngestFrameworkRedshiftDeduplicatorArn}"}]}]}},"env":"${Environment}"}'
+
+  IngestFrameworkLinkedinMonthlyCron:
+    Type: AWS::Events::Rule
+    Properties:
+      Name: !Sub "cron-ingest-framework-linkedin-monthly-${Environment}"
+      Description: "ScheduledRule for Ingest Framework for LinkedIn monthly"
+      ScheduleExpression: !Ref CronJabmoLinkedinMonthly
+      State: !If [IsProd, ENABLED, DISABLED]
+      Targets:
+        - Arn: !Ref IngestFrameworkLauncherArn
+          Id: "IngestFrameworkLauncher"
+          Input: !Sub '{"task_parameters":{"cluster":"ingest-framework-cluster","launchType":"FARGATE","taskDefinition":"ingest-framework-task-definition-${Environment}","count":1,"platformVersion":"LATEST","networkConfiguration":{"awsvpcConfiguration":{"subnets":["subnet-6501a53f","subnet-572e5b1f","subnet-bea63cd8"],"assignPublicIp":"ENABLED"}},"overrides":{"containerOverrides":[{"name":"ingest-framework-container-${Environment}","environment":[{"name":"PROVIDER","value":"linkedin"},{"name":"SENTRY_DSN","value":"${SentryDsn}"},{"name":"RUNNING_ENV","value":"${Environment}"},{"name":"TASK_GROUP","value":"monthly_tasks_list"},{"name":"AWS_DEFAULT_REGION","value":"${AWS::Region}"},{"name": "APP_VERSION", "value": "${Tag}"},{"name":"LAMBDA_DEDUPLICATOR_FUNCTION_ARN","value":"${IngestFrameworkRedshiftDeduplicatorArn}"}]}]}},"env":"${Environment}"}'
+
+  IngestFrameworkLinkedinQuarterlyCron:
+    Type: AWS::Events::Rule
+    Properties:
+      Name: !Sub "cron-ingest-framework-linkedin-quarterly-${Environment}"
+      Description: "ScheduledRule for Ingest Framework for LinkedIn quarterly"
+      ScheduleExpression: !Ref CronJabmoLinkedinQuarterly
+      State: !If [IsProd, ENABLED, DISABLED]
+      Targets:
+        - Arn: !Ref IngestFrameworkLauncherArn
+          Id: "IngestFrameworkLauncher"
+          Input: !Sub '{"task_parameters":{"cluster":"ingest-framework-cluster","launchType":"FARGATE","taskDefinition":"ingest-framework-task-definition-${Environment}","count":1,"platformVersion":"LATEST","networkConfiguration":{"awsvpcConfiguration":{"subnets":["subnet-6501a53f","subnet-572e5b1f","subnet-bea63cd8"],"assignPublicIp":"ENABLED"}},"overrides":{"containerOverrides":[{"name":"ingest-framework-container-${Environment}","environment":[{"name":"PROVIDER","value":"linkedin"},{"name":"SENTRY_DSN","value":"${SentryDsn}"},{"name":"RUNNING_ENV","value":"${Environment}"},{"name":"TASK_GROUP","value":"quarterly_tasks"},{"name":"AWS_DEFAULT_REGION","value":"${AWS::Region}"},{"name": "APP_VERSION", "value": "${Tag}"},{"name":"LAMBDA_DEDUPLICATOR_FUNCTION_ARN","value":"${IngestFrameworkRedshiftDeduplicatorArn}"}]}]}},"env":"${Environment}"}'
+
+  IngestFrameworkBingDailyCron:
+    Type: AWS::Events::Rule
+    Properties:
+      Name: !Sub "cron-ingest-framework-bing-daily-${Environment}"
+      Description: "ScheduledRule for Ingest Framework for Bing daily"
+      ScheduleExpression: !Ref CronJabmoBingDaily
+      State: !If [IsProd, ENABLED, DISABLED]
+      Targets:
+        - Arn: !Ref IngestFrameworkLauncherArn
+          Id: "IngestFrameworkLauncher"
+          Input: !Sub '{"task_parameters":{"cluster":"ingest-framework-cluster","launchType":"FARGATE","taskDefinition":"ingest-framework-task-definition-${Environment}","count":1,"platformVersion":"LATEST","networkConfiguration":{"awsvpcConfiguration":{"subnets":["subnet-6501a53f","subnet-572e5b1f","subnet-bea63cd8"],"assignPublicIp":"ENABLED"}},"overrides":{"containerOverrides":[{"name":"ingest-framework-container-${Environment}","environment":[{"name":"PROVIDER","value":"bing"},{"name":"SENTRY_DSN","value":"${SentryDsn}"},{"name":"RUNNING_ENV","value":"${Environment}"},{"name":"TASK_GROUP","value":"daily_tasks_list"},{"name":"AWS_DEFAULT_REGION","value":"${AWS::Region}"},{"name": "APP_VERSION", "value": "${Tag}"},{"name":"LAMBDA_DEDUPLICATOR_FUNCTION_ARN","value":"${IngestFrameworkRedshiftDeduplicatorArn}"}]}]}},"env":"${Environment}"}'
