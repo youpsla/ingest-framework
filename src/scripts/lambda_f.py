@@ -6,7 +6,7 @@ import boto3
 import sentry_sdk
 from sentry_sdk.integrations.excepthook import ExcepthookIntegration
 
-from configs.globals import PROVIDER, SENTRY_DSN, TASK_GROUP
+from configs.globals import APP_VERSION, PROVIDER, SENTRY_DSN, TASK_GROUP
 from src.clients.redshift.redshift_client import RedshiftClient
 from src.commons.task import Task
 from src.utils.custom_logger import logger
@@ -22,6 +22,7 @@ def activate_sentry():
     )
     sentry_sdk.set_tag("provider", PROVIDER)
     sentry_sdk.set_tag("task_group", TASK_GROUP)
+    sentry_sdk.set_tag("app_version", APP_VERSION)
     logger.info("Sentry activated")
 
 
@@ -65,7 +66,9 @@ def lambda_handler(event, context):
 
     task_group_list = channel_params[TASK_GROUP]
 
+    logger.info(f"Tasks group: {TASK_GROUP}")
     logger.info(f"Tasks names: {task_group_list}")
+    logger.info(f"App version: {APP_VERSION}")
 
     db_connection = RedshiftClient().db_connection
     with db_connection.cursor() as cursor:
