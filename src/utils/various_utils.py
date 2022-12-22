@@ -51,6 +51,8 @@ def recursive_asdict(d):
 
 def get_running_env():
     running_env = os.environ.get("RUNNING_ENV")
+    if running_env.startswith("if-dev-"):
+        running_env = "development"
     if not running_env:
         raise ValueError("RUNNING_ENV cannot be None.")
     return running_env
