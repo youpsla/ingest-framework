@@ -5,8 +5,6 @@ Parameters:
   Environment:
     Type: String
     Default: development
-  S3Bucket:
-    Type: String
   Tag:
     Type: String
     Default: latest
@@ -28,14 +26,12 @@ Resources:
 # Stack
 #########
   CronStack:
-    Type: AWS::CloudFormation::Stack
+    Type: AWS::Serverless::Application
     DeletionPolicy: Delete
     UpdateReplacePolicy: Delete
     Properties:
-      TemplateURL:
-        Fn::Sub: "https://${S3Bucket}.s3.amazonaws.com/${Tag}/cron.yaml"
+      Location: cron.yaml
       Parameters:
-        StackVersion: !Ref StackVersion
         Environment: !Ref Environment
         Tag: !Ref Tag
         SentryDsn: !Ref SentryDsn
