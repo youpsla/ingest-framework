@@ -112,6 +112,7 @@ sam deploy -t ci/infrastructure.yaml \
         ClusterName=$CLUSTER_NAME \
         Tag=$TAG \
         TS=$TS \
+        SentryDsn=$SENTRY_DSN \
     --confirm-changeset \
     --use-json \
     --no-fail-on-empty-changeset \
