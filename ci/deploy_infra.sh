@@ -105,7 +105,7 @@ sam deploy -t ci/cluster-repository-infrastructure.yaml \
 
 echo "==> Deploying/updating the $1 infrastructure <=="
 sam deploy -t ci/infrastructure.yaml \
-    --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM \
+    --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM CAPABILITY_AUTO_EXPAND \
     --parameter-overrides \
         Environment=$1 \
         StackVersion=$STACK_VERSION \
